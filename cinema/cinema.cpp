@@ -17,6 +17,8 @@ int main() {
     
     Wout();
 
-    cout << "\nЙоу" << endl;
-    cout << "\nПобеда" << endl;
+    for (int i = 0; i < 10; i++) {
+        cout << i+1 << ": Йоу" << endl;
+        cout << "\nПобеда" << endl;
+    }
 }
