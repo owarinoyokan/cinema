@@ -25,7 +25,7 @@ void fileOut(string filename, const wstring& txt) {
     fout.write(utf16_text.c_str(), utf16_text.size());
         
     fout.close();
-    wcout << L"Текст успешно записан с BOM." << endl;
+    wcout << L"Ваш текст успешно записан." << endl;
 }
 
 
