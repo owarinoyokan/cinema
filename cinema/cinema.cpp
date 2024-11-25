@@ -11,7 +11,13 @@ using namespace std;    // Пространство имен
 
 
 // Запись текста в файл с поддержкой широких символов (UTF-16)
-void fileOut(string filename, const wstring& txt) {
+void fileOut(string filename) {
+
+    // Запрос текста у пользователя
+    wstring input;
+    wcout << L"Введите текст: ";
+    getline(wcin, input); // Читаем строку (включая пробелы)
+
     // Открываем файл в бинарном режиме
     ofstream fout(filename, ios::binary);
     if (!fout.is_open()) {
@@ -21,7 +27,7 @@ void fileOut(string filename, const wstring& txt) {
 
     // Преобразуем wstring в UTF-16LE и записываем
     wstring_convert<codecvt_utf8_utf16<wchar_t, 0x10FFFF, little_endian>> converter;
-    string utf16_text = converter.to_bytes(txt);
+    string utf16_text = converter.to_bytes(input);
     fout.write(utf16_text.c_str(), utf16_text.size());
         
     fout.close();
@@ -54,19 +60,17 @@ int main() {
     _setmode(_fileno(stdin), _O_U16TEXT);
 
     wcout << L"Проект кинотеатра.🎬" << endl;
-
-
-    // Запрос текста у пользователя
-    wstring input;
-    wcout << L"Введите текст: ";
-    getline(wcin, input); // Читаем строку (включая пробелы)
-
+    
     // Запись в файл
-    fileOut("example.txt", input);
+    fileOut("example.txt");
 
     // Чтение файла
     wstring content = fileIn("example.txt");
     if (!content.empty())
         wcout << L"Содержимое файла: " << content << endl;
+
+    wstring content1 = fileIn("check.txt");
+    if (!content.empty())
+        wcout << L"\n" << content1 << endl;
     return 0;
 }
