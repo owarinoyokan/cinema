@@ -1,4 +1,4 @@
-﻿#include <iostream>     // Для работы потока ввда и вывода
+﻿#include <iostream>     // Для работы потока ввода и вывода
 #include <io.h>         // Для работы с _setmode
 #include <locale>       // Для работы с кодировками
 #include <fcntl.h>      // Для режима _O_U8TEXT
@@ -10,25 +10,22 @@
 using namespace std;    // Пространство имен
 
 
-// Запись текста в файл с поддержкой широких символов (UTF-8)
+// Запись текста в файл с поддержкой широких символов (UTF-16)
 void fileOut(string filename, const wstring& txt) {
+    // Открываем файл в бинарном режиме
     ofstream fout(filename, ios::binary);
-    if (fout.is_open()) {
-        // Записываем BOM для UTF-8
-        unsigned char bom[] = { 0xEF, 0xBB, 0xBF };
-        fout.write(reinterpret_cast<const char*>(bom), sizeof(bom));
-
-        // Преобразуем wstring в UTF-8 и записываем
-        wstring_convert<codecvt_utf8<wchar_t>> converter;
-        string utf8_text = converter.to_bytes(txt);
-        fout.write(utf8_text.c_str(), utf8_text.size());
-
-        fout.close();
-        wcout << L"Ваш текст был успешно записан.❤" << endl;
+    if (!fout.is_open()) {
+        wcerr << L"Ошибка открытия файла для записи." << endl;
+        return;
     }
-    else {
-        wcerr << L"Не удалось открыть файл для записи.😔" << endl;
-    }
+
+    // Преобразуем wstring в UTF-16LE и записываем
+    wstring_convert<codecvt_utf8_utf16<wchar_t, 0x10FFFF, little_endian>> converter;
+    string utf16_text = converter.to_bytes(txt);
+    fout.write(utf16_text.c_str(), utf16_text.size());
+        
+    fout.close();
+    wcout << L"Текст успешно записан с BOM." << endl;
 }
 
 
@@ -40,20 +37,12 @@ wstring fileIn(const string& fname) {
         return L"";
     }
 
-    // Проверяем наличие BOM
-    char bom[3];
-    fin.read(bom, 3);
-    if (bom[0] != (char)0xEF || bom[1] != (char)0xBB || bom[2] != (char)0xBF) {
-        // Если BOM нет, перемещаемся в начало файла
-        fin.seekg(0);
-    }
-
     // Читаем остальное содержимое файла
-    string utf8_content((istreambuf_iterator<char>(fin)), istreambuf_iterator<char>());
+    string utf16_content((istreambuf_iterator<char>(fin)), istreambuf_iterator<char>());
     fin.close();
 
-    wstring_convert<codecvt_utf8<wchar_t>> converter;
-    return converter.from_bytes(utf8_content);
+    wstring_convert<codecvt_utf8_utf16<wchar_t, 0x10FFFF, little_endian>> converter;
+    return converter.from_bytes(utf16_content);
 }
 
 
@@ -61,10 +50,10 @@ int main() {
     setlocale(LC_ALL, "ru_RU.UTF-8");
 
     // Установим режим wide-string для вывода на консоль (поддержка Unicode)
-    _setmode(_fileno(stdout), _O_U8TEXT);
+    _setmode(_fileno(stdout), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);
 
-    wcout << L"Проект кинотеатра." << endl;
+    wcout << L"Проект кинотеатра.🎬" << endl;
 
 
     // Запрос текста у пользователя
