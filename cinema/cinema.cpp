@@ -10,6 +10,117 @@
 using namespace std;    // Пространство имен
 
 
+void extranceToCinema();
+void availablePromo();
+void movieSelection();
+void detailedInform();
+void choosingPlace();
+
+
+void extranceToCinema() {
+    short int input;
+    wcout << L"Что вы желаете сделать?" << endl;
+    wcout << L"Нажмите '1', чтобы выбрать фильм" << endl;
+    wcout << L"Нажмите '2', чтобы посмотреть доступные акции" << endl;
+    wcout << L"Нажмите '0', чтобы выйти" << endl;
+    wcin >> input;
+    system("cls");
+    switch (input) {
+    case 1:
+        movieSelection();
+        break;
+    case 2:
+        availablePromo();
+        break;
+    case 3:
+        // место под ф-ю буфета
+        break;
+    case 0:
+        // что-то для выхода
+        break;
+    }
+}
+
+void availablePromo() {
+    short int input;
+    wcout << L"Список доступных акций ... " << endl;
+    wcout << L"Введите номер акции, чтобы посмотреть подробное описание" << endl;
+    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+    wcin >> input;
+    system("cls");
+    if (input == 0)
+        extranceToCinema();
+    else {
+        // место для функции выводящей подробную информацию про акции
+    }
+}
+
+void movieSelection() {
+    short int input;
+    wcout << L"Список фильмов с краткой информацией ... " << endl;
+    wcout << L"Нажмите '1', чтобы выбрать сеанс" << endl;
+    wcout << L"Нажмите '2', чтобы посмотреть детали" << endl;
+    wcout << L"Нажмите '3', чтобы использовать фильтр" << endl;
+    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+    wcin >> input;
+    system("cls");
+    switch (input) {
+    case 1:
+        choosingPlace();
+        break;
+    case 2:
+        detailedInform();
+        break;
+    case 3:
+        // место для функции фильтра
+        break;
+    case 0:
+        extranceToCinema();
+        break;
+    }
+}
+
+void detailedInform() {
+    short int input;
+    wcout << L"Детальная информация про фильм ... " << endl;
+    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+    wcin >> input;
+    system("cls");
+    movieSelection();
+}
+
+void choosingPlace() { // меню выбора места << после выбора мест использовать функцию оплаты
+    short int input;
+    wcout << L"Выберите место" << endl;
+    wcout << L"Нажмите '1', чтобы выбрать одно место" << endl;
+    wcout << L"Нажмите '2', чтобы выбрать сразу несколько мест" << endl;
+    wcout << L"Нажмите '3', для автоматического подбора места" << endl;
+    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+    wcin >> input;
+    system("cls");
+    switch (input) {
+    case 1:
+        // место для функции выбора места
+        break;
+    case 2:
+        // место для функции выбора нескольких мест ( можно объединить с 1 )
+        break;
+    case 3:
+        // место для функции авт подбора места 
+        break;
+    case 0:
+        movieSelection();
+        break;
+    }
+}
+
+
+
+
+
+
+
+
 // Запись текста в файл с поддержкой широких символов (UTF-16)
 void fileOut(string filename) {
 
@@ -29,7 +140,7 @@ void fileOut(string filename) {
     wstring_convert<codecvt_utf8_utf16<wchar_t, 0x10FFFF, little_endian>> converter;
     string utf16_text = converter.to_bytes(input);
     fout.write(utf16_text.c_str(), utf16_text.size());
-        
+
     fout.close();
     wcout << L"Ваш текст успешно записан." << endl;
 }
@@ -60,9 +171,10 @@ int main() {
     _setmode(_fileno(stdin), _O_U16TEXT);
 
     wcout << L"Проект кинотеатра.🎬" << endl;
-    
+
     // Запись в файл
     fileOut("example.txt");
+    wcout << L"SDGSHDGJ" << endl;
 
     // Чтение файла
     wstring content = fileIn("example.txt");
@@ -72,5 +184,10 @@ int main() {
     wstring content1 = fileIn("check.txt");
     if (!content.empty())
         wcout << L"\n" << content1 << endl;
+
+
+    extranceToCinema();
+
+
     return 0;
 }
