@@ -1,7 +1,7 @@
 ﻿#include <iostream>     // Для работы потока ввода и вывода
 #include <io.h>         // Для работы с _setmode
 #include <locale>       // Для работы с кодировками
-#include <fcntl.h>      // Для режима _O_U8TEXT
+#include <fcntl.h>      // Для режима _O_U16TEXT
 #include <fstream>      // Для работы с файлами
 #include <codecvt>      // Для преобразования UTF-8 в wide string
 #include <string>       // Для работы с строками
@@ -18,6 +18,7 @@ void detailedInform(); // Функция выводящая детали фил�
 void choosingPlace(); // меню выбора места
 wstring fileIn(const string& fname); // Функция для чтения файла с широкими символами
 void sessionSelection();
+
 
 void extranceToCinema() { // Функция входа в кино, предлагает самый первый выбор
     short int input;
@@ -138,12 +139,6 @@ void choosingPlace() { // меню выбора места << после выб�
     }
 }
 
-
-
-
-
-
-
 // Запись текста в файл с поддержкой широких символов (UTF-16)
 void fileOut(string filename) {
 
@@ -168,7 +163,6 @@ void fileOut(string filename) {
     wcout << L"Ваш текст успешно записан." << endl;
 }
 
-
 // Функция для чтения файла с широкими символами
 wstring fileIn(const string& fname) {
     ifstream fin(fname, ios::binary);
@@ -185,33 +179,22 @@ wstring fileIn(const string& fname) {
     return converter.from_bytes(utf16_content);
 }
 
-
 int main() {
-    //setlocale(LC_ALL, "ru_RU.UTF-8");
-
     // Установим режим wide-string для вывода на консоль (поддержка Unicode)
     _setmode(_fileno(stdout), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);
+
+    system("cls");      // Очистка консоли
 
     wcout << L"Проект кинотеатра.🎬" << endl;
 
     // Запись в файл
     fileOut("example.txt");
-    wcout << L"SDGSHDGJ" << endl;
 
     // Чтение файла
-    wstring content = fileIn("example.txt");
-    if (!content.empty())
-        wcout << L"Содержимое файла: " << content << endl;
+    wcout << L"Содержимое файла: " << fileIn("example.txt") << endl;
 
-    wstring content1 = fileIn("check.txt");
-    if (!content.empty())
-        wcout << L"\n" << content1 << endl;
-
-
-    system("cls");
     extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
-
 
     return 0;
 }
