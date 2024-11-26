@@ -187,7 +187,7 @@ wstring fileIn(const string& fname) {
 
 
 int main() {
-    setlocale(LC_ALL, "ru_RU.UTF-8");
+    //setlocale(LC_ALL, "ru_RU.UTF-8");
 
     // Установим режим wide-string для вывода на консоль (поддержка Unicode)
     _setmode(_fileno(stdout), _O_U16TEXT);
