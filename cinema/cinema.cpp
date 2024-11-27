@@ -189,7 +189,7 @@ int main() {
     wcout << L"Проект кинотеатра.🎬" << endl;
 
     // Запись в файл
-    fileOut("example.txt");
+    //fileOut("example.txt");
 
     // Чтение файла
     wcout << L"Содержимое файла: " << fileIn("example.txt") << endl;
