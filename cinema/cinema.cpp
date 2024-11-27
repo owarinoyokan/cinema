@@ -3,7 +3,7 @@
 #include <locale>       // Для работы с кодировками
 #include <fcntl.h>      // Для режима _O_U16TEXT
 #include <fstream>      // Для работы с файлами
-#include <codecvt>      // Для преобразования UTF-8 в wide string
+#include <codecvt>      // Для преобразования UTF-16 в wide string
 #include <string>       // Для работы с строками
 #include <sstream>      // Для работы с строковыми потоками
 #include <vector>       // Сами знаете
