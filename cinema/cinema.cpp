@@ -192,7 +192,7 @@ int main() {
     //fileOut("example.txt");
 
     // Чтение файла
-    wcout << L"Содержимое файла: " << fileIn("example.txt") << endl;
+    //wcout << L"Содержимое файла: " << fileIn("example.txt") << endl;
 
     extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
 
