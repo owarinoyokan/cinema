@@ -129,7 +129,6 @@
   <ItemGroup>
     <ClCompile Include="cinema.cpp" />
     <ClCompile Include="Kino pmi.cpp" />
-    <ClCompile Include="rendering.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header.h" />

@@ -7,6 +7,8 @@
 #include <string>       // Для работы с строками
 #include <sstream>      // Для работы с строковыми потоками
 #include <vector>       // Сами знаете
+#include <windows.h>
+#include "Header.h"
 
 using namespace std;    // Пространство имен
 
@@ -189,9 +191,34 @@ int main() {
     _setmode(_fileno(stdout), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);
 
+    fullScreen();
     system("cls");      // Очистка консоли
 
     wcout << L"Проект кинотеатра.🎬" << endl;
+
+    extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
+
+    srand(time(0));
+    const int rowCount = 8;
+    const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
+    
+    Hall hall;
+    GenerationRoom(hall, rowCount, placeCount);
+    initializeConsole();
+    DrawHall(hall, rowCount, placeCount);
+    
+    ///пример замены сущесвующего места без проверок индекса
+    /* int changeRow, changePalace;
+    cout << "Введите номер ряда: ";
+    cin >> changeRow;
+    cout << "\nВведите номер места: ";
+    cin >> changePalace;
+    changePlaces(hall, changeRow, changePalace);
+    DrawHall(hall, rowCount, placeCount);*/
+    
+    
+     waitForInput();
+     //closeWindow();
 
     // Запись в файл
     //fileOut("example.txt");
@@ -199,7 +226,7 @@ int main() {
     // Чтение файла
     //wcout << L"Содержимое файла: " << fileIn("example.txt") << endl;
 
-    extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
+    
 
     return 0;
 }

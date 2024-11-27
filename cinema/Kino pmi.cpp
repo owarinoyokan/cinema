@@ -1,7 +1,4 @@
 #include "Header.h"
-#include <chrono>
-#include <thread>
-#include <iostream>
 
 using namespace std;
 using namespace Config;
@@ -29,27 +26,6 @@ bool correctInput(int& number) {
     return true; // Успех
 }
 
-void initializeConsole() {
-    fullScreen();
-    this_thread::sleep_for(chrono::milliseconds(100));
-    srand(static_cast<unsigned>(time(nullptr)));
-    this_thread::sleep_for(chrono::milliseconds(100));
-}
-
-
-void DrawHall(Hall& hall, int rowCount, int placeCount) {
-    int y = 0;
-    for (size_t i = 0; i < hall.rows.size(); ++i) {
-        drawRow(y, hall.rows[i], i + 1);
-        y += BOX_HEIGHT + 2;
-    }
-    setCursorPosition(0, y);
-}
-
-void waitForInput() {
-    cout << "Нажмите Enter, чтобы выйти..." << endl;
-    cin.get();
-}
 
 //черновая версия void choosingPlace()
 void changePlaces(Hall& hall, int row, int place) {
@@ -64,28 +40,28 @@ void changePlaces(Hall& hall, int row, int place) {
     }
 }
 
-int main() {
-    setlocale(LC_ALL, "RU");
-    srand(time(0));
-    const int rowCount = 8;
-    const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
-
-    Hall hall;
-    GenerationRoom(hall, rowCount, placeCount);
-    initializeConsole();
-    DrawHall(hall, rowCount, placeCount);
-
-    ///пример замены сущесвующего места без проверок индекса
-    /* int changeRow, changePalace;
-    cout << "Введите номер ряда: ";
-    cin >> changeRow;
-    cout << "\nВведите номер места: ";
-    cin >> changePalace;
-    changePlaces(hall, changeRow, changePalace);
-    DrawHall(hall, rowCount, placeCount);*/
-
-
-    waitForInput();
-    //closeWindow();
-    return 0;
-}
+//int main() {
+//    setlocale(LC_ALL, "RU");
+//    srand(time(0));
+//    const int rowCount = 8;
+//    const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
+//
+//    Hall hall;
+//    GenerationRoom(hall, rowCount, placeCount);
+//    initializeConsole();
+//    DrawHall(hall, rowCount, placeCount);
+//
+//    ///пример замены сущесвующего места без проверок индекса
+//    /* int changeRow, changePalace;
+//    cout << "Введите номер ряда: ";
+//    cin >> changeRow;
+//    cout << "\nВведите номер места: ";
+//    cin >> changePalace;
+//    changePlaces(hall, changeRow, changePalace);
+//    DrawHall(hall, rowCount, placeCount);*/
+//
+//
+//    waitForInput();
+//    //closeWindow();
+//    return 0;
+//}
