@@ -28,7 +28,7 @@ void fileOut(string filename) {
     // Преобразуем wstring в UTF-16LE и записываем
     wstring_convert<codecvt_utf8_utf16<wchar_t, 0x10FFFF, little_endian>> converter;
     string utf16_text = converter.to_bytes(input);
-    fout.write(utf16_text.c_str(), utf16_text.size());
+    fout.write(utf16_text.c_str(), utf16_text.size()); // Писать
         
     fout.close();
     wcout << L"Ваш текст успешно записан." << endl;
