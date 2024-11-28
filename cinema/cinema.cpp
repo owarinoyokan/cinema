@@ -200,14 +200,15 @@ int main() {
 
     extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
 
-    //srand(time(0));
-    //const int rowCount = 8;
-    //const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
+    srand(time(0));
+    const int rowCount = 8;
+    const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
 
-    //Hall hall;
-    //GenerationRoom(hall, rowCount, placeCount);
-    //initializeConsole();
-    //DrawHall(hall, rowCount, placeCount);
+    Hall hall;
+    GenerationRoom(hall, rowCount, placeCount);
+    initializeConsole();
+    DrawHall(hall, rowCount, placeCount);
+    extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
 
     ///пример замены сущесвующего места без проверок индекса
     /* int changeRow, changePalace;
@@ -219,8 +220,8 @@ int main() {
     DrawHall(hall, rowCount, placeCount);*/
 
 
-    //waitForInput();
-    //closeWindow();
+    waitForInput();
+    closeWindow();
 
    // Запись в файл
    //fileOut("example.txt");
