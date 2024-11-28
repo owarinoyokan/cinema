@@ -192,8 +192,8 @@ int main() {
     _setmode(_fileno(stdout), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);
 
-    //fullScreen();
-    //ClearScreen();      // Очистка консоли
+    fullScreen();
+    ClearScreen();      // Очистка консоли
 
     wcout << L"Проект кинотеатра.🎬" << endl;
     wcout << L"Тестовый запуск" << endl;
@@ -208,6 +208,7 @@ int main() {
     GenerationRoom(hall, rowCount, placeCount);
     initializeConsole();
     DrawHall(hall, rowCount, placeCount);
+    
     
 
     ///пример замены сущесвующего места без проверок индекса
