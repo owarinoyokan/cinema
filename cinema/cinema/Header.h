@@ -4,10 +4,14 @@
 #include <windows.h>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <algorithm>
 #include <chrono>
+#include <fstream>
+#include <sstream>
 #include <thread>
+#include <locale>
 
 using namespace std;
 
@@ -30,8 +34,17 @@ struct Row {
 };
 
 // Структура зала
-struct Hall {
+struct Session {
     vector<Row> rows;
+    wstring film_name;
+    wstring time_film;
+};
+
+//структура Сеанса
+struct Day {
+    vector<Session> Session_one;
+    vector<Session> Session_two;
+    vector<Session> Session_three;
 };
 
 // Настройка консоли
@@ -40,11 +53,12 @@ struct Hall {
 void fullScreen() {
     COORD coord;
     SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
-    keybd_event(VK_MENU, 0x38, 0, 0); // нажимается Alt
-    keybd_event(VK_RETURN, 0x1c, 0, 0); // нажимается Enthe
-    keybd_event(VK_RETURN, 0x1c, KEYEVENTF_KEYUP, 0); //отпускается Alt
-    keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0); //отпускается Enther
+    keybd_event(VK_MENU, 0, 0, 0); // Нажатие Alt
+    keybd_event(VK_RETURN, 0, 0, 0); // Нажатие Enter
+    keybd_event(VK_RETURN, 0, KEYEVENTF_KEYUP, 0); // Отпуск Enter
+    keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0); // Отпуск Alt
 }
+
 
 // Установка позиции курсора
 void setCursorPosition(int x, int y) {
@@ -61,9 +75,13 @@ void SetColor(int text, int background) {
 // Проверка и преобразование строк
 // Проверка, является ли строка числом
 bool isNumber(const wstring& str) {
-    return !str.empty() && all_of(str.begin(), str.end(), ::isdigit);
+    for (wchar_t c : str) {
+        if (!iswdigit(c)) {
+            return false;
+        }
+    }
+    return true;
 }
-
 // Преобразование строки в число
 int stringToInt(const wstring& str) {
     return stoi(str);
@@ -126,22 +144,129 @@ void drawRow(int y, const Row& row, int rowNumber) {
     }
 }
 
+wstring utf8ToUtf16(const string& utf8Str) {
+    if (utf8Str.empty()) return L"";
+
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), (int)utf8Str.size(), NULL, 0);
+    wstring utf16Str(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), (int)utf8Str.size(), &utf16Str[0], size_needed);
+    return utf16Str;
+}
+
 // Генерация зала
-void GenerationRoom(Hall& hall, const int rowCount, const int placeCount) {
-    hall.rows.resize(rowCount);
+void GenerationRoom(Session& session, const int rowCount, const int placeCount, wstring name, wstring time_f) {
+    session.rows.resize(rowCount);
+    session.film_name = name;
+    session.time_film = time_f;
     for (int i = 0; i < rowCount; ++i) {
-        hall.rows[i].seats.resize(placeCount);
+        session.rows[i].seats.resize(placeCount);
         for (int j = 0; j < placeCount; ++j) {
             if (j == 0 || j == placeCount - 1) {
-                hall.rows[i].seats[j].status = L"0";
+                session.rows[i].seats[j].status = L"0";
             }
             else {
                 int rand_not_free = rand() % CHANSE_NOT_FREE_PLACES;
-                hall.rows[i].seats[j].status = (rand_not_free == 0) ? L"x" : to_wstring(j);
+                session.rows[i].seats[j].status = (rand_not_free == 0) ? L"x" : to_wstring(j);
             }
         }
     }
 }
+
+wstring replaceDash(wstring str) {
+    replace(str.begin(), str.end(), L'—', L'-');
+    return str;
+}
+
+// Удаление символа \r из строки
+void removeCarriageReturn(std::wstring& line) {
+    line.erase(std::remove(line.begin(), line.end(), L'\r'), line.end());
+}
+
+
+// Генерация дня с чтением из файла
+void GenerationDay(Day& day, const string& filename, int rowCount, int placeCount) {
+    // Читаем файл в строку
+    ifstream fin(filename, ios::binary);
+    if (!fin) {
+        wcerr << L"Ошибка: Не удалось открыть файл." << endl;
+        return;
+    }
+
+    // Читаем содержимое файла
+    ostringstream buffer;
+    buffer << fin.rdbuf();
+    string utf8Content = buffer.str();
+    fin.close();
+
+    // Конвертация из UTF-8 в UTF-16
+    wstring fileContent = utf8ToUtf16(utf8Content);
+
+    if (fileContent.empty()) {
+        wcerr << L"Ошибка: Файл пуст." << endl;
+        return;
+    }
+    // Обработка содержимого файла
+    wstringstream stream(fileContent);
+    wstring line;
+    vector<Session>* currentSessionGroup = nullptr;
+
+    while (getline(stream, line)) {
+        removeCarriageReturn(line); // Удаляем \r из строки
+
+        line = replaceDash(line);  // Замена длинных дефисов
+        if (line.empty()) {
+            continue; // Игнорируем пустые строки
+        }
+
+        if (line == L"Кинозал 1") {
+            currentSessionGroup = &day.Session_one;
+        }
+        else if (line == L"Кинозал 2") {
+            currentSessionGroup = &day.Session_two;
+        }
+        else if (line == L"Кинозал 3 ") {
+            currentSessionGroup = &day.Session_three;
+        }
+        else if (currentSessionGroup && !line.empty() && iswdigit(line[0])) {
+            int sessionCount = 0;
+            try {
+                sessionCount = stoi(line); // Преобразуем строку в число
+                currentSessionGroup->resize(sessionCount);
+            }
+            catch (const exception&) {
+                wcerr << L"Ошибка: Некорректное количество сеансов." << endl;
+                return;
+            }
+
+            for (int i = 0; i < sessionCount; ++i) {
+                wstring timeRange, filmName;
+
+                if (!getline(stream, timeRange) || timeRange.empty()) {
+                    wcerr << L"Ошибка: Некорректное или отсутствует время фильма." << endl;
+                    return;
+                }
+
+                if (!getline(stream, filmName) || filmName.empty()) {
+                    wcerr << L"Ошибка: Некорректное или отсутствует название фильма." << endl;
+                    return;
+                }
+
+                (*currentSessionGroup)[i].film_name = filmName;
+                (*currentSessionGroup)[i].time_film = timeRange;
+
+                GenerationRoom((*currentSessionGroup)[i], rowCount, placeCount, filmName, timeRange);
+            }
+        }
+        else {
+            wcerr << L"Ошибка: Неизвестная строка в файле." << endl;
+            return;
+        }
+    }
+}
+
+
+
+
 
 //Очистка экрана :
 void ClearScreen() {
@@ -170,10 +295,9 @@ void closeWindow() {
 }
 
 
-// Kino pmi
 void waitForInput() {
-    wcout << L"Нажмите Enter, чтобы выйти..." << endl;
-    cin.get();
+    //wcout << L"Нажмите Enter, чтобы выйти..." << endl;
+    system("pause");
 }
 
 void initializeConsole() {
@@ -183,10 +307,14 @@ void initializeConsole() {
     this_thread::sleep_for(chrono::milliseconds(100));
 }
 
-void DrawHall(Hall& hall, int rowCount, int placeCount) {
+void DrawSession(Session& session, int rowCount, int placeCount) {
     int y = 0;
-    for (size_t i = 0; i < hall.rows.size(); ++i) {
-        drawRow(y, hall.rows[i], i + 1);
+    wcout << setw(65) << session.time_film << endl;
+    ++y;
+    wcout << setw(67) << session.film_name << endl;
+    ++y;
+    for (size_t i = 0; i < session.rows.size(); ++i) {
+        drawRow(y, session.rows[i], i + 1);
         y += BOX_HEIGHT + 2;
     }
     setCursorPosition(0, y);
@@ -217,15 +345,21 @@ bool correctInput(int& number) {
 
 
 //черновая версия void choosingPlace()
-void changePlaces(Hall& hall, int row, int place) {
-    row -= 1;  // коррекция индекса ряда  
-    if (hall.rows[row].seats[place].status == L"0" || hall.rows[row].seats[place].status == L"x")
-        wcout << L"Место уже занято, выберите пожалуйста другое место\n";
+void changePlaces(Session& session, int row, int place) {
+    --row; // Приведение к 0-индексации
+    --place; // Приведение к 0-индексации
+    if (row < 0 || row >= session.rows.size() || place < 0 || place >= session.rows[row].seats.size()) {
+        wcout << L"Некорректный выбор места.\n";
+        return;
+    }
+
+    if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
+        wcout << L"Место занято, выберите другое.\n";
+    }
     else {
         ClearScreen();
-        wcout << L"Выбор зафиксирован\n";
-        hall.rows[row].seats[place].status.clear();
-        hall.rows[row].seats[place].status = L"x";
+        wcout << L"Место успешно забронировано.\n";
+        session.rows[row].seats[place].status = L"x";
     }
 }
 

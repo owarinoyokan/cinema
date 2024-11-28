@@ -188,13 +188,41 @@ wstring fileIn(const string& fname) {
 
 
 int main() {
+
+    srand(time(0));
+    const int rowCount = 8;
+    const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
+    
     // Настройка широких символов для потока вывода
     _setmode(_fileno(stdout), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);
+    
+    { // это посути ввывод всех сеансов 
+        // сделаю в функции, сейчас это просто пример работы генерации и хранения сеанса
 
-    //fullScreen();
-    //ClearScreen();      // Очистка консоли
+        Day day_one;
+        GenerationDay(day_one, "schedule.txt", rowCount, placeCount);
+        fullScreen();
+        for (int i = 0; i < day_one.Session_one.size(); ++i) {
+            DrawSession(day_one.Session_one[0], rowCount, placeCount);
+            waitForInput();
+            ClearScreen();      // Очистка консоли
+        }
 
+        for (int i = 0; i < day_one.Session_two.size(); ++i) {
+            DrawSession(day_one.Session_one[0], rowCount, placeCount);
+            waitForInput();
+            ClearScreen();      // Очистка консоли
+        }
+
+        for (int i = 0; i < day_one.Session_three.size(); ++i) {
+            DrawSession(day_one.Session_one[0], rowCount, placeCount);
+            waitForInput();
+            ClearScreen();      // Очистка консоли
+        }
+
+    }
+    fullScreen();
     wcout << L"Проект кинотеатра.🎬" << endl;
 
     extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
@@ -203,10 +231,10 @@ int main() {
     //const int rowCount = 8;
     //const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
 
-    //Hall hall;
-    //GenerationRoom(hall, rowCount, placeCount);
+    //Session Session;
+    //GenerationRoom(Session, rowCount, placeCount);
     //initializeConsole();
-    //DrawHall(hall, rowCount, placeCount);
+    //DrawSession(Session, rowCount, placeCount);
 
     ///пример замены сущесвующего места без проверок индекса
     /* int changeRow, changePalace;
@@ -214,8 +242,8 @@ int main() {
     cin >> changeRow;
     cout << "\nВведите номер места: ";
     cin >> changePalace;
-    changePlaces(hall, changeRow, changePalace);
-    DrawHall(hall, rowCount, placeCount);*/
+    changePlaces(Session, changeRow, changePalace);
+    DrawSession(Session, rowCount, placeCount);*/
 
 
     //waitForInput();
