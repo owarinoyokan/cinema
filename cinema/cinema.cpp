@@ -208,7 +208,7 @@ int main() {
     GenerationRoom(hall, rowCount, placeCount);
     initializeConsole();
     DrawHall(hall, rowCount, placeCount);
-    extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
+    
 
     ///пример замены сущесвующего места без проверок индекса
     /* int changeRow, changePalace;
