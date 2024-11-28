@@ -20,7 +20,8 @@ void movieSelection(); // Функция выводяшая список фил�
 void detailedInform(); // Функция выводящая детали фильма
 void choosingPlace(); // меню выбора места
 wstring fileIn(const string& fname); // Функция для чтения файла с широкими символами
-void sessionSelection();
+void sessionSelection(int);
+int listFilmFromTheDay(int day, int filmNumber);
 
 
 
@@ -44,7 +45,7 @@ void extranceToCinema() { // Функция входа в кино, предла
         // место под ф-ю буфета
         break;
     case 0:
-        // что-то для выхода
+        closeWindow();
         break;
     }
 }
@@ -72,14 +73,14 @@ void movieSelection() { // Функция выводяшая список фил
     //wcout << L"Нажмите '2', чтобы посмотреть детали" << endl; // Возможно это не стоит показывать отдельно 
                                                                 // а показывать принудительно после выбора сеанса
 
-    //wcout << L"Нажмите '3', чтобы использовать фильтр" << endl;
+    wcout << L"Нажмите '3', чтобы использовать фильтр" << endl;
     wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
     wcin >> input;
     ClearScreen();
     switch (input) {
     case 1:
         //choosingPlace(); // выбор сеанса >> меню выбора места >> после выбора мест использовать функцию оплаты
-        sessionSelection();
+        sessionSelection(1);
         break;
         //case 2:
         //    detailedInform(); // Функция выводящая детали фильма
@@ -88,26 +89,9 @@ void movieSelection() { // Функция выводяшая список фил
         // место для функции фильтра
         break;
     case 0:
-
-
-
-
         extranceToCinema(); // Возврат назад (к предыдущей функции)
         break;
     }
-}
-
-void sessionSelection() { // Выбор сеанса >> после выбора следует выбор мест
-    wcout << L"\n" << fileIn("cimema_info.txt") << endl; // В таком случае отдельная функция не нужна
-    short int input;
-    //wcout << L"\n" << fileIn("cimema_info.txt") << endl; // Вывод файла
-    wcout << L"Выберите фильм который хотите посмотреть" << endl;
-    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
-    wcin >> input;
-    ClearScreen();
-    // Сюда вставить функцию выводящую кинозал по выбору пользователя >> она будет вести на choosingPlace()
-    if (input == 0)
-        movieSelection();
 }
 
 void detailedInform() { // Функция выводящая детали фильма
@@ -119,6 +103,7 @@ void detailedInform() { // Функция выводящая детали фил
     ClearScreen();
     movieSelection(); // Возврат назад (к предыдущей функции)
 }
+
 
 void choosingPlace() { // меню выбора места << после выбора мест использовать функцию оплаты
     short int input;
@@ -146,6 +131,214 @@ void choosingPlace() { // меню выбора места << после выб�
         break;
     }
 }
+
+void sessionSelection(int day) { // Выбор сеанса
+    //wcout << L"\n" << fileIn("cimema_info.txt") << endl; 
+    short int input;
+
+    switch (day) { // изменение расписания в зависсимости от дня (сейчас ничего не меняется)
+    case 1:
+        wcout << L"\n" << fileIn("AllMovDay_1.txt") << endl;
+        break;
+    case 2:
+        wcout << L"\n" << fileIn("AllMovDay_2.txt") << endl;
+        break;
+    case 3:
+        wcout << L"\n" << fileIn("AllMovDay_3.txt") << endl;
+        break;
+    }
+
+    wcout << L"Выберите фильм который хотите посмотреть" << endl;
+    wcout << L"Введите 111 чтобы посмотреть расписание на следующий день" << endl;
+    wcout << L"Введите 222 чтобы посмотреть расписание на следующий день" << endl;
+    //wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+    wcin >> input;
+    if (input == 111) {
+        ClearScreen();
+        sessionSelection(day + 1);
+    }
+    else if (input == 222) {
+        ClearScreen();
+        sessionSelection(day - 1);
+    }
+    input = listFilmFromTheDay(day, input); // возвращаяем номер фильма зная день и его номер в расписании дня
+
+
+    ClearScreen();
+
+
+    switch (input) { // выводим все сеансы на данный фильм
+    case 1001:
+        wcout << L"\n" << fileIn("MovSched1001.txt") << endl; // Унесённые сессией 
+        break;
+    case 1002:
+        wcout << L"\n" << fileIn("MovSched1002.txt") << endl; // Шрек и болото багов 
+        break;
+    case 1003:
+        wcout << L"\n" << fileIn("MovSched1003.txt") << endl; // Назад к компилятору 
+        break;
+    case 1004:
+        wcout << L"\n" << fileIn("MovSched1004.txt") << endl; // А дедлайны здесь жесткие
+        break;
+    case 1005:
+        wcout << L"\n" << fileIn("MovSched1005.txt") << endl; // Властелин лаб: возвращение сеньора
+        break;
+    case 1006:
+        wcout << L"\n" << fileIn("MovSched1006.txt") << endl; // Титаник: крах программы
+        break;
+    case 1007:
+        wcout << L"\n" << fileIn("MovSched1007.txt") << endl; // Дебаггер 2: Судный день компиляции
+        break;
+    case 1008:
+        wcout << L"\n" << fileIn("MovSched1008.txt") << endl; // Гарри Кодер и C++ 
+        break;
+    case 1009:
+        wcout << L"\n" << fileIn("MovSched1009.txt") << endl; // Матрица данных 
+        break;
+    case 1010:
+        wcout << L"\n" << fileIn("MovSched1010.txt") << endl; // Пятый алгоритм
+        break;
+    case 1011:
+        wcout << L"\n" << fileIn("MovSched1011.txt") << endl; // Люди в Черных пикселях 
+        break;
+    case 1012:
+        wcout << L"\n" << fileIn("MovSched1012.txt") << endl; // Лабные Войны: Эпизод 5 
+        break;
+    }
+
+
+    wcout << L"Введите номер сеанса, на который хотите пойти" << endl << endl;
+    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+    wcin >> input;
+    ClearScreen();
+    if (input == 0) {
+        movieSelection();
+    }
+    else {
+
+        // переносит в функцию с залом для выбора места в зависсимости от выбранного сеанса
+    }
+
+}
+
+int listFilmFromTheDay(int day, int filmNumber) { // выводит номер фильма от его номера в таблице и от дня
+    switch (day) {
+    case 1:
+        switch (filmNumber) {
+        case 1:
+            return (1002); //  код фильма 
+            break;
+        case 2:
+            return (1007);
+            break;
+        case 3:
+            return (1005);
+            break;
+        case 4:
+            return (1008);
+            break;
+        case 5:
+            return (1009);
+            break;
+        case 6:
+            return (1001);
+            break;
+        case 7:
+            return (1006);
+            break;
+        case 8:
+            return (1005);
+            break;
+        case 9:
+            return (1010);
+            break;
+        case 10:
+            return (1011);
+            break;
+        case 11:
+            return (1009);
+            break;
+        case 12:
+            return (1004);
+            break;
+        }
+        break;
+
+    case 2:
+        switch (filmNumber) {
+        case 1:
+            return (1010);
+            break;
+        case 2:
+            return (1006);
+            break;
+        case 3:
+            return (1004);
+            break;
+        case 4:
+            return (1005);
+            break;
+        case 5:
+            return (1002);
+            break;
+        case 6:
+            return (1003);
+            break;
+        case 7:
+            return (1007);
+            break;
+        case 8:
+            return (1009);
+            break;
+        case 9:
+            return (1001);
+            break;
+        case 10:
+            return (1012);
+            break;
+        }
+        break;
+
+    case 3:
+        switch (filmNumber) {
+        case 1:
+            return (1011);
+            break;
+        case 2:
+            return (1003);
+            break;
+        case 3:
+            return (1004);
+            break;
+        case 4:
+            return (1012);
+            break;
+        case 5:
+            return (1007);
+            break;
+        case 6:
+            return (1002);
+            break;
+        case 7:
+            return (1006);
+            break;
+        case 8:
+            return (1008);
+            break;
+        case 9:
+            return (1011);
+            break;
+        case 10:
+            return (1008);
+            break;
+        case 11:
+            return (1005);
+            break;
+        }
+        break;
+    }
+}
+
 
 // Запись текста в файл с поддержкой широких символов (UTF-16)
 void fileOut(string filename) {
@@ -208,8 +401,8 @@ int main() {
     GenerationRoom(hall, rowCount, placeCount);
     initializeConsole();
     DrawHall(hall, rowCount, placeCount);
-    
-    
+
+
 
     ///пример замены сущесвующего места без проверок индекса
     /* int changeRow, changePalace;
@@ -224,11 +417,13 @@ int main() {
     waitForInput();
     closeWindow();
 
-   // Запись в файл
-   //fileOut("example.txt");
 
-   // Чтение файла
-   //wcout << L"Содержимое файла: " << fileIn("example.txt") << endl;
+
+    // Запись в файл
+    //fileOut("example.txt");
+
+    // Чтение файла
+    //wcout << L"Содержимое файла: " << fileIn("example.txt") << endl;
 
     return 0;
 }
