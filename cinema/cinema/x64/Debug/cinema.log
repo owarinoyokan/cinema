@@ -1,0 +1,5 @@
+﻿  cinema.cpp
+C:\Users\aaa_s\source\repos\cinema\cinema\Header.h(189,36): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+  (компиляция исходного файла "cinema.cpp")
+  
+  cinema.vcxproj -> C:\Users\aaa_s\source\repos\cinema\x64\Debug\cinema.exe
