@@ -5,7 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include <algorithm>
+#include <algorithm> // для std::max
 #include <chrono>
 #include <thread>
 
@@ -34,9 +34,8 @@ struct Hall {
     vector<Row> rows;
 };
 
-// Настройка консоли
+    // Настройка консоли
 // Перевод консоли в полноэкранный режим
-
 void fullScreen() {
     COORD coord;
     SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
@@ -45,6 +44,7 @@ void fullScreen() {
     keybd_event(VK_RETURN, 0x1c, KEYEVENTF_KEYUP, 0); //отпускается Alt
     keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0); //отпускается Enther
 }
+
 
 // Установка позиции курсора
 void setCursorPosition(int x, int y) {
@@ -58,7 +58,7 @@ void SetColor(int text, int background) {
 }
 
 
-// Проверка и преобразование строк
+    // Проверка и преобразование строк
 // Проверка, является ли строка числом
 bool isNumber(const wstring& str) {
     return !str.empty() && all_of(str.begin(), str.end(), ::isdigit);
