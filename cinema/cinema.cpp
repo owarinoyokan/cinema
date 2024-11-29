@@ -415,8 +415,8 @@ int main() {
 	Day day_one;
     GenerationDay(day_one, "schedule.txt", rowCount, placeCount); // генерация всех сеансов первого дня
 
-    demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала 
-    waitForInput();
+    /*demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала 
+    waitForInput();*/
     fullScreen();
     ClearScreen();      // Очистка консоли
 
