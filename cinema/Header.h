@@ -11,12 +11,14 @@
 #include <fstream>
 #include <sstream>
 #include <thread>
+#include <stdexcept>
 #include <locale>
 
 using namespace std;
 
 // Конфигурация программы
 namespace Config {
+    int y = 0;
     constexpr int BOX_WIDTH = 6;              // Ширина бокса
     constexpr int BOX_HEIGHT = 3;             // Высота бокса
     constexpr int CHANSE_NOT_FREE_PLACES = 9; // Вероятность занятого места
@@ -269,6 +271,7 @@ void GenerationDay(Day& day, const string& filename, int rowCount, int placeCoun
 
 //Очистка экрана :
 void ClearScreen() {
+    y = 0;
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     DWORD count, cellCount;
@@ -299,7 +302,6 @@ void waitForInput() {
 }
 
 void DrawSession(Session& session, int rowCount, int placeCount) {
-    int y = 0;
     wcout << setw(65) << session.time_film << endl;
     ++y;
     wcout << setw(67) << session.film_name << endl;
@@ -313,8 +315,8 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
 
 // Функция для проверки ввода числа
 bool correctInput(int& number) {
-    string input;
-    getline(cin, input); // Читаем строку
+    wstring input;
+    getline(wcin, input); // Читаем строку из wcin
     if (input.empty()) {
         return false; // Проверка на пустой ввод
     }
@@ -335,23 +337,6 @@ bool correctInput(int& number) {
 }
 
 
-//черновая версия void choosingPlace()
-void changePlaces(Session& session, int row, int place) {
-    --row; // Приведение к 0-индексации
-    --place; // Приведение к 0-индексации
-    if (row < 0 || row >= session.rows.size() || place < 0 || place >= session.rows[row].seats.size()) {
-        wcout << L"Некорректный выбор места.\n";
-        return;
-    }
 
-    if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
-        wcout << L"Место занято, выберите другое.\n";
-    }
-    else {
-        ClearScreen();
-        wcout << L"Место успешно забронировано.\n";
-        session.rows[row].seats[place].status = L"x";
-    }
-}
 
 #endif // HEADER_H
