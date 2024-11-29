@@ -220,13 +220,13 @@ void GenerationDay(Day& day, const string& filename, int rowCount, int placeCoun
         }
         
 
-        if (line == L"Кинозал 1") {
+        if (line == L"Cinema room 1") {
             currentSessionGroup = &day.Session_one;
         }
-        else if (line == L"Кинозал 2") {
+        else if (line == L"Cinema room 2") {
             currentSessionGroup = &day.Session_two;
         }
-        else if (line == L"Кинозал 3 ") {
+        else if (line == L"Cinema room 3 ") {
             currentSessionGroup = &day.Session_three;
         }
         else if (currentSessionGroup && !line.empty() && iswdigit(line[0])) {

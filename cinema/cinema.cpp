@@ -386,7 +386,7 @@ void demoVis_All_sessions(Day& day_one, const int rowCount, const int placeCount
         DrawSession(day_one.Session_one[i], rowCount, placeCount);
         waitForInput();
         ClearScreen();
-        ClearScreen();
+        
     }
 
     for (int i = 0; i < day_one.Session_two.size(); ++i) {
@@ -415,8 +415,8 @@ int main() {
 	Day day_one;
     GenerationDay(day_one, "schedule.txt", rowCount, placeCount); // генерация всех сеансов первого дня
 
-    //demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала 
-
+    demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала 
+    waitForInput();
     fullScreen();
     ClearScreen();      // Очистка консоли
 
