@@ -379,12 +379,44 @@ wstring fileIn(const string& fname) {
     return converter.from_bytes(utf16_content);
 }
 
+// вывод всех сеансов ввиде зала  //для понимания кода 
+void demoVis_All_sessions(Day& day_one, const int rowCount, const int placeCount) {
+    fullScreen();
+    for (int i = 0; i < day_one.Session_one.size(); ++i) {
+        DrawSession(day_one.Session_one[i], rowCount, placeCount);
+        waitForInput();
+        ClearScreen();
+
+    }
+
+    for (int i = 0; i < day_one.Session_two.size(); ++i) {
+        DrawSession(day_one.Session_two[i], rowCount, placeCount);
+        waitForInput();
+        ClearScreen();
+    }
+
+    for (int i = 0; i < day_one.Session_three.size(); ++i) {
+        DrawSession(day_one.Session_three[i], rowCount, placeCount);
+        waitForInput();
+        ClearScreen();
+    }
+}
+
 
 int main() {
+
+    srand(time(0));
+    const int rowCount = 8;
+    const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
     // Настройка широких символов для потока вывода
     _setmode(_fileno(stdout), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);
 
+    Day day_one;
+    GenerationDay(day_one, "schedule.txt", rowCount, placeCount); // генерация всех сеансов первого дня
+
+    /*demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала
+    waitForInput();*/
     fullScreen();
     ClearScreen();      // Очистка консоли
 
@@ -393,14 +425,9 @@ int main() {
 
     extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
 
-    srand(time(0));
-    const int rowCount = 8;
-    const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
 
-    Hall hall;
-    GenerationRoom(hall, rowCount, placeCount);
-    initializeConsole();
-    DrawHall(hall, rowCount, placeCount);
+
+
 
 
 
