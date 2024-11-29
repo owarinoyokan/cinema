@@ -404,8 +404,7 @@ wstring fileIn(const string& fname) {
 int main() {
     // Настройка широких символов для потока вывода
     setMode16();
-    
-    //fullScreen();
+
     ClearScreen();      // Очистка консоли
 
     srand(time(0));
