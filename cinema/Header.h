@@ -11,7 +11,10 @@
 #include <fstream>
 #include <sstream>
 #include <thread>
-#include <locale>
+#include <codecvt>      // Для преобразования UTF-16 в wide string
+#include <io.h>         // Для работы с _setmode
+#include <locale>       // Для работы с кодировками
+#include <fcntl.h>      // Для режима _O_U16TEXT
 
 using namespace std;
 
@@ -47,9 +50,14 @@ struct Day {
     vector<Session> Session_three;
 };
 
-// Настройка консоли
-// Перевод консоли в полноэкранный режим
+    // Настройка консоли
 
+void setMode16() {
+    _setmode(_fileno(stdout), _O_U16TEXT);
+    _setmode(_fileno(stdin), _O_U16TEXT);
+}
+
+// Перевод консоли в полноэкранный режим
 void fullScreen() {
     COORD coord;
     SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
@@ -145,15 +153,6 @@ void drawRow(int y, const Row& row, int rowNumber) {
     }
 }
 
-wstring utf8ToUtf16(const string& utf8Str) {
-    if (utf8Str.empty()) return L"";
-
-    int size_needed = MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), (int)utf8Str.size(), NULL, 0);
-    wstring utf16Str(size_needed, 0);
-    MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), (int)utf8Str.size(), &utf16Str[0], size_needed);
-    return utf16Str;
-}
-
 // Генерация зала
 void GenerationRoom(Session& session, const int rowCount, const int placeCount, wstring name, wstring time_f) {
     session.rows.resize(rowCount);
@@ -185,29 +184,11 @@ void removeCarriageReturn(std::wstring& line) {
 
 
 // Генерация дня с чтением из файла
-void GenerationDay(Day& day, const string& filename, int rowCount, int placeCount) {
-    // Читаем файл в строку
-    ifstream fin(filename, ios::binary);
-    if (!fin) {
-        wcerr << L"Ошибка: Не удалось открыть файл." << endl;
-        return;
-    }
+void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 
-    // Читаем содержимое файла
-    ostringstream buffer;
-    buffer << fin.rdbuf();
-    string utf8Content = buffer.str();
-    fin.close();
 
-    // Конвертация из UTF-8 в UTF-16
-    wstring fileContent = utf8ToUtf16(utf8Content);
-
-    if (fileContent.empty()) {
-        wcerr << L"Ошибка: Файл пуст." << endl;
-        return;
-    }
     // Обработка содержимого файла
-    wstringstream stream(fileContent);
+    wstringstream stream(filename);
     wstring line;
     vector<Session>* currentSessionGroup = nullptr;
 

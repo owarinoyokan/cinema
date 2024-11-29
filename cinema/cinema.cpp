@@ -339,6 +339,28 @@ int listFilmFromTheDay(int day, int filmNumber) { // выводит номер �
     }
 }
 
+// вывод всех сеансов ввиде зала  //для понимания кода 
+void demoVis_All_sessions(Day& day_one, const int rowCount, const int placeCount) {
+    fullScreen();
+    for (int i = 0; i < day_one.Session_one.size(); ++i) {
+        DrawSession(day_one.Session_one[i], rowCount, placeCount);
+        waitForInput();
+        ClearScreen();
+
+    }
+
+    for (int i = 0; i < day_one.Session_two.size(); ++i) {
+        DrawSession(day_one.Session_two[i], rowCount, placeCount);
+        waitForInput();
+        ClearScreen();
+    }
+
+    for (int i = 0; i < day_one.Session_three.size(); ++i) {
+        DrawSession(day_one.Session_three[i], rowCount, placeCount);
+        waitForInput();
+        ClearScreen();
+    }
+}
 
 // Запись текста в файл с поддержкой широких символов (UTF-16)
 void fileOut(string filename) {
@@ -379,57 +401,32 @@ wstring fileIn(const string& fname) {
     return converter.from_bytes(utf16_content);
 }
 
-// вывод всех сеансов ввиде зала  //для понимания кода 
-void demoVis_All_sessions(Day& day_one, const int rowCount, const int placeCount) {
-    fullScreen();
-    for (int i = 0; i < day_one.Session_one.size(); ++i) {
-        DrawSession(day_one.Session_one[i], rowCount, placeCount);
-        waitForInput();
-        ClearScreen();
-
-    }
-
-    for (int i = 0; i < day_one.Session_two.size(); ++i) {
-        DrawSession(day_one.Session_two[i], rowCount, placeCount);
-        waitForInput();
-        ClearScreen();
-    }
-
-    for (int i = 0; i < day_one.Session_three.size(); ++i) {
-        DrawSession(day_one.Session_three[i], rowCount, placeCount);
-        waitForInput();
-        ClearScreen();
-    }
-}
-
-
 int main() {
+    // Настройка широких символов для потока вывода
+    setMode16();
+    
+    //fullScreen();
+    ClearScreen();      // Очистка консоли
 
     srand(time(0));
     const int rowCount = 8;
     const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
-    // Настройка широких символов для потока вывода
-    _setmode(_fileno(stdout), _O_U16TEXT);
-    _setmode(_fileno(stdin), _O_U16TEXT);
+
+    
 
     Day day_one;
-    GenerationDay(day_one, "schedule.txt", rowCount, placeCount); // генерация всех сеансов первого дня
+    GenerationDay(day_one, fileIn("schedule.txt"), rowCount, placeCount); // генерация всех сеансов первого дня
 
-    /*demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала
-    waitForInput();*/
-    fullScreen();
-    ClearScreen();      // Очистка консоли
+    demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала
+    waitForInput();
+
+    wcout << fileIn("check.txt") << endl;
 
     wcout << L"Проект кинотеатра.🎬" << endl;
     wcout << L"Тестовый запуск" << endl;
 
+
     extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
-
-
-
-
-
-
 
     ///пример замены сущесвующего места без проверок индекса
     /* int changeRow, changePalace;
@@ -439,7 +436,6 @@ int main() {
     cin >> changePalace;
     changePlaces(hall, changeRow, changePalace);
     DrawHall(hall, rowCount, placeCount);*/
-
 
     waitForInput();
     closeWindow();
