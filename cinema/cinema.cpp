@@ -12,6 +12,7 @@
 
 
 using namespace std;    // Пространство имен
+using namespace Config;    // Пространство имен
 
 
 void extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
@@ -339,28 +340,6 @@ int listFilmFromTheDay(int day, int filmNumber) { // выводит номер �
     }
 }
 
-// вывод всех сеансов ввиде зала  //для понимания кода 
-void demoVis_All_sessions(Day& day_one, const int rowCount, const int placeCount) {
-    fullScreen();
-    for (int i = 0; i < day_one.Session_one.size(); ++i) {
-        DrawSession(day_one.Session_one[i], rowCount, placeCount);
-        waitForInput();
-        ClearScreen();
-
-    }
-
-    for (int i = 0; i < day_one.Session_two.size(); ++i) {
-        DrawSession(day_one.Session_two[i], rowCount, placeCount);
-        waitForInput();
-        ClearScreen();
-    }
-
-    for (int i = 0; i < day_one.Session_three.size(); ++i) {
-        DrawSession(day_one.Session_three[i], rowCount, placeCount);
-        waitForInput();
-        ClearScreen();
-    }
-}
 
 // Запись текста в файл с поддержкой широких символов (UTF-16)
 void fileOut(string filename) {
@@ -401,6 +380,75 @@ wstring fileIn(const string& fname) {
     return converter.from_bytes(utf16_content);
 }
 
+// вывод всех сеансов ввиде зала  //для понимания кода 
+void demoVis_All_sessions(Day& day_one, const int rowCount, const int placeCount) {
+    fullScreen();
+    for (int i = 0; i < day_one.Session_one.size(); ++i) {
+        DrawSession(day_one.Session_one[i], rowCount, placeCount);
+        waitForInput();
+        ClearScreen();
+
+    }
+
+    for (int i = 0; i < day_one.Session_two.size(); ++i) {
+        DrawSession(day_one.Session_two[i], rowCount, placeCount);
+        waitForInput();
+        ClearScreen();
+    }
+
+    for (int i = 0; i < day_one.Session_three.size(); ++i) {
+        DrawSession(day_one.Session_three[i], rowCount, placeCount);
+        waitForInput();
+        ClearScreen();
+    }
+}
+void choosingPlace(Session& session) {
+    DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+    setCursorPosition(0, y);
+
+    int row, place;
+    bool notFreePlace = true; // Флаг для проверки доступности места
+
+    while (true) {
+        wcout << L"Введите номер ряда: ";
+        if (!correctInput(row)) {
+            wcout << L"Некорректный ввод. Пожалуйста, введите номер ряда заново.\n";
+            continue;
+        }
+        --row; // Приводим к индексации с 0
+        if (row < 0 || row >= session.rows.size()) {
+            wcout << L"Номер ряда вне диапазона. Пожалуйста, введите корректный номер ряда.\n";
+            continue;
+        }
+
+        wcout << L"Введите номер места: ";
+        if (!correctInput(place)) {
+            wcout << L"Некорректный ввод. Пожалуйста, введите номер места заново.\n";
+            continue;
+        }
+        if (place < 0 || place >= session.rows[row].seats.size() - 1) {
+            wcout << L"Номер места вне диапазона. Пожалуйста, введите корректный номер места.\n";
+            continue;
+        }
+
+        if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
+            wcout << L"Место занято, выберите другое.\n";
+            continue; // Повторяем выбор ряда и места
+        }
+
+        // Если место свободно, бронируем его
+        ClearScreen();
+        session.rows[row].seats[place].status = L"x";
+        DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+        wcout << L"Место успешно забронировано.\n";
+        break; // Выход из цикла после успешного бронирования
+    }
+}
+
+
+
+
+
 int main() {
     // Настройка широких символов для потока вывода
     setMode16();
@@ -411,14 +459,17 @@ int main() {
     const int rowCount = 8;
     const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
 
-    
+
 
     Day day_one;
     GenerationDay(day_one, fileIn("schedule.txt"), rowCount, placeCount); // генерация всех сеансов первого дня
 
-    demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала
+    /*demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала
+    waitForInput();*/
+    fullScreen();
+    choosingPlace(day_one.Session_one[0]);
     waitForInput();
-
+    ClearScreen();
     wcout << fileIn("check.txt") << endl;
 
     wcout << L"Проект кинотеатра.🎬" << endl;
