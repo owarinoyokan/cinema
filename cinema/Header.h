@@ -1,4 +1,4 @@
-#ifndef HEADER_H
+п»ї#ifndef HEADER_H
 #define HEADER_H
 
 #include <windows.h>
@@ -11,78 +11,63 @@
 #include <fstream>
 #include <sstream>
 #include <thread>
-#include <codecvt>      // Для преобразования UTF-16 в wide string
-#include <io.h>         // Для работы с _setmode
-#include <locale>       // Для работы с кодировками
-#include <fcntl.h>      // Для режима _O_U16TEXT
+#include <codecvt>      // Г„Г«Гї ГЇГ°ГҐГ®ГЎГ°Г Г§Г®ГўГ Г­ГЁГї UTF-16 Гў wide string
+#include <io.h>         // Г„Г«Гї Г°Г ГЎГ®ГІГ» Г± _setmode
+#include <locale>       // Г„Г«Гї Г°Г ГЎГ®ГІГ» Г± ГЄГ®Г¤ГЁГ°Г®ГўГЄГ Г¬ГЁ
+#include <fcntl.h>      // Г„Г«Гї Г°ГҐГ¦ГЁГ¬Г  _O_U16TEXT
+
 
 using namespace std;
 
-// Конфигурация программы
+// РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ РїСЂРѕРіСЂР°РјРјС‹
 namespace Config {
-    constexpr int BOX_WIDTH = 6;              // Ширина бокса
-    constexpr int BOX_HEIGHT = 3;             // Высота бокса
-    constexpr int CHANSE_NOT_FREE_PLACES = 9; // Вероятность занятого места
+    int y = 0;
+    constexpr int BOX_WIDTH = 6;              // РЁРёСЂРёРЅР° Р±РѕРєСЃР°
+    constexpr int BOX_HEIGHT = 3;             // Р’С‹СЃРѕС‚Р° Р±РѕРєСЃР°
+    constexpr int CHANSE_NOT_FREE_PLACES = 9; // Р’РµСЂРѕСЏС‚РЅРѕСЃС‚СЊ Р·Р°РЅСЏС‚РѕРіРѕ РјРµСЃС‚Р°
 }
 using namespace Config;
 
-// Структура для представления одного места
+// РЎС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°
 struct Seat {
-    wstring status; // "x" — занято, "0" — номер ряда, число — номер места
+    wstring status; // "x" вЂ” Р·Р°РЅСЏС‚Рѕ, "0" вЂ” РЅРѕРјРµСЂ СЂСЏРґР°, С‡РёСЃР»Рѕ вЂ” РЅРѕРјРµСЂ РјРµСЃС‚Р°
 };
 
-// Структура для ряда
+// РЎС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ СЂСЏРґР°
 struct Row {
     vector<Seat> seats;
 };
 
-// Структура зала
+void setCursorPosition(int x, int y) {
+    COORD coord = { (SHORT)x, (SHORT)y };
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+// РЎС‚СЂСѓРєС‚СѓСЂР° Р·Р°Р»Р°
 struct Session {
     vector<Row> rows;
     wstring film_name;
     wstring time_film;
 };
 
-//структура Сеанса
+//СЃС‚СЂСѓРєС‚СѓСЂР° РЎРµР°РЅСЃР°
 struct Day {
     vector<Session> Session_one;
     vector<Session> Session_two;
     vector<Session> Session_three;
 };
 
-    // Настройка консоли
+void SetColor(int text, int background) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (background << 4) | text);
+}
 
 void setMode16() {
     _setmode(_fileno(stdout), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);
 }
 
-// Перевод консоли в полноэкранный режим
-void fullScreen() {
-    COORD coord;
-    SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
-    keybd_event(VK_MENU, 0, 0, 0); // Нажатие Alt
-    keybd_event(VK_RETURN, 0, 0, 0); // Нажатие Enter
-    keybd_event(VK_RETURN, 0, KEYEVENTF_KEYUP, 0); // Отпуск Enter
-    keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0); // Отпуск Alt
-    this_thread::sleep_for(chrono::milliseconds(100));
-}
-
-
-// Установка позиции курсора
-void setCursorPosition(int x, int y) {
-    COORD coord = { (SHORT)x, (SHORT)y };
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
-
-// Установка цвета текста и фона
-void SetColor(int text, int background) {
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (background << 4) | text);
-}
-
-
-// Проверка и преобразование строк
-// Проверка, является ли строка числом
+// РџСЂРѕРІРµСЂРєР° Рё РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃС‚СЂРѕРє
+// РџСЂРѕРІРµСЂРєР°, СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЃС‚СЂРѕРєР° С‡РёСЃР»РѕРј
 bool isNumber(const wstring& str) {
     for (wchar_t c : str) {
         if (!iswdigit(c)) {
@@ -91,14 +76,14 @@ bool isNumber(const wstring& str) {
     }
     return true;
 }
-// Преобразование строки в число
+// РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё РІ С‡РёСЃР»Рѕ
 int stringToInt(const wstring& str) {
     return stoi(str);
 }
 
 
-// Функции отрисовки
-// Функция отрисовки занятого места
+// Р¤СѓРЅРєС†РёРё РѕС‚СЂРёСЃРѕРІРєРё
+// Р¤СѓРЅРєС†РёСЏ РѕС‚СЂРёСЃРѕРІРєРё Р·Р°РЅСЏС‚РѕРіРѕ РјРµСЃС‚Р°
 void drawOccupiedBox(int& x, int y) {
     SetColor(7, 7);
     setCursorPosition(x, y + 1);
@@ -111,7 +96,7 @@ void drawOccupiedBox(int& x, int y) {
     x += BOX_WIDTH + 1;
 }
 
-// Функция отрисовки номера ряда
+// Р¤СѓРЅРєС†РёСЏ РѕС‚СЂРёСЃРѕРІРєРё РЅРѕРјРµСЂР° СЂСЏРґР°
 void drawRowNumberBox(int& x, int y, int rowNumber) {
     x += 1;
     setCursorPosition(x, y + 2);
@@ -119,7 +104,9 @@ void drawRowNumberBox(int& x, int y, int rowNumber) {
     x += BOX_WIDTH + 1;
 }
 
-// Функция отрисовки свободного места
+
+
+// Р¤СѓРЅРєС†РёСЏ РѕС‚СЂРёСЃРѕРІРєРё СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°
 void drawAvailableBox(int& x, int y, const wstring& number) {
     setCursorPosition(x, y);
     wcout << L" ____ ";
@@ -132,7 +119,7 @@ void drawAvailableBox(int& x, int y, const wstring& number) {
     x += BOX_WIDTH + 1;
 }
 
-// Рисуем рамку для конкретного места
+// Р РёСЃСѓРµРј СЂР°РјРєСѓ РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РјРµСЃС‚Р°
 void drawBox(int& x, int y, const Seat& seat, int rowNumber) {
     if (isNumber(seat.status) && seat.status != L"0") {
         drawAvailableBox(x, y, seat.status);
@@ -145,7 +132,7 @@ void drawBox(int& x, int y, const Seat& seat, int rowNumber) {
     }
 }
 
-//// Отрисовка ряда
+//// РћС‚СЂРёСЃРѕРІРєР° СЂСЏРґР°
 void drawRow(int y, const Row& row, int rowNumber) {
     int x = 0;
     for (const auto& seat : row.seats) {
@@ -153,7 +140,7 @@ void drawRow(int y, const Row& row, int rowNumber) {
     }
 }
 
-// Генерация зала
+// Р“РµРЅРµСЂР°С†РёСЏ Р·Р°Р»Р°
 void GenerationRoom(Session& session, const int rowCount, const int placeCount, wstring name, wstring time_f) {
     session.rows.resize(rowCount);
     session.film_name = name;
@@ -172,32 +159,41 @@ void GenerationRoom(Session& session, const int rowCount, const int placeCount, 
     }
 }
 
+void fullScreen() {
+    COORD coord;
+    SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
+    keybd_event(VK_MENU, 0, 0, 0); // РќР°Р¶Р°С‚РёРµ Alt
+    keybd_event(VK_RETURN, 0, 0, 0); // РќР°Р¶Р°С‚РёРµ Enter
+    keybd_event(VK_RETURN, 0, KEYEVENTF_KEYUP, 0); // РћС‚РїСѓСЃРє Enter
+    keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0); // РћС‚РїСѓСЃРє Alt
+    this_thread::sleep_for(chrono::milliseconds(100));
+}
+
 wstring replaceDash(wstring str) {
-    replace(str.begin(), str.end(), L'—', L'-');
+    replace(str.begin(), str.end(), L'вЂ”', L'-');
     return str;
 }
 
-// Удаление символа \r из строки
+// РЈРґР°Р»РµРЅРёРµ СЃРёРјРІРѕР»Р° \r РёР· СЃС‚СЂРѕРєРё
 void removeCarriageReturn(std::wstring& line) {
     line.erase(std::remove(line.begin(), line.end(), L'\r'), line.end());
 }
 
 
-// Генерация дня с чтением из файла
+// Р“РµРЅРµСЂР°С†РёСЏ РґРЅСЏ СЃ С‡С‚РµРЅРёРµРј РёР· С„Р°Р№Р»Р°
 void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 
-
-    // Обработка содержимого файла
+    // Р§РёС‚Р°РµРј С„Р°Р№Р» РІ СЃС‚СЂРѕРєСѓ
     wstringstream stream(filename);
     wstring line;
     vector<Session>* currentSessionGroup = nullptr;
 
     while (getline(stream, line)) {
-        removeCarriageReturn(line); // Удаляем \r из строки
+        removeCarriageReturn(line); // РЈРґР°Р»СЏРµРј \r РёР· СЃС‚СЂРѕРєРё
 
-        line = replaceDash(line);  // Замена длинных дефисов
+        line = replaceDash(line);  // Р—Р°РјРµРЅР° РґР»РёРЅРЅС‹С… РґРµС„РёСЃРѕРІ
         if (line.empty()) {
-            continue; // Игнорируем пустые строки
+            continue; // РРіРЅРѕСЂРёСЂСѓРµРј РїСѓСЃС‚С‹Рµ СЃС‚СЂРѕРєРё
         }
 
 
@@ -213,11 +209,11 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
         else if (currentSessionGroup && !line.empty() && iswdigit(line[0])) {
             int sessionCount = 0;
             try {
-                sessionCount = stoi(line); // Преобразуем строку в число
+                sessionCount = stoi(line); // РџСЂРµРѕР±СЂР°Р·СѓРµРј СЃС‚СЂРѕРєСѓ РІ С‡РёСЃР»Рѕ
                 currentSessionGroup->resize(sessionCount);
             }
             catch (const exception&) {
-                wcerr << L"Ошибка: Некорректное количество сеансов." << endl;
+                wcerr << L"РћС€РёР±РєР°: РќРµРєРѕСЂСЂРµРєС‚РЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРµР°РЅСЃРѕРІ." << endl;
                 return;
             }
 
@@ -225,12 +221,12 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
                 wstring timeRange, filmName;
 
                 if (!getline(stream, timeRange) || timeRange.empty()) {
-                    wcerr << L"Ошибка: Некорректное или отсутствует время фильма." << endl;
+                    wcerr << L"РћС€РёР±РєР°: РќРµРєРѕСЂСЂРµРєС‚РЅРѕРµ РёР»Рё РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РІСЂРµРјСЏ С„РёР»СЊРјР°." << endl;
                     return;
                 }
 
                 if (!getline(stream, filmName) || filmName.empty()) {
-                    wcerr << L"Ошибка: Некорректное или отсутствует название фильма." << endl;
+                    wcerr << L"РћС€РёР±РєР°: РќРµРєРѕСЂСЂРµРєС‚РЅРѕРµ РёР»Рё РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РЅР°Р·РІР°РЅРёРµ С„РёР»СЊРјР°." << endl;
                     return;
                 }
 
@@ -241,22 +237,23 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
             }
         }
         else {
-            wcerr << L"Ошибка: Неизвестная строка в файле." << endl;
+            wcerr << L"РћС€РёР±РєР°: РќРµРёР·РІРµСЃС‚РЅР°СЏ СЃС‚СЂРѕРєР° РІ С„Р°Р№Р»Рµ." << endl;
             return;
         }
     }
 }
 
 
-//Очистка экрана :
+//РћС‡РёСЃС‚РєР° СЌРєСЂР°РЅР° :
 void ClearScreen() {
+    y = 0;
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     DWORD count, cellCount;
     COORD homeCoords = { 0, 0 };
 
     if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
-        cellCount = csbi.dwSize.X * csbi.dwSize.Y; // Исправлено
+        cellCount = csbi.dwSize.X * csbi.dwSize.Y; // РСЃРїСЂР°РІР»РµРЅРѕ
         FillConsoleOutputCharacter(hConsole, ' ', cellCount, homeCoords, &count);
         FillConsoleOutputAttribute(hConsole, csbi.wAttributes, cellCount, homeCoords, &count);
         SetConsoleCursorPosition(hConsole, homeCoords);
@@ -264,13 +261,13 @@ void ClearScreen() {
 }
 
 void closeWindow() {
-    // Нажимаем Alt
+    // РќР°Р¶РёРјР°РµРј Alt
     keybd_event(VK_MENU, 0x38, 0, 0);
-    // Нажимаем F4
+    // РќР°Р¶РёРјР°РµРј F4
     keybd_event(VK_F4, 0x3E, 0, 0);
-    // Отпускаем F4
+    // РћС‚РїСѓСЃРєР°РµРј F4
     keybd_event(VK_F4, 0x3E, KEYEVENTF_KEYUP, 0);
-    // Отпускаем Alt
+    // РћС‚РїСѓСЃРєР°РµРј Alt
     keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 }
 
@@ -280,7 +277,6 @@ void waitForInput() {
 }
 
 void DrawSession(Session& session, int rowCount, int placeCount) {
-    int y = 0;
     wcout << setw(65) << session.time_film << endl;
     ++y;
     wcout << setw(67) << session.film_name << endl;
@@ -292,47 +288,27 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
     setCursorPosition(0, y);
 }
 
-// Функция для проверки ввода числа
+// Р¤СѓРЅРєС†РёСЏ РґР»СЏ РїСЂРѕРІРµСЂРєРё РІРІРѕРґР° С‡РёСЃР»Р°
 bool correctInput(int& number) {
-    string input;
-    getline(cin, input); // Читаем строку
+    wstring input;
+    getline(wcin, input); // Р§РёС‚Р°РµРј СЃС‚СЂРѕРєСѓ РёР· wcin
     if (input.empty()) {
-        return false; // Проверка на пустой ввод
+        return false; // РџСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕР№ РІРІРѕРґ
     }
     try {
         size_t pos;
-        number = stoi(input, &pos); // Пробуем преобразовать строку в число
+        number = stoi(input, &pos); // РџСЂРѕР±СѓРµРј РїСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ СЃС‚СЂРѕРєСѓ РІ С‡РёСЃР»Рѕ
         if (pos != input.size()) {
-            return false; // Если есть лишние символы
+            return false; // Р•СЃР»Рё РµСЃС‚СЊ Р»РёС€РЅРёРµ СЃРёРјРІРѕР»С‹
         }
     }
     catch (const invalid_argument&) {
-        return false; // Если преобразование не удалось
+        return false; // Р•СЃР»Рё РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РЅРµ СѓРґР°Р»РѕСЃСЊ
     }
     catch (const out_of_range&) {
-        return false; // Если число выходит за пределы
+        return false; // Р•СЃР»Рё С‡РёСЃР»Рѕ РІС‹С…РѕРґРёС‚ Р·Р° РїСЂРµРґРµР»С‹
     }
-    return true; // Успех
-}
-
-
-//черновая версия void choosingPlace()
-void changePlaces(Session& session, int row, int place) {
-    --row; // Приведение к 0-индексации
-    --place; // Приведение к 0-индексации
-    if (row < 0 || row >= session.rows.size() || place < 0 || place >= session.rows[row].seats.size()) {
-        wcout << L"Некорректный выбор места.\n";
-        return;
-    }
-
-    if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
-        wcout << L"Место занято, выберите другое.\n";
-    }
-    else {
-        ClearScreen();
-        wcout << L"Место успешно забронировано.\n";
-        session.rows[row].seats[place].status = L"x";
-    }
+    return true; // РЈСЃРїРµС…
 }
 
 #endif // HEADER_H
