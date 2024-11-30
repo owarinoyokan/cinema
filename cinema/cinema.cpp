@@ -12,6 +12,7 @@
 
 
 using namespace std;    // Пространство имен
+using namespace Config;    // Пространство имен
 
 
 void extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
@@ -401,35 +402,80 @@ void demoVis_All_sessions(Day& day_one, const int rowCount, const int placeCount
         ClearScreen();
     }
 }
+void choosingPlace(Session& session) {
+    DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+    setCursorPosition(0, y);
+
+    int row, place;
+    bool notFreePlace = true; // Флаг для проверки доступности места
+
+    while (true) {
+        wcout << L"Введите номер ряда: ";
+        if (!correctInput(row)) {
+            wcout << L"Некорректный ввод. Пожалуйста, введите номер ряда заново.\n";
+            continue;
+        }
+        --row; // Приводим к индексации с 0
+        if (row < 0 || row >= session.rows.size()) {
+            wcout << L"Номер ряда вне диапазона. Пожалуйста, введите корректный номер ряда.\n";
+            continue;
+        }
+
+        wcout << L"Введите номер места: ";
+        if (!correctInput(place)) {
+            wcout << L"Некорректный ввод. Пожалуйста, введите номер места заново.\n";
+            continue;
+        }
+        if (place < 0 || place >= session.rows[row].seats.size()) {
+            wcout << L"Номер места вне диапазона. Пожалуйста, введите корректный номер места.\n";
+            continue;
+        }
+
+        if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
+            wcout << L"Место занято, выберите другое.\n";
+            continue; // Повторяем выбор ряда и места
+        }
+
+        // Если место свободно, бронируем его
+        ClearScreen();
+        session.rows[row].seats[place].status = L"x";
+        DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+        wcout << L"Место успешно забронировано.\n";
+        break; // Выход из цикла после успешного бронирования
+    }
+}
+
+
+
 
 
 int main() {
+    // Настройка широких символов для потока вывода
+    setMode16();
 
-	srand(time(0));
-	const int rowCount = 8;
-	const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
-	// Настройка широких символов для потока вывода
-	_setmode(_fileno(stdout), _O_U16TEXT);
-	_setmode(_fileno(stdin), _O_U16TEXT);
+    ClearScreen();      // Очистка консоли
 
-	Day day_one;
-    GenerationDay(day_one, "schedule.txt", rowCount, placeCount); // генерация всех сеансов первого дня
+    srand(time(0));
+    const int rowCount = 8;
+    const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
 
-    /*demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала 
+
+
+    Day day_one;
+    GenerationDay(day_one, fileIn("schedule.txt"), rowCount, placeCount); // генерация всех сеансов первого дня
+
+    /*demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала
     waitForInput();*/
     fullScreen();
-    ClearScreen();      // Очистка консоли
+    choosingPlace(day_one.Session_one[0]);
+    waitForInput();
+    wcout << fileIn("check.txt") << endl;
 
     wcout << L"Проект кинотеатра.🎬" << endl;
     wcout << L"Тестовый запуск" << endl;
 
+
     extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
-
-   
-
-    
-
-
 
     ///пример замены сущесвующего места без проверок индекса
     /* int changeRow, changePalace;
@@ -439,7 +485,6 @@ int main() {
     cin >> changePalace;
     changePlaces(hall, changeRow, changePalace);
     DrawHall(hall, rowCount, placeCount);*/
-
 
     waitForInput();
     closeWindow();

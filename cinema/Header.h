@@ -11,12 +11,17 @@
 #include <fstream>
 #include <sstream>
 #include <thread>
-#include <locale>
+#include <codecvt>      // Äëÿ ïðåîáðàçîâàíèÿ UTF-16 â wide string
+#include <io.h>         // Äëÿ ðàáîòû ñ _setmode
+#include <locale>       // Äëÿ ðàáîòû ñ êîäèðîâêàìè
+#include <fcntl.h>      // Äëÿ ðåæèìà _O_U16TEXT
+
 
 using namespace std;
 
 // Конфигурация программы
 namespace Config {
+    int y = 0;
     constexpr int BOX_WIDTH = 6;              // Ширина бокса
     constexpr int BOX_HEIGHT = 3;             // Высота бокса
     constexpr int CHANSE_NOT_FREE_PLACES = 9; // Вероятность занятого места
@@ -33,6 +38,11 @@ struct Row {
     vector<Seat> seats;
 };
 
+void setCursorPosition(int x, int y) {
+    COORD coord = { (SHORT)x, (SHORT)y };
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
 // Структура зала
 struct Session {
     vector<Row> rows;
@@ -47,31 +57,14 @@ struct Day {
     vector<Session> Session_three;
 };
 
-// Настройка консоли
-// Перевод консоли в полноэкранный режим
-
-void fullScreen() {
-    COORD coord;
-    SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
-    keybd_event(VK_MENU, 0, 0, 0); // Нажатие Alt
-    keybd_event(VK_RETURN, 0, 0, 0); // Нажатие Enter
-    keybd_event(VK_RETURN, 0, KEYEVENTF_KEYUP, 0); // Отпуск Enter
-    keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0); // Отпуск Alt
-    this_thread::sleep_for(chrono::milliseconds(100));
-}
-
-
-// Установка позиции курсора
-void setCursorPosition(int x, int y) {
-    COORD coord = { (SHORT)x, (SHORT)y };
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
-
-// Установка цвета текста и фона
 void SetColor(int text, int background) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (background << 4) | text);
 }
 
+void setMode16() {
+    _setmode(_fileno(stdout), _O_U16TEXT);
+    _setmode(_fileno(stdin), _O_U16TEXT);
+}
 
 // Проверка и преобразование строк
 // Проверка, является ли строка числом
@@ -111,6 +104,8 @@ void drawRowNumberBox(int& x, int y, int rowNumber) {
     x += BOX_WIDTH + 1;
 }
 
+
+
 // Функция отрисовки свободного места
 void drawAvailableBox(int& x, int y, const wstring& number) {
     setCursorPosition(x, y);
@@ -145,15 +140,6 @@ void drawRow(int y, const Row& row, int rowNumber) {
     }
 }
 
-wstring utf8ToUtf16(const string& utf8Str) {
-    if (utf8Str.empty()) return L"";
-
-    int size_needed = MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), (int)utf8Str.size(), NULL, 0);
-    wstring utf16Str(size_needed, 0);
-    MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), (int)utf8Str.size(), &utf16Str[0], size_needed);
-    return utf16Str;
-}
-
 // Генерация зала
 void GenerationRoom(Session& session, const int rowCount, const int placeCount, wstring name, wstring time_f) {
     session.rows.resize(rowCount);
@@ -173,6 +159,16 @@ void GenerationRoom(Session& session, const int rowCount, const int placeCount, 
     }
 }
 
+void fullScreen() {
+    COORD coord;
+    SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
+    keybd_event(VK_MENU, 0, 0, 0); // Нажатие Alt
+    keybd_event(VK_RETURN, 0, 0, 0); // Нажатие Enter
+    keybd_event(VK_RETURN, 0, KEYEVENTF_KEYUP, 0); // Отпуск Enter
+    keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0); // Отпуск Alt
+    this_thread::sleep_for(chrono::milliseconds(100));
+}
+
 wstring replaceDash(wstring str) {
     replace(str.begin(), str.end(), L'—', L'-');
     return str;
@@ -185,29 +181,10 @@ void removeCarriageReturn(std::wstring& line) {
 
 
 // Генерация дня с чтением из файла
-void GenerationDay(Day& day, const string& filename, int rowCount, int placeCount) {
+void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
+    
     // Читаем файл в строку
-    ifstream fin(filename, ios::binary);
-    if (!fin) {
-        wcerr << L"Ошибка: Не удалось открыть файл." << endl;
-        return;
-    }
-
-    // Читаем содержимое файла
-    ostringstream buffer;
-    buffer << fin.rdbuf();
-    string utf8Content = buffer.str();
-    fin.close();
-
-    // Конвертация из UTF-8 в UTF-16
-    wstring fileContent = utf8ToUtf16(utf8Content);
-
-    if (fileContent.empty()) {
-        wcerr << L"Ошибка: Файл пуст." << endl;
-        return;
-    }
-    // Обработка содержимого файла
-    wstringstream stream(fileContent);
+    wstringstream stream(filename);
     wstring line;
     vector<Session>* currentSessionGroup = nullptr;
 
@@ -299,7 +276,6 @@ void waitForInput() {
 }
 
 void DrawSession(Session& session, int rowCount, int placeCount) {
-    int y = 0;
     wcout << setw(65) << session.time_film << endl;
     ++y;
     wcout << setw(67) << session.film_name << endl;
@@ -313,8 +289,8 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
 
 // Функция для проверки ввода числа
 bool correctInput(int& number) {
-    string input;
-    getline(cin, input); // Читаем строку
+    wstring input;
+    getline(wcin, input); // Читаем строку из wcin
     if (input.empty()) {
         return false; // Проверка на пустой ввод
     }
@@ -332,26 +308,6 @@ bool correctInput(int& number) {
         return false; // Если число выходит за пределы
     }
     return true; // Успех
-}
-
-
-//черновая версия void choosingPlace()
-void changePlaces(Session& session, int row, int place) {
-    --row; // Приведение к 0-индексации
-    --place; // Приведение к 0-индексации
-    if (row < 0 || row >= session.rows.size() || place < 0 || place >= session.rows[row].seats.size()) {
-        wcout << L"Некорректный выбор места.\n";
-        return;
-    }
-
-    if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
-        wcout << L"Место занято, выберите другое.\n";
-    }
-    else {
-        ClearScreen();
-        wcout << L"Место успешно забронировано.\n";
-        session.rows[row].seats[place].status = L"x";
-    }
 }
 
 #endif // HEADER_H
