@@ -402,51 +402,218 @@ void demoVis_All_sessions(Day& day_one, const int rowCount, const int placeCount
         ClearScreen();
     }
 }
+
+bool aoutoChoosingPlace(Session& session, int cnt_places) {
+    for (int i = 0; i < session.rows.size(); ++i) {
+        int cnt = 0;  // Счётчик свободных мест подряд
+        int start_index = -1; // Индекс начала первого подходящего участка
+
+        for (int j = 1; j < session.rows[i].seats.size() - 1; ++j) { // Проход от 1 до предпоследнего индекса
+            if (session.rows[i].seats[j].status != L"x") {
+                // Если место свободно, увеличиваем счётчик
+                if (cnt == 0) start_index = j; // Устанавливаем начало участка
+                ++cnt;
+
+                if (cnt == cnt_places) { // Если нашли подходящий участок
+                    // Помечаем места как занятые
+                    for (int k = start_index; k < start_index + cnt_places; ++k) {
+                        session.rows[i].seats[k].status = L"x";
+                        session.rows[i].seats[k].color = L"violet";
+                    }
+                    ClearScreen();
+                    DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+                    for (int k = start_index; k < start_index + cnt_places; ++k) {
+                        session.rows[i].seats[k].color = L"red";
+                    }
+                    return true; // Возвращаем успех
+                }
+            }
+            else {
+                // Если место занято, сбрасываем счётчик
+                cnt = 0;
+                start_index = -1;
+            }
+        }
+    }
+    return false; // Если ни одного подходящего участка не найдено
+}
+
+
 void choosingPlace(Session& session) {
     DrawSession(session, session.rows.size(), session.rows[0].seats.size());
     setCursorPosition(0, y);
 
-    int row, place;
-    bool notFreePlace = true; // Флаг для проверки доступности места
 
+    int choice = 0;
+    int cnt_error_messeg = 0;
+
+    // Выбор способа бронирования
     while (true) {
-        wcout << L"Введите номер ряда: ";
-        if (!correctInput(row)) {
-            wcout << L"Некорректный ввод. Пожалуйста, введите номер ряда заново.\n";
+        if (cnt_error_messeg > 3) {
+            ClearScreenFromPosition(0, 42);
+            cnt_error_messeg = 0;
             continue;
         }
-        --row; // Приводим к индексации с 0
-        if (row < 0 || row >= session.rows.size()) {
-            wcout << L"Номер ряда вне диапазона. Пожалуйста, введите корректный номер ряда.\n";
+        wcout << L"Выберите способ бронирования мест:\n";
+        wcout << L"1. Автоподбор мест\n";
+        wcout << L"2. Ручной выбор мест\n";
+        wcout << L"Введите ваш выбор: ";
+
+        if (!correctInput(choice) || (choice != 1 && choice != 2)) {
+            cnt_error_messeg += 3;
+            wcout << L"Некорректный ввод. Введите 1 или 2.\n";
             continue;
         }
 
-        wcout << L"Введите номер места: ";
-        if (!correctInput(place)) {
-            wcout << L"Некорректный ввод. Пожалуйста, введите номер места заново.\n";
-            continue;
+        if (choice == 1) { // Автоподбор мест
+            int cnt_places;
+            while (true) {
+                if (cnt_error_messeg > 3) {
+                    ClearScreenFromPosition(0, 42);
+                    cnt_error_messeg = 0;
+                    continue;
+                }
+                wcout << L"Введите количество мест (меньше 16): ";
+
+                if (!correctInput(cnt_places)) {
+                    ++cnt_error_messeg;
+                    wcout << L"Некорректный ввод. Введите количество мест заново.\n";
+                    continue;
+                }
+
+                if (cnt_places <= 0 || cnt_places > 16) {
+                    ++cnt_error_messeg;
+                    wcout << L"Количество мест вне диапазона. Пожалуйста, введите корректное количество.\n";
+                    continue;
+                }
+
+                if (!aoutoChoosingPlace(session, cnt_places)) {
+                    wcout << L"К сожалению, не удалось найти " << cnt_places << L" свободных рядом мест.\n";
+                    ++cnt_error_messeg;
+                    continue;
+                }
+
+
+                wcout << L"Места успешно забронированы.\n";
+                break;
+            }
+            break;
+
         }
-        if (place < 0 || place >= session.rows[row].seats.size() - 1) {
-            wcout << L"Номер места вне диапазона. Пожалуйста, введите корректный номер места.\n";
-            continue;
+        else if (choice == 2) { // Ручной выбор мест
+            int cnt_places, row, place;
+            while (true) {
+                if (cnt_error_messeg > 3) {
+                    ClearScreenFromPosition(0, 42);
+                    cnt_error_messeg = 0;
+                    continue;
+                }
+                wcout << L"Сколько мест вы хотите купить? ";
+                if (!correctInput(cnt_places)) {
+                    ++cnt_error_messeg;
+                    wcout << L"Некорректный ввод. Введите количество мест заново.\n";
+                    continue;
+                }
+
+                if (cnt_places <= 0 || cnt_places > 16) {
+                    ++cnt_error_messeg;
+                    wcout << L"Количество мест вне диапазона. Пожалуйста, введите корректное количество.\n";
+                    continue;
+                }
+
+                for (int i = 0; i < cnt_places; ++i) {
+                    while (true) {
+                        if (cnt_error_messeg > 3) {
+                            ClearScreenFromPosition(0, 42);
+                            cnt_error_messeg = 0;
+                            continue;
+                        }
+                        wcout << L"Введите номер ряда: ";
+                        if (!correctInput(row)) {
+                            ++cnt_error_messeg;
+                            wcout << L"Некорректный ввод. Введите номер ряда заново.\n";
+                            continue;
+                        }
+
+                        --row; // Приведение к индексации с 0
+                        if (row < 0 || row >= session.rows.size()) {
+                            ++cnt_error_messeg;
+                            wcout << L"Номер ряда вне диапазона. Введите корректный номер ряда.\n";
+                            continue;
+                        }
+
+                        wcout << L"Введите номер места: ";
+                        if (!correctInput(place)) {
+                            ++cnt_error_messeg;
+                            wcout << L"Некорректный ввод. Введите номер места заново.\n";
+                            continue;
+                        }
+
+                        if (place <= 0 || place >= session.rows[row].seats.size() - 1) {
+                            ++cnt_error_messeg;
+                            wcout << L"Номер места вне диапазона. Введите корректный номер места.\n";
+                            continue;
+                        }
+
+                        if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
+                            ++cnt_error_messeg;
+                            wcout << L"Место занято, выберите другое.\n";
+                            continue;
+                        }
+                        ClearScreen();
+                        // Если место свободно, бронируем его
+                        session.rows[row].seats[place].status = L"x";
+                        session.rows[row].seats[place].color = L"violet";
+                        DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+                        wcout << L"Место успешно забронировано.\n";
+                        session.rows[row].seats[place].color = L"red";
+                        break;
+                    }
+                }
+                break;
+            }
+            break;
         }
 
-        if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
-            wcout << L"Место занято, выберите другое.\n";
-            continue; // Повторяем выбор ряда и места
-        }
+        int row, place;
+        bool notFreePlace = true; // Флаг для проверки доступности места
 
-        // Если место свободно, бронируем его
-        ClearScreen();
-        session.rows[row].seats[place].status = L"x";
-        DrawSession(session, session.rows.size(), session.rows[0].seats.size());
-        wcout << L"Место успешно забронировано.\n";
-        break; // Выход из цикла после успешного бронирования
+        while (true) {
+            wcout << L"Введите номер ряда: ";
+            if (!correctInput(row)) {
+                wcout << L"Некорректный ввод. Пожалуйста, введите номер ряда заново.\n";
+                continue;
+            }
+            --row; // Приводим к индексации с 0
+            if (row < 0 || row >= session.rows.size()) {
+                wcout << L"Номер ряда вне диапазона. Пожалуйста, введите корректный номер ряда.\n";
+                continue;
+            }
+
+            wcout << L"Введите номер места: ";
+            if (!correctInput(place)) {
+                wcout << L"Некорректный ввод. Пожалуйста, введите номер места заново.\n";
+                continue;
+            }
+            if (place < 0 || place >= session.rows[row].seats.size() - 1) {
+                wcout << L"Номер места вне диапазона. Пожалуйста, введите корректный номер места.\n";
+                continue;
+            }
+
+            if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
+                wcout << L"Место занято, выберите другое.\n";
+                continue; // Повторяем выбор ряда и места
+            }
+
+            // Если место свободно, бронируем его
+            ClearScreen();
+            session.rows[row].seats[place].status = L"x";
+            DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+            wcout << L"Место успешно забронировано.\n";
+            break; // Выход из цикла после успешного бронирования
+        }
     }
 }
-
-
-
 
 
 // вывод всех сеансов ввиде зала  //для понимания кода 
@@ -646,11 +813,6 @@ void choosingPlace(Session& session) {
 
 
 
-
-
-
-
-
 int main() {
     // Настройка широких символов для потока вывода
     setMode16();
@@ -660,8 +822,6 @@ int main() {
     srand(time(0));
     const int rowCount = 8;
     const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
-
-
 
     Day day_one;
     GenerationDay(day_one, fileIn("schedule.txt"), rowCount, placeCount); // генерация всех сеансов первого дня

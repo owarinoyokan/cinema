@@ -33,6 +33,13 @@ void setCursorPosition(int x, int y) {
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
+
+// Структура для представления одного места
+struct Seat {
+    wstring status; // "x" — занято, "0" — номер ряда, число — номер места
+    wstring color; // цвет места 
+};
+
 // Структура для представления одного места
 struct Seat {
     wstring status; // "x" — занято, "0" — номер ряда, число — номер места
@@ -44,10 +51,12 @@ struct Row {
     vector<Seat> seats;
 };
 
+
 void setCursorPosition(int x, int y) {
     COORD coord = { (SHORT)x, (SHORT)y };
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
+
 
 // Структура зала
 struct Session {
@@ -82,6 +91,7 @@ bool isNumber(const wstring& str) {
     }
     return true;
 }
+
 // Преобразование строки в число
 int stringToInt(const wstring& str) {
     return stoi(str);
@@ -90,6 +100,7 @@ int stringToInt(const wstring& str) {
 
 // Функции отрисовки
 // Функция отрисовки занятого места
+
 void drawOccupiedBox(int& x, int y, wstring& clr) {
     if (clr == L"red") 
         SetColor(12, 12);
@@ -99,6 +110,21 @@ void drawOccupiedBox(int& x, int y, wstring& clr) {
     }
     
     
+=======
+
+void drawOccupiedBox(int& x, int y, wstring& clr) {
+    if (clr == L"red")
+        SetColor(12, 12);
+    else
+        if (clr == L"violet") {
+            SetColor(13, 13);
+        }
+}
+    
+
+void drawOccupiedBox(int& x, int y) {
+    SetColor(7, 7);
+
     setCursorPosition(x, y + 1);
     wcout << L"|    |";
     setCursorPosition(x, y + 2);
@@ -116,7 +142,6 @@ void drawRowNumberBox(int& x, int y, int rowNumber) {
     wcout << L"Row " << rowNumber;
     x += BOX_WIDTH + 1;
 }
-
 
 
 // Функция отрисовки свободного места
@@ -347,6 +372,7 @@ void waitForInput() {
     cin.clear();
 }
 
+
 void DrawSession(Session& session, int rowCount, int placeCount) {
     wcout << setw(65) << session.time_film << endl;
     ++y;
@@ -358,6 +384,7 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
     }
     setCursorPosition(0, y);
 }
+
 
 // Функция для проверки ввода числа
 bool correctInput(int& number) {
