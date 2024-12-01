@@ -17,6 +17,7 @@
 #include <fcntl.h>      // Äëÿ ðåæèìà _O_U16TEXT
 
 
+
 using namespace std;
 
 // Конфигурация программы
