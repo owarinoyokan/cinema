@@ -33,13 +33,6 @@ void setCursorPosition(int x, int y) {
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-
-// Структура для представления одного места
-struct Seat {
-    wstring status; // "x" — занято, "0" — номер ряда, число — номер места
-    wstring color; // цвет места 
-};
-
 // Структура для представления одного места
 struct Seat {
     wstring status; // "x" — занято, "0" — номер ряда, число — номер места
@@ -50,13 +43,6 @@ struct Seat {
 struct Row {
     vector<Seat> seats;
 };
-
-
-void setCursorPosition(int x, int y) {
-    COORD coord = { (SHORT)x, (SHORT)y };
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
-
 
 // Структура зала
 struct Session {
@@ -91,7 +77,6 @@ bool isNumber(const wstring& str) {
     }
     return true;
 }
-
 // Преобразование строки в число
 int stringToInt(const wstring& str) {
     return stoi(str);
@@ -100,18 +85,6 @@ int stringToInt(const wstring& str) {
 
 // Функции отрисовки
 // Функция отрисовки занятого места
-
-void drawOccupiedBox(int& x, int y, wstring& clr) {
-    if (clr == L"red") 
-        SetColor(12, 12);
-    else 
-        if (clr == L"violet") {
-            SetColor(13, 13);
-    }
-    
-    
-=======
-
 void drawOccupiedBox(int& x, int y, wstring& clr) {
     if (clr == L"red")
         SetColor(12, 12);
@@ -119,11 +92,7 @@ void drawOccupiedBox(int& x, int y, wstring& clr) {
         if (clr == L"violet") {
             SetColor(13, 13);
         }
-}
-    
 
-void drawOccupiedBox(int& x, int y) {
-    SetColor(7, 7);
 
     setCursorPosition(x, y + 1);
     wcout << L"|    |";
@@ -142,6 +111,7 @@ void drawRowNumberBox(int& x, int y, int rowNumber) {
     wcout << L"Row " << rowNumber;
     x += BOX_WIDTH + 1;
 }
+
 
 
 // Функция отрисовки свободного места
@@ -217,16 +187,6 @@ void GenerationRoom(Session& session, const int rowCount, const int placeCount, 
             }
         }
     }
-}
-
-void fullScreen() {
-    COORD coord;
-    SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
-    keybd_event(VK_MENU, 0, 0, 0); // Нажатие Alt
-    keybd_event(VK_RETURN, 0, 0, 0); // Нажатие Enter
-    keybd_event(VK_RETURN, 0, KEYEVENTF_KEYUP, 0); // Отпуск Enter
-    keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0); // Отпуск Alt
-    this_thread::sleep_for(chrono::milliseconds(100));
 }
 
 void fullScreen() {
@@ -371,20 +331,6 @@ void waitForInput() {
     system("pause");
     cin.clear();
 }
-
-
-void DrawSession(Session& session, int rowCount, int placeCount) {
-    wcout << setw(65) << session.time_film << endl;
-    ++y;
-    wcout << setw(67) << session.film_name << endl;
-    ++y;
-    for (size_t i = 0; i < session.rows.size(); ++i) {
-        drawRow(y, session.rows[i], i + 1);
-        y += BOX_HEIGHT + 2;
-    }
-    setCursorPosition(0, y);
-}
-
 
 // Функция для проверки ввода числа
 bool correctInput(int& number) {
