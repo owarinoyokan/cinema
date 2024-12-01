@@ -406,9 +406,10 @@ void choosingPlace(Session& session) {
     DrawSession(session, session.rows.size(), session.rows[0].seats.size());
     setCursorPosition(0, y);
 
+
     int row, place, cnt_error_messeg = 0;
     bool notFreePlace = true; // Флаг для проверки доступности места
-    
+
     while (true) {
         if (cnt_error_messeg > 3) {
             ClearScreenFromPosition(0, 42);
@@ -417,44 +418,68 @@ void choosingPlace(Session& session) {
         wcout << L"Введите номер ряда: ";
         if (!correctInput(row)) {
             ++cnt_error_messeg;
-            wcout << L"Некорректный ввод. Пожалуйста, введите номер ряда заново.\n";
-            continue;
-        }
-        --row; // Приводим к индексации с 0
-        if (row < 0 || row >= session.rows.size()) {
-            ++cnt_error_messeg;
-            wcout << L"Номер ряда вне диапазона. Пожалуйста, введите корректный номер ряда.\n";
-            continue;
+
+            int row, place;
+            bool notFreePlace = true; // Флаг для проверки доступности места
+
+            while (true) {
+                wcout << L"Введите номер ряда: ";
+                if (!correctInput(row)) {
+
+                    wcout << L"Некорректный ввод. Пожалуйста, введите номер ряда заново.\n";
+                    continue;
+                }
+                --row; // Приводим к индексации с 0
+                if (row < 0 || row >= session.rows.size()) {
+
+                    ++cnt_error_messeg;
+
+                    wcout << L"Номер ряда вне диапазона. Пожалуйста, введите корректный номер ряда.\n";
+                    continue;
+                }
+
+                wcout << L"Введите номер места: ";
+                if (!correctInput(place)) {
+
+                    ++cnt_error_messeg;
+
+                    wcout << L"Некорректный ввод. Пожалуйста, введите номер места заново.\n";
+                    continue;
+                }
+                if (place < 0 || place >= session.rows[row].seats.size() - 1) {
+
+                    ++cnt_error_messeg;
+
+                    wcout << L"Номер места вне диапазона. Пожалуйста, введите корректный номер места.\n";
+                    continue;
+                }
+
+                if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
+
+                    ++cnt_error_messeg;
+
+                    wcout << L"Место занято, выберите другое.\n";
+                    continue; // Повторяем выбор ряда и места
+                }
+
+                // Если место свободно, бронируем его
+                ClearScreen();
+                session.rows[row].seats[place].status = L"x";
+
+                session.rows[row].seats[place].color = L"violet";
+                DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+                wcout << L"Место успешно забронировано.\n";
+                session.rows[row].seats[place].color = L"red";
+                break; // Выход из цикла после успешного бронирования
+            }
+
+
+            DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+            wcout << L"Место успешно забронировано.\n";
+            break; // Выход из цикла после успешного бронирования
         }
 
-        wcout << L"Введите номер места: ";
-        if (!correctInput(place)) {
-            ++cnt_error_messeg;
-            wcout << L"Некорректный ввод. Пожалуйста, введите номер места заново.\n";
-            continue;
-        }
-        if (place < 0 || place >= session.rows[row].seats.size() - 1) {
-            ++cnt_error_messeg;
-            wcout << L"Номер места вне диапазона. Пожалуйста, введите корректный номер места.\n";
-            continue;
-        }
-
-        if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
-            ++cnt_error_messeg;
-            wcout << L"Место занято, выберите другое.\n";
-            continue; // Повторяем выбор ряда и места
-        }
-
-        // Если место свободно, бронируем его
-        ClearScreen();
-        session.rows[row].seats[place].status = L"x";
-        session.rows[row].seats[place].color = L"violet";
-        DrawSession(session, session.rows.size(), session.rows[0].seats.size());
-        wcout << L"Место успешно забронировано.\n";
-        session.rows[row].seats[place].color = L"red";
-        break; // Выход из цикла после успешного бронирования
     }
-
 }
 
 
@@ -482,9 +507,11 @@ int main() {
     choosingPlace(day_one.Session_one[0]);
     waitForInput();
     ClearScreen();
+
     choosingPlace(day_one.Session_one[0]);
     waitForInput();
     ClearScreen();
+
     wcout << fileIn("check.txt") << endl;
 
     wcout << L"Проект кинотеатра.🎬" << endl;

@@ -31,7 +31,9 @@ using namespace Config;
 // Структура для представления одного места
 struct Seat {
     wstring status; // "x" — занято, "0" — номер ряда, число — номер места
+
     wstring color; // цвет места 
+
 };
 
 // Структура для ряда
@@ -86,14 +88,16 @@ int stringToInt(const wstring& str) {
 // Функции отрисовки
 // Функция отрисовки занятого места
 void drawOccupiedBox(int& x, int y, wstring& clr) {
-    if (clr == L"red") 
+    if (clr == L"red")
         SetColor(12, 12);
-    else 
+    else
         if (clr == L"violet") {
             SetColor(13, 13);
-    }
+        }
+}
     
-    
+void drawOccupiedBox(int& x, int y) {
+    SetColor(7, 7);
     setCursorPosition(x, y + 1);
     wcout << L"|    |";
     setCursorPosition(x, y + 2);
@@ -330,6 +334,20 @@ void closeWindow() {
 void waitForInput() {
     system("pause");
 }
+
+
+void DrawSession(Session& session, int rowCount, int placeCount) {
+    wcout << setw(65) << session.time_film << endl;
+    ++y;
+    wcout << setw(67) << session.film_name << endl;
+    ++y;
+    for (size_t i = 0; i < session.rows.size(); ++i) {
+        drawRow(y, session.rows[i], i + 1);
+        y += BOX_HEIGHT + 2;
+    }
+    setCursorPosition(0, y);
+}
+
 
 // Функция для проверки ввода числа
 bool correctInput(int& number) {
