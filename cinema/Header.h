@@ -17,7 +17,6 @@
 #include <fcntl.h>      // Äëÿ ðåæèìà _O_U16TEXT
 
 
-
 using namespace std;
 
 // Конфигурация программы
@@ -44,6 +43,11 @@ struct Seat {
 struct Row {
     vector<Seat> seats;
 };
+
+void setCursorPosition(int x, int y) {
+    COORD coord = { (SHORT)x, (SHORT)y };
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
 
 // Структура зала
 struct Session {
@@ -200,6 +204,16 @@ void fullScreen() {
     this_thread::sleep_for(chrono::milliseconds(100));
 }
 
+void fullScreen() {
+    COORD coord;
+    SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
+    keybd_event(VK_MENU, 0, 0, 0); // Нажатие Alt
+    keybd_event(VK_RETURN, 0, 0, 0); // Нажатие Enter
+    keybd_event(VK_RETURN, 0, KEYEVENTF_KEYUP, 0); // Отпуск Enter
+    keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0); // Отпуск Alt
+    this_thread::sleep_for(chrono::milliseconds(100));
+}
+
 wstring replaceDash(wstring str) {
     replace(str.begin(), str.end(), L'—', L'-');
     return str;
@@ -331,6 +345,18 @@ void closeWindow() {
 void waitForInput() {
     system("pause");
     cin.clear();
+}
+
+void DrawSession(Session& session, int rowCount, int placeCount) {
+    wcout << setw(65) << session.time_film << endl;
+    ++y;
+    wcout << setw(67) << session.film_name << endl;
+    ++y;
+    for (size_t i = 0; i < session.rows.size(); ++i) {
+        drawRow(y, session.rows[i], i + 1);
+        y += BOX_HEIGHT + 2;
+    }
+    setCursorPosition(0, y);
 }
 
 // Функция для проверки ввода числа
