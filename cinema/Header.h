@@ -28,6 +28,11 @@ namespace Config {
 }
 using namespace Config;
 
+void setCursorPosition(int x, int y) {
+    COORD coord = { (SHORT)x, (SHORT)y };
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
 // Структура для представления одного места
 struct Seat {
     wstring status; // "x" — занято, "0" — номер ряда, число — номер места
@@ -38,11 +43,6 @@ struct Seat {
 struct Row {
     vector<Seat> seats;
 };
-
-void setCursorPosition(int x, int y) {
-    COORD coord = { (SHORT)x, (SHORT)y };
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
 
 // Структура зала
 struct Session {
@@ -329,6 +329,7 @@ void closeWindow() {
 
 void waitForInput() {
     system("pause");
+    cin.clear();
 }
 
 // Функция для проверки ввода числа
