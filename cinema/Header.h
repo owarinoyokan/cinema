@@ -33,14 +33,17 @@ void setCursorPosition(int x, int y) {
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
+
 // Структура для представления одного места
 struct Seat {
     wstring status; // "x" — занято, "0" — номер ряда, число — номер места
     wstring color; // цвет места 
 };
+
 // Структура для представления одного места
 struct Seat {
     wstring status; // "x" — занято, "0" — номер ряда, число — номер места
+    wstring color; // цвет места 
 };
 
 // Структура для ряда
@@ -99,6 +102,17 @@ int stringToInt(const wstring& str) {
 // Функция отрисовки занятого места
 
 void drawOccupiedBox(int& x, int y, wstring& clr) {
+    if (clr == L"red") 
+        SetColor(12, 12);
+    else 
+        if (clr == L"violet") {
+            SetColor(13, 13);
+    }
+    
+    
+=======
+
+void drawOccupiedBox(int& x, int y, wstring& clr) {
     if (clr == L"red")
         SetColor(12, 12);
     else
@@ -110,6 +124,7 @@ void drawOccupiedBox(int& x, int y, wstring& clr) {
 
 void drawOccupiedBox(int& x, int y) {
     SetColor(7, 7);
+
     setCursorPosition(x, y + 1);
     wcout << L"|    |";
     setCursorPosition(x, y + 2);
@@ -164,7 +179,6 @@ void drawRow(int y, const Row& row, int rowNumber) {
     }
 }
 
-
 /// <summary>
 /// Эта функция отрисовывает весь зал
 /// </summary>
@@ -185,7 +199,6 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
 
 }
 
-
 // Генерация зала
 void GenerationRoom(Session& session, const int rowCount, const int placeCount, wstring name, wstring time_f) {
     session.rows.resize(rowCount);
@@ -204,6 +217,16 @@ void GenerationRoom(Session& session, const int rowCount, const int placeCount, 
             }
         }
     }
+}
+
+void fullScreen() {
+    COORD coord;
+    SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
+    keybd_event(VK_MENU, 0, 0, 0); // Нажатие Alt
+    keybd_event(VK_RETURN, 0, 0, 0); // Нажатие Enter
+    keybd_event(VK_RETURN, 0, KEYEVENTF_KEYUP, 0); // Отпуск Enter
+    keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0); // Отпуск Alt
+    this_thread::sleep_for(chrono::milliseconds(100));
 }
 
 void fullScreen() {
