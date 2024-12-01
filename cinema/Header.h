@@ -31,6 +31,7 @@ using namespace Config;
 // Структура для представления одного места
 struct Seat {
     wstring status; // "x" — занято, "0" — номер ряда, число — номер места
+    wstring color; // цвет места 
 };
 
 // Структура для ряда
@@ -84,8 +85,15 @@ int stringToInt(const wstring& str) {
 
 // Функции отрисовки
 // Функция отрисовки занятого места
-void drawOccupiedBox(int& x, int y) {
-    SetColor(7, 7);
+void drawOccupiedBox(int& x, int y, wstring& clr) {
+    if (clr == L"red") 
+        SetColor(12, 12);
+    else 
+        if (clr == L"violet") {
+            SetColor(13, 13);
+    }
+    
+    
     setCursorPosition(x, y + 1);
     wcout << L"|    |";
     setCursorPosition(x, y + 2);
@@ -125,7 +133,8 @@ void drawBox(int& x, int y, const Seat& seat, int rowNumber) {
         drawAvailableBox(x, y, seat.status);
     }
     else if (seat.status == L"x") {
-        drawOccupiedBox(x, y);
+        wstring clr = seat.color;
+        drawOccupiedBox(x, y, clr);
     }
     else if (seat.status == L"0") {
         drawRowNumberBox(x, y, rowNumber);
@@ -140,6 +149,26 @@ void drawRow(int y, const Row& row, int rowNumber) {
     }
 }
 
+/// <summary>
+/// Эта функция отрисовывает весь зал
+/// </summary>
+/// <param name="session">сеанс</param>
+/// <param name="rowCount"> количество рядов</param>
+/// <param name="placeCount">количество мест</param>
+void DrawSession(Session& session, int rowCount, int placeCount) {
+    wcout << setw(65) << session.time_film << endl;
+    ++y;
+    wcout << setw(67) << session.film_name << endl;
+    ++y;
+    for (int i = session.rows.size() - 1; i >= 0; --i) {
+        drawRow(y, session.rows[i], i + 1);
+        y += BOX_HEIGHT + 2;
+    }
+    setCursorPosition(0, y);
+    wcout << y << endl;
+
+}
+
 // Генерация зала
 void GenerationRoom(Session& session, const int rowCount, const int placeCount, wstring name, wstring time_f) {
     session.rows.resize(rowCount);
@@ -152,8 +181,9 @@ void GenerationRoom(Session& session, const int rowCount, const int placeCount, 
                 session.rows[i].seats[j].status = L"0";
             }
             else {
-                int rand_not_free = rand() % CHANSE_NOT_FREE_PLACES;
-                session.rows[i].seats[j].status = (rand_not_free == 0) ? L"x" : to_wstring(j);
+                int rand_not_free = rand() % CHANSE_NOT_FREE_PLACES; // шанс что место уже занято 
+                session.rows[i].seats[j].status = (rand_not_free == 0) ? L"x" : to_wstring(j); // сохранение состояния текущего места
+                session.rows[i].seats[j].color = (rand_not_free == 0) ? L"red" : L"white"; // установка цвета текущего места
             }
         }
     }
@@ -260,6 +290,31 @@ void ClearScreen() {
     }
 }
 
+
+/// <summary>
+/// Очистка экрана с определённой позиции и доконца
+/// </summary>
+/// <param name="startX">Позиция Х</param>
+/// <param name="startY">Позиция Y</param>
+void ClearScreenFromPosition(int startX, int startY) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    DWORD count, cellCount;
+    COORD startCoord = { (SHORT)startX, (SHORT)startY };
+
+    if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+        // Вычисляем количество ячеек, которые нужно очистить
+        cellCount = (csbi.dwSize.X - startX) * (csbi.dwSize.Y - startY);
+
+        // Заполняем пространство пробелами
+        FillConsoleOutputCharacter(hConsole, ' ', cellCount, startCoord, &count);
+        FillConsoleOutputAttribute(hConsole, csbi.wAttributes, cellCount, startCoord, &count);
+
+        // Устанавливаем курсор в начальную позицию
+        setCursorPosition(startX, startY);
+    }
+}
+
 void closeWindow() {
     // Нажимаем Alt
     keybd_event(VK_MENU, 0x38, 0, 0);
@@ -274,18 +329,6 @@ void closeWindow() {
 
 void waitForInput() {
     system("pause");
-}
-
-void DrawSession(Session& session, int rowCount, int placeCount) {
-    wcout << setw(65) << session.time_film << endl;
-    ++y;
-    wcout << setw(67) << session.film_name << endl;
-    ++y;
-    for (size_t i = 0; i < session.rows.size(); ++i) {
-        drawRow(y, session.rows[i], i + 1);
-        y += BOX_HEIGHT + 2;
-    }
-    setCursorPosition(0, y);
 }
 
 // Функция для проверки ввода числа
