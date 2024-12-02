@@ -68,7 +68,7 @@ void availablePromo() { // Функция для просмотра доспуп
 
 void movieSelection() { // Функция выводяшая список фильмов с краткой информацией
     short int input;
-    wcout << L"\n" << fileIn("cimema_info.txt") << endl; // Вывод файла
+    wcout << L"\n" << fileIn("cinema_info.txt") << endl; // Вывод файла
     //wcout << L"Список фильмов с краткой информацией ... " << endl;
     wcout << L"Нажмите '1', чтобы выбрать сеанс" << endl;
     //wcout << L"Нажмите '2', чтобы посмотреть детали" << endl; // Возможно это не стоит показывать отдельно 
