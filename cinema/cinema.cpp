@@ -82,8 +82,53 @@ void movieSelection() { // Функция выводяшая список фил
         //choosingPlace(); // выбор сеанса >> меню выбора места >> после выбора мест использовать функцию оплаты
         sessionSelection(1);
         break;
-    case 2:
-        detailedInform(); // Функция выводящая детали фильма
+    case 21:
+        wcout << L"\n" << fileIn("Gone with the session.txt") << endl; // Унесённые сессией        
+        //detailedInform(); // Функция выводящая детали фильма
+        break;
+    case 22:
+        wcout << L"\n" << fileIn("Back to the compiler.txt") << endl; // Назад к компилятору      
+        //detailedInform(); // Функция выводящая детали фильма
+        break;
+    case 23:
+        wcout << L"\n" << fileIn("And deadlines are tight.txt") << endl; // А дедлайны здесь жесткие      
+        //detailedInform(); // Функция выводящая детали фильма
+        break;
+    case 24:
+        wcout << L"\n" << fileIn("Lord of the Lab.txt") << endl; // Властелин лаб: возвращение сеньора       
+        //detailedInform(); // Функция выводящая детали фильма
+        break;
+    case 25:
+        wcout << L"\n" << fileIn("Titanic.txt") << endl; // Титаник: крах программы        
+        //detailedInform(); // Функция выводящая детали фильма
+        break;
+    case 26:
+        wcout << L"\n" << fileIn("Debagger 2.txt") << endl; // Дебаггер 2: Судный день компиляции      
+        //detailedInform(); // Функция выводящая детали фильма
+        break;
+    case 27:
+        wcout << L"\n" << fileIn("Garry Coder.txt") << endl; // Гарри Кодер и C++       
+        //detailedInform(); // Функция выводящая детали фильма
+        break;
+    case 28:
+        wcout << L"\n" << fileIn("Matrix.txt") << endl; // Матрица данных        
+        //detailedInform(); // Функция выводящая детали фильма
+        break;
+    case 29:
+        wcout << L"\n" << fileIn("Fifth algorithm.txt") << endl; // Пятый алгоритм      
+        //detailedInform(); // Функция выводящая детали фильма
+        break;
+    case 210:
+        wcout << L"\n" << fileIn("People in black pixels.txt") << endl; // Люди в Черных пикселях      
+        //detailedInform(); // Функция выводящая детали фильма
+        break;
+    case 211:
+        wcout << L"\n" << fileIn("Lab Wars.txt") << endl; // Лабные Войны: Эпизод 5        
+        //detailedInform(); // Функция выводящая детали фильма
+        break;
+    case 212:
+        wcout << L"\n" << fileIn("Shrek.txt") << endl; // Шрек и болото багов        
+        //detailedInform(); // Функция выводящая детали фильма
         break;
     case 3:
         // место для функции фильтра
@@ -169,42 +214,43 @@ void sessionSelection(int day) { // Выбор сеанса
 
     switch (input) { // выводим все сеансы на данный фильм
     case 1001:
-        wcout << L"\n" << fileIn("MovSched1001.txt") << endl; // Унесённые сессией 
+        wcout << L"\n" << fileIn("Gone with the session.txt") << endl; // Унесённые сессией 
         break;
     case 1002:
-        wcout << L"\n" << fileIn("MovSched1002.txt") << endl; // Шрек и болото багов 
+        wcout << L"\n" << fileIn("Back to the compiler.txt") << endl; // Назад к компилятору 
         break;
     case 1003:
-        wcout << L"\n" << fileIn("MovSched1003.txt") << endl; // Назад к компилятору 
+        wcout << L"\n" << fileIn("And deadlines are tight.txt") << endl; // А дедлайны здесь жесткие
         break;
     case 1004:
-        wcout << L"\n" << fileIn("MovSched1004.txt") << endl; // А дедлайны здесь жесткие
+        wcout << L"\n" << fileIn("Lord of the Lab.txt") << endl; // Властелин лаб: возвращение сеньора
         break;
     case 1005:
-        wcout << L"\n" << fileIn("MovSched1005.txt") << endl; // Властелин лаб: возвращение сеньора
+        wcout << L"\n" << fileIn("Titanic.txt") << endl; // Титаник: крах программы
         break;
     case 1006:
-        wcout << L"\n" << fileIn("MovSched1006.txt") << endl; // Титаник: крах программы
+        wcout << L"\n" << fileIn("Debagger 2.txt") << endl; // Дебаггер 2: Судный день компиляции
         break;
     case 1007:
-        wcout << L"\n" << fileIn("MovSched1007.txt") << endl; // Дебаггер 2: Судный день компиляции
+        wcout << L"\n" << fileIn("Garry Coder.txt") << endl; // Гарри Кодер и C++ 
         break;
     case 1008:
-        wcout << L"\n" << fileIn("MovSched1008.txt") << endl; // Гарри Кодер и C++ 
+        wcout << L"\n" << fileIn("Matrix.txt") << endl; // Матрица данных 
         break;
     case 1009:
-        wcout << L"\n" << fileIn("MovSched1009.txt") << endl; // Матрица данных 
+        wcout << L"\n" << fileIn("Fifth algorithm.txt") << endl; // Пятый алгоритм
         break;
     case 1010:
-        wcout << L"\n" << fileIn("MovSched1010.txt") << endl; // Пятый алгоритм
+        wcout << L"\n" << fileIn("People in black pixels.txt") << endl; // Люди в Черных пикселях 
         break;
     case 1011:
-        wcout << L"\n" << fileIn("MovSched1011.txt") << endl; // Люди в Черных пикселях 
+        wcout << L"\n" << fileIn("Lab Wars.txt") << endl; // Лабные Войны: Эпизод 5 
         break;
     case 1012:
-        wcout << L"\n" << fileIn("MovSched1012.txt") << endl; // Лабные Войны: Эпизод 5 
+        wcout << L"\n" << fileIn("Shrek.txt") << endl; // Шрек и болото багов 
         break;
     }
+
 
 
     wcout << L"Введите номер сеанса, на который хотите пойти" << endl << endl;
@@ -226,40 +272,40 @@ int listFilmFromTheDay(int day, int filmNumber) { // выводит номер �
     case 1:
         switch (filmNumber) {
         case 1:
-            return (1002); //  код фильма 
+            return (1012); // Шрек и болото багов 
             break;
         case 2:
-            return (1007);
+            return (1006); // Дебаггер 2: Судный день компиляции
             break;
         case 3:
-            return (1005);
+            return (1004); // Властелин лаб: возвращение сеньора
             break;
         case 4:
-            return (1008);
+            return (1007); // Гарри Кодер и C++ 
             break;
         case 5:
-            return (1009);
+            return (1008); // Матрица данных
             break;
         case 6:
-            return (1001);
+            return (1001); // Унесённые сессией
             break;
         case 7:
-            return (1006);
+            return (1005); // Титаник: крах программы
             break;
         case 8:
-            return (1005);
+            return (1004); // Властелин лаб: возвращение сеньора
             break;
         case 9:
-            return (1010);
+            return (1009); // Пятый алгоритм
             break;
         case 10:
-            return (1011);
+            return (1010); // Люди в Черных пикселях
             break;
         case 11:
-            return (1009);
+            return (1008); // Матрица данных
             break;
         case 12:
-            return (1004);
+            return (1003); // А дедлайны здесь жесткие
             break;
         }
         break;
@@ -267,34 +313,37 @@ int listFilmFromTheDay(int day, int filmNumber) { // выводит номер �
     case 2:
         switch (filmNumber) {
         case 1:
-            return (1010);
+            return (1009); // Пятый алгоритм
             break;
         case 2:
-            return (1006);
+            return (1005); // Титаник: крах программы
             break;
         case 3:
-            return (1004);
+            return (1003); // А дедлайны здесь жесткие
             break;
         case 4:
-            return (1005);
+            return (1004); // Властелин лаб: возвращение сеньора
             break;
         case 5:
-            return (1002);
+            return (1012); // Шрек и болото багов 
             break;
         case 6:
-            return (1003);
+            return (1002); // Назад к компилятору 
             break;
         case 7:
-            return (1007);
+            return (1006); // Дебаггер 2: Судный день компиляции
             break;
         case 8:
-            return (1009);
+            return (1008); // Матрица данных
             break;
         case 9:
-            return (1001);
+            return (1001); // Унесённые сессией
             break;
         case 10:
-            return (1012);
+            return (1007); // Гарри Кодер и C++
+            break;
+        case 11:
+            return (1011); // Лабные Войны: Эпизод 5 
             break;
         }
         break;
@@ -302,37 +351,37 @@ int listFilmFromTheDay(int day, int filmNumber) { // выводит номер �
     case 3:
         switch (filmNumber) {
         case 1:
-            return (1011);
+            return (1010); // Люди в Черных пикселях
             break;
         case 2:
-            return (1003);
+            return (1002); // Назад к компилятору 
             break;
         case 3:
-            return (1004);
+            return (1003); // А дедлайны здесь жесткие
             break;
         case 4:
-            return (1012);
+            return (1011); // Лабные Войны: Эпизод 5 
             break;
         case 5:
-            return (1007);
+            return (1006); // Дебаггер 2: Судный день компиляции
             break;
         case 6:
-            return (1002);
+            return (1012); // Шрек и болото багов
             break;
         case 7:
-            return (1006);
+            return (1005); // Титаник: крах программы
             break;
         case 8:
-            return (1008);
+            return (1007); // Гарри Кодер и C++
             break;
         case 9:
-            return (1011);
+            return (1010); // Люди в Черных пикселях
             break;
         case 10:
-            return (1008);
+            return (1007); // Гарри Кодер и C++
             break;
         case 11:
-            return (1005);
+            return (1004); // Властелин лаб: возвращение сеньора
             break;
         }
         break;
