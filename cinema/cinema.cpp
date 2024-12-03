@@ -736,10 +736,12 @@ void choosingPlace(Session& session) {
                 choosePaymentMethod(totalCost);
                 break;
             }
-            break;
+            break;// завершение программы.
         }
     }
 }
+
+
 
 
 
