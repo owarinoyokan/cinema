@@ -326,6 +326,17 @@ void closeWindow() {
     keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 }
 
+// функиция смены масштаба
+void PressCtrlMinus() {
+    // Эмуляция нажатия клавиши Ctrl
+    keybd_event(VK_CONTROL, 0, 0, 0);
+    // Эмуляция нажатия клавиши "-"
+    keybd_event(VK_OEM_MINUS, 0, 0, 0);
+    // Эмуляция отпускания клавиши "-"
+    keybd_event(VK_OEM_MINUS, 0, KEYEVENTF_KEYUP, 0);
+    // Эмуляция отпускания клавиши Ctrl
+    keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
+}
 
 void waitForInput() {
     system("pause");

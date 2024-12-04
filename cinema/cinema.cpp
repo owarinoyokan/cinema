@@ -1,6 +1,6 @@
 ﻿#include "Header.h"
 #include <iostream>     // Для работы потока ввода и вывода
-#include <io.h>         // Для работы с _setmode
+#include <io.h>         // Для работы с _setmode 
 #include <locale>       // Для работы с кодировками
 #include <fcntl.h>      // Для режима _O_U16TEXT
 #include <fstream>      // Для работы с файлами
@@ -750,6 +750,10 @@ void choosingPlace(Session& session) {
 int main() {
     // Настройка широких символов для потока вывода
     setMode16();
+
+    for (int i = 0; i < 2; i++) {
+        PressCtrlMinus();
+    }
 
     ClearScreen();      // Очистка консоли
 
