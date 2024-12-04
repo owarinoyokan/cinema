@@ -22,9 +22,14 @@ using namespace std;
 // Конфигурация программы
 namespace Config {
     int y = 0;
-    constexpr int BOX_WIDTH = 6;              // Ширина бокса
-    constexpr int BOX_HEIGHT = 3;             // Высота бокса
-    constexpr int CHANSE_NOT_FREE_PLACES = 9; // Вероятность занятого места
+    constexpr const int BOX_WIDTH = 6;              // Ширина бокса
+    constexpr const int BOX_HEIGHT = 3;             // Высота бокса
+    constexpr const int CHANSE_NOT_FREE_PLACES = 8; // Вероятность занятого места
+    constexpr const int row_distance = 3; // дистанция для генерации дорогих мест для ряда
+    constexpr const int column_distance = 5; // дистанция для генерации дорогих мест для мест 
+    constexpr const int expensive_place  = 450; // стоимость дорогого места
+    constexpr const int cheap_place = 350; // стоимость дешёвого места
+
 }
 using namespace Config;
 
@@ -37,6 +42,7 @@ void setCursorPosition(int x, int y) {
 struct Seat {
     wstring status; // "x" — занято, "0" — номер ряда, число — номер места
     wstring color; // цвет места 
+    int cost;
 };
 
 // Структура для ряда
@@ -114,8 +120,9 @@ void drawRowNumberBox(int& x, int y, int rowNumber) {
 
 
 
-// Функция отрисовки свободного места
-void drawAvailableBox(int& x, int y, const wstring& number) {
+// Функция отрисовки дешёвого свободного места
+void drawWhiteAvailableBox(int& x, int y, const wstring& number) {
+    SetColor(15, 0);
     setCursorPosition(x, y);
     wcout << L" ____ ";
     setCursorPosition(x, y + 1);
@@ -127,10 +134,25 @@ void drawAvailableBox(int& x, int y, const wstring& number) {
     x += BOX_WIDTH + 1;
 }
 
+// Функция отрисовки дорогого свободного места
+void drawYellowAvailableBox(int& x, int y, const wstring& number) {
+    SetColor(14, 0);
+    setCursorPosition(x, y);
+    wcout << L" ____ ";
+    setCursorPosition(x, y + 1);
+    wcout << L"|    |";
+    setCursorPosition(x, y + 2);
+    wcout << L"| " << (stringToInt(number) < 10 ? L" " : L"") << number << L" |";
+    setCursorPosition(x, y + 3);
+    wcout << L"|____|";
+    x += BOX_WIDTH + 1;
+    SetColor(15, 0);
+}
+
 // Рисуем рамку для конкретного места
 void drawBox(int& x, int y, const Seat& seat, int rowNumber) {
-    if (isNumber(seat.status) && seat.status != L"0") {
-        drawAvailableBox(x, y, seat.status);
+    if (isNumber(seat.status) && seat.status != L"0" && seat.color == L"white") {
+        drawWhiteAvailableBox(x, y, seat.status);
     }
     else if (seat.status == L"x") {
         wstring clr = seat.color;
@@ -138,6 +160,9 @@ void drawBox(int& x, int y, const Seat& seat, int rowNumber) {
     }
     else if (seat.status == L"0") {
         drawRowNumberBox(x, y, rowNumber);
+    }
+    else if (isNumber(seat.status) && seat.status != L"0" && seat.color == L"yellow") {
+        drawYellowAvailableBox(x, y, seat.status);
     }
 }
 
@@ -165,7 +190,6 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
         y += BOX_HEIGHT + 2;
     }
     setCursorPosition(0, y);
-    wcout << y << endl;
 
 }
 
@@ -182,8 +206,23 @@ void GenerationRoom(Session& session, const int rowCount, const int placeCount, 
             }
             else {
                 int rand_not_free = rand() % CHANSE_NOT_FREE_PLACES; // шанс что место уже занято 
-                session.rows[i].seats[j].status = (rand_not_free == 0) ? L"x" : to_wstring(j); // сохранение состояния текущего места
-                session.rows[i].seats[j].color = (rand_not_free == 0) ? L"red" : L"white"; // установка цвета текущего места
+                if (rand_not_free == 0) {
+                    session.rows[i].seats[j].status = L"x"; // сохранение состояния текущего места
+                    session.rows[i].seats[j].color = L"red"; // установка цвета текущего места
+                }
+                else {
+                    session.rows[i].seats[j].status = to_wstring(j); // сохранение состояния текущего места
+
+                    if ((i <= (rowCount - row_distance) && i >= (row_distance - 1)) && (j >= column_distance && j <= (placeCount - column_distance - 1))) {
+                        session.rows[i].seats[j].color = L"yellow"; // установка цвета текущего места
+                        session.rows[i].seats[j].cost = expensive_place; //установка цены текущего места
+                    }
+                    else {
+                        session.rows[i].seats[j].color = L"white"; // установка цвета текущего места
+                        session.rows[i].seats[j].cost = cheap_place; //установка цены текущего места
+                    }
+                }
+
             }
         }
     }
