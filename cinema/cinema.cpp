@@ -448,7 +448,7 @@ void demoVis_All_sessions(Day& day_one, const int rowCount, const int placeCount
     }
 }
 
-bool aoutoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector<int>& bookedRows, vector<int>& bookedPlaces) {
+bool aoutoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector<int>& bookedRows, vector<int>& bookedPlaces, double& totalCost) {
     for (int i = 0; i < session.rows.size(); ++i) {
         int cnt = 0;  // Счётчик свободных мест подряд
         int start_index = -1; // Индекс начала первого подходящего участка
@@ -466,6 +466,7 @@ bool aoutoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector
                         session.rows[i].seats[k].color = L"violet";
                         bookedRows.push_back(i); // Добавляем ряд в список забронированных
                         bookedPlaces.push_back(k); // Добавляем место в список забронированных
+                        totalCost += session.rows[i].seats[k].cost;
                     }
                     ClearScreen();
                     DrawSession(session, session.rows.size(), session.rows[0].seats.size());
@@ -592,7 +593,7 @@ void choosingPlace(Session& session) {
 
     int choice = 0;
     int cnt_error_messeg = 0;
-
+    double totalCost = 0;
     // Выбор способа бронирования
     while (true) {
         if (cnt_error_messeg > 3) {
@@ -635,7 +636,7 @@ void choosingPlace(Session& session) {
                     continue;
                 }
 
-                if (!aoutoChoosingPlace(session, cnt_places, bookedRow, bookedRows, bookedPlaces)) {
+                if (!aoutoChoosingPlace(session, cnt_places, bookedRow, bookedRows, bookedPlaces, totalCost)) {
                     wcout << L"К сожалению, не удалось найти " << cnt_places << L" свободных рядом мест.\n";
                     ++cnt_error_messeg;
                     continue;
@@ -643,7 +644,6 @@ void choosingPlace(Session& session) {
 
 
                 wcout << L"Места успешно забронированы.\n";
-                double totalCost = cnt_places * 100;
 
                 // Вывод всех деталей билета
                 printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost);
@@ -676,7 +676,7 @@ void choosingPlace(Session& session) {
                     wcout << L"Количество мест вне диапазона. Пожалуйста, введите корректное количество.\n";
                     continue;
                 }
-                double totalCost = cnt_places * 100;
+                
                 for (int i = 0; i < cnt_places; ++i) {
                     while (true) {
                         if (cnt_error_messeg > 3) {
@@ -723,6 +723,7 @@ void choosingPlace(Session& session) {
                         DrawSession(session, session.rows.size(), session.rows[0].seats.size());
                         wcout << L"Место успешно забронировано.\n";
                         session.rows[row].seats[place].color = L"red";
+                        totalCost += session.rows[row].seats[place].cost;
                         bookedRows.push_back(row);
                         bookedPlaces.push_back(place);
                         break;
@@ -752,9 +753,13 @@ int main() {
     srand(time(0));
     const int rowCount = 8;
     const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
-
+    
     Day day_one;
-    GenerationDay(day_one, fileIn("schedule.txt"), rowCount, placeCount); // генерация всех сеансов первого дня
+    Day day_two;
+    Day day_three;
+    GenerationDay(day_one, fileIn("sessions_day_one.txt"), rowCount, placeCount); // генерация всех сеансов первого дня
+    GenerationDay(day_two, fileIn("sessions_day_two.txt"), rowCount, placeCount); // генерация всех сеансов второго дня
+    GenerationDay(day_three, fileIn("sessions_day_three.txt"), rowCount, placeCount); // генерация всех сеансов третьего дня
 
     /*demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала
     waitForInput();*/
@@ -769,15 +774,6 @@ int main() {
 
 
     extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
-
-    ///пример замены сущесвующего места без проверок индекса
-    /* int changeRow, changePalace;
-    cout << "Введите номер ряда: ";
-    cin >> changeRow;
-    cout << "\nВведите номер места: ";
-    cin >> changePalace;
-    changePlaces(hall, changeRow, changePalace);
-    DrawHall(hall, rowCount, placeCount);*/
 
     waitForInput();
     closeWindow();
