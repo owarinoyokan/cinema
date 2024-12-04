@@ -739,14 +739,6 @@ void choosingPlace(Session& session) {
 }
 
 
-
-
-
-
-
-
-
-
 int main() {
     // Настройка широких символов для потока вывода
     setMode16();
