@@ -8,18 +8,20 @@
 #include <string>       // Для работы с строками
 #include <sstream>      // Для работы с строковыми потоками
 #include <vector>       // Сами знаете
+#include <map>
 #include <windows.h>
 
 
 using namespace std;    // Пространство имен
 using namespace Config;    // Пространство имен
 
+TrioDays Days; //глобальная переменная дней
 
 void extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
 void availablePromo(); // Функция для просмотра доспупных акций
 void movieSelection(); // Функция выводяшая список фильмов с краткой информацией
 void detailedInform(); // Функция выводящая детали фильма
-void choosingPlace(); // меню выбора места
+//void choosingPlace(); // меню выбора места
 wstring fileIn(const string& fname); // Функция для чтения файла с широкими символами
 void sessionSelection(int);
 int listFilmFromTheDay(int day, int filmNumber);
@@ -74,59 +76,60 @@ void movieSelection() { // Функция выводяшая список фил
     switch (input) {
     case 1:
         //choosingPlace(); // выбор сеанса >> меню выбора места >> после выбора мест использовать функцию оплаты
+
         sessionSelection(1);
         break;
     case 2:
         availablePromo(); // Функция для просмотра доспупных акций
         break;
-    //case 21:
-    //    wcout << L"\n" << fileIn("Gone with the session.txt") << endl; // Унесённые сессией        
-    //    //detailedInform(); // Функция выводящая детали фильма
-    //    break;
-    //case 22:
-    //    wcout << L"\n" << fileIn("Back to the compiler.txt") << endl; // Назад к компилятору      
-    //    //detailedInform(); // Функция выводящая детали фильма
-    //    break;
-    //case 23:
-    //    wcout << L"\n" << fileIn("And deadlines are tight.txt") << endl; // А дедлайны здесь жесткие      
-    //    //detailedInform(); // Функция выводящая детали фильма
-    //    break;
-    //case 24:
-    //    wcout << L"\n" << fileIn("Lord of the Lab.txt") << endl; // Властелин лаб: возвращение сеньора       
-    //    //detailedInform(); // Функция выводящая детали фильма
-    //    break;
-    //case 25:
-    //    wcout << L"\n" << fileIn("Titanic.txt") << endl; // Титаник: крах программы        
-    //    //detailedInform(); // Функция выводящая детали фильма
-    //    break;
-    //case 26:
-    //    wcout << L"\n" << fileIn("Debagger 2.txt") << endl; // Дебаггер 2: Судный день компиляции      
-    //    //detailedInform(); // Функция выводящая детали фильма
-    //    break;
-    //case 27:
-    //    wcout << L"\n" << fileIn("Garry Coder.txt") << endl; // Гарри Кодер и C++       
-    //    //detailedInform(); // Функция выводящая детали фильма
-    //    break;
-    //case 28:
-    //    wcout << L"\n" << fileIn("Matrix.txt") << endl; // Матрица данных        
-    //    //detailedInform(); // Функция выводящая детали фильма
-    //    break;
-    //case 29:
-    //    wcout << L"\n" << fileIn("Fifth algorithm.txt") << endl; // Пятый алгоритм      
-    //    //detailedInform(); // Функция выводящая детали фильма
-    //    break;
-    //case 210:
-    //    wcout << L"\n" << fileIn("People in black pixels.txt") << endl; // Люди в Черных пикселях      
-    //    //detailedInform(); // Функция выводящая детали фильма
-    //    break;
-    //case 211:
-    //    wcout << L"\n" << fileIn("Lab Wars.txt") << endl; // Лабные Войны: Эпизод 5        
-    //    //detailedInform(); // Функция выводящая детали фильма
-    //    break;
-    //case 212:
-    //    wcout << L"\n" << fileIn("Shrek.txt") << endl; // Шрек и болото багов        
-    //    //detailedInform(); // Функция выводящая детали фильма
-    //    break;
+        //case 21:
+        //    wcout << L"\n" << fileIn("Gone with the session.txt") << endl; // Унесённые сессией        
+        //    //detailedInform(); // Функция выводящая детали фильма
+        //    break;
+        //case 22:
+        //    wcout << L"\n" << fileIn("Back to the compiler.txt") << endl; // Назад к компилятору      
+        //    //detailedInform(); // Функция выводящая детали фильма
+        //    break;
+        //case 23:
+        //    wcout << L"\n" << fileIn("And deadlines are tight.txt") << endl; // А дедлайны здесь жесткие      
+        //    //detailedInform(); // Функция выводящая детали фильма
+        //    break;
+        //case 24:
+        //    wcout << L"\n" << fileIn("Lord of the Lab.txt") << endl; // Властелин лаб: возвращение сеньора       
+        //    //detailedInform(); // Функция выводящая детали фильма
+        //    break;
+        //case 25:
+        //    wcout << L"\n" << fileIn("Titanic.txt") << endl; // Титаник: крах программы        
+        //    //detailedInform(); // Функция выводящая детали фильма
+        //    break;
+        //case 26:
+        //    wcout << L"\n" << fileIn("Debagger 2.txt") << endl; // Дебаггер 2: Судный день компиляции      
+        //    //detailedInform(); // Функция выводящая детали фильма
+        //    break;
+        //case 27:
+        //    wcout << L"\n" << fileIn("Garry Coder.txt") << endl; // Гарри Кодер и C++       
+        //    //detailedInform(); // Функция выводящая детали фильма
+        //    break;
+        //case 28:
+        //    wcout << L"\n" << fileIn("Matrix.txt") << endl; // Матрица данных        
+        //    //detailedInform(); // Функция выводящая детали фильма
+        //    break;
+        //case 29:
+        //    wcout << L"\n" << fileIn("Fifth algorithm.txt") << endl; // Пятый алгоритм      
+        //    //detailedInform(); // Функция выводящая детали фильма
+        //    break;
+        //case 210:
+        //    wcout << L"\n" << fileIn("People in black pixels.txt") << endl; // Люди в Черных пикселях      
+        //    //detailedInform(); // Функция выводящая детали фильма
+        //    break;
+        //case 211:
+        //    wcout << L"\n" << fileIn("Lab Wars.txt") << endl; // Лабные Войны: Эпизод 5        
+        //    //detailedInform(); // Функция выводящая детали фильма
+        //    break;
+        //case 212:
+        //    wcout << L"\n" << fileIn("Shrek.txt") << endl; // Шрек и болото багов        
+        //    //detailedInform(); // Функция выводящая детали фильма
+        //    break;
     case 3:
         // место для функции фильтра
         break;
@@ -147,36 +150,10 @@ void detailedInform() { // Функция выводящая детали фил
 }
 
 
-void choosingPlace() { // меню выбора места << после выбора мест использовать функцию оплаты
-    short int input;
-    wcout << L"\n" << fileIn("places.txt") << endl; // Вывод файла
-    wcout << L"Выберите место" << endl;
-    wcout << L"Нажмите '1', чтобы выбрать одно место" << endl;
-    wcout << L"Нажмите '2', чтобы выбрать сразу несколько мест" << endl;
-    wcout << L"Нажмите '3', для автоматического подбора места" << endl;
-    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
-    wcin >> input;
-    ClearScreen();
-    switch (input) {
-    case 1:
-        // место для функции выбора места
-        break;
-    case 2:
-        // место для функции выбора нескольких мест ( можно объединить с 1 )
-        break;
-    case 3:
-        // место для функции авт подбора места 
-        break;
-    case 0:
-        //movieSelection(); // Возврат назад (к предыдущей функции)
-
-        break;
-    }
-}
-
 void sessionSelection(int day) { // Выбор сеанса
-    //wcout << L"\n" << fileIn("cimema_info.txt") << endl; 
-    short int input;
+    //wcout << L"\n" << fileIn("cimema_info.txt") << endl;
+    ClearScreen();
+
 
     switch (day) { // изменение расписания в зависсимости от дня (сейчас ничего не меняется)
     case 1:
@@ -191,76 +168,132 @@ void sessionSelection(int day) { // Выбор сеанса
     }
 
     wcout << L"Выберите фильм который хотите посмотреть" << endl;
-    wcout << L"Введите 111 чтобы посмотреть расписание на следующий день" << endl;
-    wcout << L"Введите 222 чтобы посмотреть расписание на следующий день" << endl;
+    wcout << L"Введите 111 чтобы посмотреть расписание на 1 день" << endl;
+    wcout << L"Введите 222 чтобы посмотреть расписание на 2 день" << endl;
+    wcout << L"Введите 333 чтобы посмотреть расписание на 3 день" << endl;
     //wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
-    wcin >> input;
-    if (input == 111) {
-        ClearScreen();
-        sessionSelection(day + 1);
-    }
-    if (input == 222) {
-        ClearScreen();
-        sessionSelection(day - 1);
-    }
-    input = listFilmFromTheDay(day, input); // возвращаяем номер фильма зная день и его номер в расписании дня
-
-
-    ClearScreen();
-
-
-    switch (input) { // выводим все сеансы на данный фильм
-    case 1001:
-        wcout << L"\n" << fileIn("Gone with the session.txt") << endl; // Унесённые сессией 
-        break;
-    case 1002:
-        wcout << L"\n" << fileIn("Shrek.txt") << endl; // Шрек и болото багов 
-        break;
-    case 1003:
-        wcout << L"\n" << fileIn("Back to the compiler.txt") << endl; // Назад к компилятору
-        break;
-    case 1004:
-        wcout << L"\n" << fileIn("And deadlines are tight.txt") << endl; // А дедлайны здесь жесткие
-        break;
-    case 1005:
-        wcout << L"\n" << fileIn("Lord of the Lab.txt") << endl; // Властелин лаб: возвращение сеньора
-        break;
-    case 1006:
-        wcout << L"\n" << fileIn("Titanic.txt") << endl; // Титаник: крах программы
-        break;
-    case 1007:
-        wcout << L"\n" << fileIn("Debagger 2.txt") << endl; // Дебаггер 2: Судный день компиляции 
-        break;
-    case 1008:
-        wcout << L"\n" << fileIn("Garry Coder.txt") << endl; // Гарри Кодер и C++
-        break;
-    case 1009:
-        wcout << L"\n" << fileIn("Matrix.txt") << endl; // Матрица данных
-        break;
-    case 1010:
-        wcout << L"\n" << fileIn("Fifth algorithm.txt") << endl; // Пятый алгоритм 
-        break;
-    case 1011:
-        wcout << L"\n" << fileIn("People in black pixels.txt") << endl; // Люди в Черных пикселях 
-        break;
-    case 1012:
-        wcout << L"\n" << fileIn("Lab Wars.txt") << endl; // Лабные Войны: Эпизод 5
-        break;
-    }
-
-
-
     wcout << L"Введите номер сеанса, на который хотите пойти" << endl << endl;
     wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
-    wcin >> input;
+    //wcin >> input;
+
+    int input;
+    while (true) {
+        if (correctInput(input) && input > 0 && input <= 333)
+            break;
+        wcout << L"Ошибка ввода попробуйте ещё раз\n";
+    }
     ClearScreen();
     if (input == 0) {
         movieSelection();
     }
     else {
 
-        // переносит в функцию с залом для выбора места в зависсимости от выбранного сеанса
     }
+    if (input == 111) {
+        ClearScreen();
+        day = 1;
+        sessionSelection(day);
+
+    }
+    else if (input == 222) {
+        ClearScreen();
+        day = 2;
+        sessionSelection(day);
+
+    }
+    else if (input == 333) {
+        ClearScreen();
+        day = 3;
+        sessionSelection(day);
+
+    }
+    else {
+        int numbers_1_day = Days.trio_days[day - 1].Cinema_room_1.size();
+        int numbers_2_day = Days.trio_days[day - 1].Cinema_room_2.size() + Days.trio_days[day - 1].Cinema_room_1.size();
+        int numbers_3_day = Days.trio_days[day - 1].Cinema_room_3.size() + Days.trio_days[day - 1].Cinema_room_2.size() + Days.trio_days[day - 1].Cinema_room_1.size();
+        if (input <= numbers_1_day) {
+            choosingPlace(Days.trio_days[day - 1].Cinema_room_1[input - 1], day);
+        }
+        else if (input > numbers_1_day && input <= numbers_2_day)
+            choosingPlace(Days.trio_days[day - 1].Cinema_room_2[input - numbers_1_day - 1], day);
+
+        else if (input > numbers_2_day && input <= numbers_3_day)
+            choosingPlace(Days.trio_days[day - 1].Cinema_room_3[input - numbers_2_day - 1], day);
+    }
+
+
+
+    /* input = listFilmFromTheDay(day, input); // возвращаяем номер фильма зная день и его номер в расписании дня
+
+
+     ClearScreen();
+
+
+     //switch (input) { // выводим все сеансы на данный фильм
+     //case 1001:
+     //    wcout << L"\n" << fileIn("Gone with the session.txt") << endl; // Унесённые сессией
+     //    break;
+     //case 1002:
+     //    wcout << L"\n" << fileIn("Shrek.txt") << endl; // Шрек и болото багов
+     //    break;
+     //case 1003:
+     //    wcout << L"\n" << fileIn("Back to the compiler.txt") << endl; // Назад к компилятору
+     //    break;
+     //case 1004:
+     //    wcout << L"\n" << fileIn("And deadlines are tight.txt") << endl; // А дедлайны здесь жесткие
+     //    break;
+     //case 1005:
+     //    wcout << L"\n" << fileIn("Lord of the Lab.txt") << endl; // Властелин лаб: возвращение сеньора
+     //    break;
+     //case 1006:
+     //    wcout << L"\n" << fileIn("Titanic.txt") << endl; // Титаник: крах программы
+     //    break;
+     //case 1007:
+     //    wcout << L"\n" << fileIn("Debagger 2.txt") << endl; // Дебаггер 2: Судный день компиляции
+     //    break;
+     //case 1008:
+     //    wcout << L"\n" << fileIn("Garry Coder.txt") << endl; // Гарри Кодер и C++
+     //    break;
+     //case 1009:
+     //    wcout << L"\n" << fileIn("Matrix.txt") << endl; // Матрица данных
+     //    break;
+     //case 1010:
+     //    wcout << L"\n" << fileIn("Fifth algorithm.txt") << endl; // Пятый алгоритм
+     //    break;
+     //case 1011:
+     //    wcout << L"\n" << fileIn("People in black pixels.txt") << endl; // Люди в Черных пикселях
+     //    break;
+     //case 1012:
+     //    wcout << L"\n" << fileIn("Lab Wars.txt") << endl; // Лабные Войны: Эпизод 5
+     //    break;
+     //}
+
+
+     // Создаем map для соответствия между номерами сеансов и именами файлов
+     map<int, string> sessionFiles = {
+         {1001, "Gone with the session.txt"},
+         {1002, "Shrek.txt"},
+         {1003, "Back to the compiler.txt"},
+         {1004, "And deadlines are tight.txt"},
+         {1005, "Lord of the Lab.txt"},
+         {1006, "Titanic.txt"},
+         {1007, "Debagger 2.txt"},
+         {1008, "Garry Coder.txt"},
+         {1009, "Matrix.txt"},
+         {1010, "Fifth algorithm.txt"},
+         {1011, "People in black pixels.txt"},
+         {1012, "Lab Wars.txt"}
+     };
+
+     // Проверяем, есть ли input в map
+     if (sessionFiles.find(input) != sessionFiles.end()) {
+         wcout << L"\n" << fileIn(sessionFiles[input]) << endl; // Выводим содержимое файла
+     }
+     else {
+         wcout << L"Сеанс не найден." << endl; // Обработка случая, если input не найден
+     }*/
+
+
 
 }
 
@@ -425,325 +458,26 @@ wstring fileIn(const string& fname) {
     return converter.from_bytes(utf16_content);
 }
 
-// вывод всех сеансов ввиде зала  //для понимания кода 
-void demoVis_All_sessions(Day& day_one, const int rowCount, const int placeCount) {
-    fullScreen();
-    for (int i = 0; i < day_one.Session_one.size(); ++i) {
-        DrawSession(day_one.Session_one[i], rowCount, placeCount);
-        waitForInput();
-        ClearScreen();
 
-    }
 
-    for (int i = 0; i < day_one.Session_two.size(); ++i) {
-        DrawSession(day_one.Session_two[i], rowCount, placeCount);
-        waitForInput();
-        ClearScreen();
-    }
 
-    for (int i = 0; i < day_one.Session_three.size(); ++i) {
-        DrawSession(day_one.Session_three[i], rowCount, placeCount);
-        waitForInput();
-        ClearScreen();
-    }
+void generationTrioDays(TrioDays& trio)
+{
+    Day day_one, day_two, day_three;
+    GenerationDay(day_one, fileIn("sessions_day_one.txt"), rowCount, placeCount); // генерация всех сеансов первого дня
+    GenerationDay(day_two, fileIn("sessions_day_two.txt"), rowCount, placeCount); // генерация всех сеансов второго дня
+    GenerationDay(day_three, fileIn("sessions_day_three.txt"), rowCount, placeCount); // генерация всех сеансов третьего дня
+    trio.trio_days.push_back(day_one);
+    trio.trio_days.push_back(day_two);
+    trio.trio_days.push_back(day_three);
 }
 
-bool aoutoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector<int>& bookedRows, vector<int>& bookedPlaces, double& totalCost) {
-    for (int i = 0; i < session.rows.size(); ++i) {
-        int cnt = 0;  // Счётчик свободных мест подряд
-        int start_index = -1; // Индекс начала первого подходящего участка
-
-        for (int j = 1; j < session.rows[i].seats.size() - 1; ++j) { // Проход от 1 до предпоследнего индекса
-            if (session.rows[i].seats[j].status != L"x") {
-                // Если место свободно, увеличиваем счётчик
-                if (cnt == 0) start_index = j; // Устанавливаем начало участка
-                ++cnt;
-
-                if (cnt == cnt_places) { // Если нашли подходящий участок
-                    // Помечаем места как занятые
-                    for (int k = start_index; k < start_index + cnt_places; ++k) {
-                        session.rows[i].seats[k].status = L"x";
-                        session.rows[i].seats[k].color = L"violet";
-                        bookedRows.push_back(i); // Добавляем ряд в список забронированных
-                        bookedPlaces.push_back(k); // Добавляем место в список забронированных
-                        totalCost += session.rows[i].seats[k].cost;
-                    }
-                    ClearScreen();
-                    DrawSession(session, session.rows.size(), session.rows[0].seats.size());
-                    for (int k = start_index; k < start_index + cnt_places; ++k) {
-                        session.rows[i].seats[k].color = L"red";
-                    }
-                    return true; // Возвращаем успех
-                }
-            }
-            else {
-                // Если место занято, сбрасываем счётчик
-                cnt = 0;
-                start_index = -1;
-            }
-        }
-    }
-    return false; // Если ни одного подходящего участка не найдено
-}
-// Функция для вывода всех деталей билета
-void printTicketDetails(const vector<int>& bookedRows, const vector<int>& bookedPlaces, int cnt_places, double totalCost) {
-    wcout << L"\n---------- Билет ----------\n";
-
-    wcout << L"Забронированные места:\n";
-    for (size_t i = 0; i < bookedRows.size(); ++i) {
-        wcout << L"Ряд: " << bookedRows[i] + 1  // Приведение к человеческому виду
-            << L", Место: " << bookedPlaces[i]; // Приведение к человеческому виду
-        if (i < bookedRows.size() - 1) {
-            wcout << L" | "; // Разделяем места
-        }
-    }
-
-    wcout << L"\nКоличество билетов: " << cnt_places << L"\n";
-    wcout << L"Общая стоимость: " << totalCost << L" рублей.\n"; // Здесь можно изменить валюту по необходимости
-    wcout << L"--------------------------------\n";
-}
-
-void chooseAdditionalItems(double& totalAmount) {
-    short int itemChoice;
-    bool moreItems = true; // Флаг для продолжения выбора товаров
-
-    while (moreItems) {
-        wcout << L"--- Дополнительные товары ---\n";
-        wcout << L"1. Кола (150 рублей)\n";
-        wcout << L"2. Попкорн (100 рублей)\n";
-        wcout << L"3. Чипсы (120 рублей)\n";
-        wcout << L"4. Соки (130 рублей)\n";
-        wcout << L"5. Нет, спасибо\n";
-        wcout << L"Введите номер выбранного товара: ";
-        wcin >> itemChoice;
-
-        switch (itemChoice) {
-        case 1:
-            wcout << L"Вы выбрали Кола.\n";
-            totalAmount += 150.0;
-            break;
-        case 2:
-            wcout << L"Вы выбрали Попкорн.\n";
-            totalAmount += 100.0;
-            break;
-        case 3:
-            wcout << L"Вы выбрали Чипсы.\n";
-            totalAmount += 120.0;
-            break;
-        case 4:
-            wcout << L"Вы выбрали Соки.\n";
-            totalAmount += 130.0;
-            break;
-        case 5:
-            wcout << L"Вы выбрали пропустить этот шаг.\n";
-            moreItems = false; // Заканчиваем выбор товаров
-            break;
-        default:
-            wcout << L"Некорректный выбор. Пожалуйста, попробуйте снова.\n";
-            continue;
-        }
-
-        // Запрос о продолжении выбора
-        if (itemChoice != 5) { // Пропускаем вопрос, если выбрано "Нет, спасибо"
-            wstring addMore;
-            wcout << L"Хотите добавить ещё товары? (Y/N): ";
-            wcin >> addMore;
-            if (addMore != L"Yes" && addMore != L"yes") {
-                moreItems = false; // Заканчиваем выбор товаров
-            }
-        }
-
-        wcout << L"Общая сумма с учетом выбранных товаров: " << totalAmount << L" рублей.\n";
-    }
-}
-
-
-// Функция для выбора способа оплаты
-void choosePaymentMethod(double totalAmount) {
-    int paymentChoice;
-    wcout << L"--- Способы оплаты ---\n";
-    wcout << L"1. Наличными\n";
-    wcout << L"2. Картой\n";
-    wcout << L"3. Электронный кошелёк\n";
-    wcout << L"Введите номер выбранного способа оплаты: ";
-    wcin >> paymentChoice;
-
-    switch (paymentChoice) {
-    case 1:
-        wcout << L"Вы выбрали оплату наличными. Общая сумма: " << totalAmount << L" рублей.\n";
-        break;
-    case 2:
-        wcout << L"Вы выбрали оплату картой. Общая сумма: " << totalAmount << L" рублей.\n";
-        break;
-    case 3:
-        wcout << L"Вы выбрали оплату электронным кошельком. Общая сумма: " << totalAmount << L" рублей.\n";
-        break;
-    default:
-        wcout << L"Некорректный выбор. Пожалуйста, попробуйте снова.\n";
-        choosePaymentMethod(totalAmount);
-        return;
-    }
-
-    wcout << L"Спасибо за ваш выбор! Транзакция завершена.\n";
-}
-
-void choosingPlace(Session& session) {
-    DrawSession(session, session.rows.size(), session.rows[0].seats.size());
-    setCursorPosition(0, y);
-
-    int choice = 0;
-    int cnt_error_messeg = 0;
-    double totalCost = 0;
-    // Выбор способа бронирования
-    while (true) {
-        if (cnt_error_messeg > 3) {
-            ClearScreenFromPosition(0, 42);
-            cnt_error_messeg = 0;
-            continue;
-        }
-        wcout << L"Выберите способ бронирования мест:\n";
-        wcout << L"1. Автоподбор мест\n";
-        wcout << L"2. Ручной выбор мест\n";
-        wcout << L"Введите ваш выбор: ";
-
-        if (!correctInput(choice) || (choice != 1 && choice != 2)) {
-            cnt_error_messeg += 3;
-            wcout << L"Некорректный ввод. Введите 1 или 2.\n";
-            continue;
-        }
-
-        if (choice == 1) { // Автоподбор мест
-            int cnt_places, bookedRow;
-            vector<int> bookedRows; // Список забронированных рядов
-            vector<int> bookedPlaces; // Список забронированных мест
-            while (true) {
-                if (cnt_error_messeg > 3) {
-                    ClearScreenFromPosition(0, 42);
-                    cnt_error_messeg = 0;
-                    continue;
-                }
-                wcout << L"Введите количество мест (меньше 16): ";
-
-                if (!correctInput(cnt_places)) {
-                    ++cnt_error_messeg;
-                    wcout << L"Некорректный ввод. Введите количество мест заново.\n";
-                    continue;
-                }
-
-                if (cnt_places <= 0 || cnt_places > 16) {
-                    ++cnt_error_messeg;
-                    wcout << L"Количество мест вне диапазона. Пожалуйста, введите корректное количество.\n";
-                    continue;
-                }
-
-                if (!aoutoChoosingPlace(session, cnt_places, bookedRow, bookedRows, bookedPlaces, totalCost)) {
-                    wcout << L"К сожалению, не удалось найти " << cnt_places << L" свободных рядом мест.\n";
-                    ++cnt_error_messeg;
-                    continue;
-                }
-
-
-                wcout << L"Места успешно забронированы.\n";
-
-                // Вывод всех деталей билета
-                printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost);
-                chooseAdditionalItems(totalCost);
-                choosePaymentMethod(totalCost);
-                break;
-            }
-            break;
-
-        }
-        else if (choice == 2) { // Ручной выбор мест
-            int cnt_places, row, place;
-            vector<int> bookedRows; // Список забронированных рядов
-            vector<int> bookedPlaces; // Список забронированных мест
-            while (true) {
-                if (cnt_error_messeg > 3) {
-                    ClearScreenFromPosition(0, 42);
-                    cnt_error_messeg = 0;
-                    continue;
-                }
-                wcout << L"Сколько мест вы хотите купить? ";
-                if (!correctInput(cnt_places)) {
-                    ++cnt_error_messeg;
-                    wcout << L"Некорректный ввод. Введите количество мест заново.\n";
-                    continue;
-                }
-
-                if (cnt_places <= 0 || cnt_places > 16) {
-                    ++cnt_error_messeg;
-                    wcout << L"Количество мест вне диапазона. Пожалуйста, введите корректное количество.\n";
-                    continue;
-                }
-                
-                for (int i = 0; i < cnt_places; ++i) {
-                    while (true) {
-                        if (cnt_error_messeg > 3) {
-                            ClearScreenFromPosition(0, 42);
-                            cnt_error_messeg = 0;
-                            continue;
-                        }
-                        wcout << L"Введите номер ряда: ";
-                        if (!correctInput(row)) {
-                            ++cnt_error_messeg;
-                            wcout << L"Некорректный ввод. Введите номер ряда заново.\n";
-                            continue;
-                        }
-
-                        --row; // Приведение к индексации с 0
-                        if (row < 0 || row >= session.rows.size()) {
-                            ++cnt_error_messeg;
-                            wcout << L"Номер ряда вне диапазона. Введите корректный номер ряда.\n";
-                            continue;
-                        }
-
-                        wcout << L"Введите номер места: ";
-                        if (!correctInput(place)) {
-                            ++cnt_error_messeg;
-                            wcout << L"Некорректный ввод. Введите номер места заново.\n";
-                            continue;
-                        }
-
-                        if (place <= 0 || place >= session.rows[row].seats.size() - 1) {
-                            ++cnt_error_messeg;
-                            wcout << L"Номер места вне диапазона. Введите корректный номер места.\n";
-                            continue;
-                        }
-
-                        if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
-                            ++cnt_error_messeg;
-                            wcout << L"Место занято, выберите другое.\n";
-                            continue;
-                        }
-                        ClearScreen();
-                        // Если место свободно, бронируем его
-                        session.rows[row].seats[place].status = L"x";
-                        session.rows[row].seats[place].color = L"violet";
-                        DrawSession(session, session.rows.size(), session.rows[0].seats.size());
-                        wcout << L"Место успешно забронировано.\n";
-                        session.rows[row].seats[place].color = L"red";
-                        totalCost += session.rows[row].seats[place].cost;
-                        bookedRows.push_back(row);
-                        bookedPlaces.push_back(place);
-                        break;
-                    }
-                }
-                printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost);
-                chooseAdditionalItems(totalCost);
-                choosePaymentMethod(totalCost);
-                break;
-            }
-            break;// завершение программы.
-        }
-    }
-}
 
 
 int main() {
     // Настройка широких символов для потока вывода
     setMode16();
-
+    fullScreen();
     for (int i = 0; i < 2; i++) {
         PressCtrlMinus();
     }
@@ -751,32 +485,27 @@ int main() {
     ClearScreen();      // Очистка консоли
 
     srand(time(0));
-    const int rowCount = 8;
-    const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
-    
-    Day day_one;
-    Day day_two;
-    Day day_three;
-    GenerationDay(day_one, fileIn("sessions_day_one.txt"), rowCount, placeCount); // генерация всех сеансов первого дня
-    GenerationDay(day_two, fileIn("sessions_day_two.txt"), rowCount, placeCount); // генерация всех сеансов второго дня
-    GenerationDay(day_three, fileIn("sessions_day_three.txt"), rowCount, placeCount); // генерация всех сеансов третьего дня
 
-    /*demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала
-    waitForInput();*/
-    fullScreen();
-    choosingPlace(day_one.Session_one[0]);
-    waitForInput();
+    generationTrioDays(Days); // генерация всех 3х дней
+
+
+    ///*demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала
+    //waitForInput();*/
+    /*
+    choosingPlace(Days.day_one.Cinema_room_1[0]);*/
+    //waitForInput();
     ClearScreen();
-    wcout << fileIn("check.txt") << endl;
+
 
     wcout << L"Проект кинотеатра.🎬" << endl;
     wcout << L"Тестовый запуск" << endl;
 
-
     extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
 
-    waitForInput();
-    closeWindow();
+
+
+    //waitForInput();
+    //closeWindow();
 
 
 
