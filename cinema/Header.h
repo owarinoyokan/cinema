@@ -27,11 +27,16 @@ namespace Config {
     constexpr const int CHANSE_NOT_FREE_PLACES = 8; // Вероятность занятого места
     constexpr const int row_distance = 3; // дистанция для генерации дорогих мест для ряда
     constexpr const int column_distance = 5; // дистанция для генерации дорогих мест для мест 
-    constexpr const int expensive_place  = 450; // стоимость дорогого места
+    constexpr const int expensive_place = 450; // стоимость дорогого места
     constexpr const int cheap_place = 350; // стоимость дешёвого места
+    const int rowCount = 8; // количества рядов
+    const int placeCount = 18;// 16 и 2 для отрисовки номера ряда с двух сторон
+
 
 }
 using namespace Config;
+
+void sessionSelection(int day);
 
 void setCursorPosition(int x, int y) {
     COORD coord = { (SHORT)x, (SHORT)y };
@@ -59,10 +64,18 @@ struct Session {
 
 //структура Сеанса
 struct Day {
-    vector<Session> Session_one;
-    vector<Session> Session_two;
-    vector<Session> Session_three;
+    vector<Session> Cinema_room_1;
+    vector<Session> Cinema_room_2;
+    vector<Session> Cinema_room_3;
+}; struct TrioDays {
+    Day day_one;
+    Day day_two;
+    Day day_three;
+
+
 };
+
+
 
 void SetColor(int text, int background) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (background << 4) | text);
@@ -267,13 +280,13 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 
 
         if (line == L"Cinema room 1") {
-            currentSessionGroup = &day.Session_one;
+            currentSessionGroup = &day.Cinema_room_1;
         }
         else if (line == L"Cinema room 2") {
-            currentSessionGroup = &day.Session_two;
+            currentSessionGroup = &day.Cinema_room_2;
         }
-        else if (line == L"Cinema room 3 ") {
-            currentSessionGroup = &day.Session_three;
+        else if (line == L"Cinema room 3") {
+            currentSessionGroup = &day.Cinema_room_3;
         }
         else if (currentSessionGroup && !line.empty() && iswdigit(line[0])) {
             int sessionCount = 0;
@@ -403,6 +416,304 @@ bool correctInput(int& number) {
         return false; // Если число выходит за пределы
     }
     return true; // Успех
+}
+
+bool aoutoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector<int>& bookedRows, vector<int>& bookedPlaces, double& totalCost) {
+    for (int i = 0; i < session.rows.size(); ++i) {
+        int cnt = 0;  // Счётчик свободных мест подряд
+        int start_index = -1; // Индекс начала первого подходящего участка
+
+        for (int j = 1; j < session.rows[i].seats.size() - 1; ++j) { // Проход от 1 до предпоследнего индекса
+            if (session.rows[i].seats[j].status != L"x") {
+                // Если место свободно, увеличиваем счётчик
+                if (cnt == 0) start_index = j; // Устанавливаем начало участка
+                ++cnt;
+
+                if (cnt == cnt_places) { // Если нашли подходящий участок
+                    // Помечаем места как занятые
+                    for (int k = start_index; k < start_index + cnt_places; ++k) {
+                        session.rows[i].seats[k].status = L"x";
+                        session.rows[i].seats[k].color = L"violet";
+                        bookedRows.push_back(i); // Добавляем ряд в список забронированных
+                        bookedPlaces.push_back(k); // Добавляем место в список забронированных
+                        totalCost += session.rows[i].seats[k].cost;
+                    }
+                    ClearScreen();
+                    DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+                    for (int k = start_index; k < start_index + cnt_places; ++k) {
+                        session.rows[i].seats[k].color = L"red";
+                    }
+                    return true; // Возвращаем успех
+                }
+            }
+            else {
+                // Если место занято, сбрасываем счётчик
+                cnt = 0;
+                start_index = -1;
+            }
+        }
+    }
+    return false; // Если ни одного подходящего участка не найдено
+}
+// Функция для вывода всех деталей билета
+void printTicketDetails(const vector<int>& bookedRows, const vector<int>& bookedPlaces, int cnt_places, double totalCost) {
+    wcout << L"\n---------- Билет ----------\n";
+
+    wcout << L"Забронированные места:\n";
+    for (size_t i = 0; i < bookedRows.size(); ++i) {
+        wcout << L"Ряд: " << bookedRows[i] + 1  // Приведение к человеческому виду
+            << L", Место: " << bookedPlaces[i]; // Приведение к человеческому виду
+        if (i < bookedRows.size() - 1) {
+            wcout << L" | "; // Разделяем места
+        }
+    }
+
+    wcout << L"\nКоличество билетов: " << cnt_places << L"\n";
+    wcout << L"Общая стоимость: " << totalCost << L" рублей.\n"; // Здесь можно изменить валюту по необходимости
+    wcout << L"--------------------------------\n";
+}
+
+void chooseAdditionalItems(double& totalAmount) {
+    short int itemChoice;
+    bool moreItems = true; // Флаг для продолжения выбора товаров
+
+    while (moreItems) {
+        wcout << L"--- Дополнительные товары ---\n";
+        wcout << L"1. Кола (150 рублей)\n";
+        wcout << L"2. Попкорн (100 рублей)\n";
+        wcout << L"3. Чипсы (120 рублей)\n";
+        wcout << L"4. Соки (130 рублей)\n";
+        wcout << L"5. Нет, спасибо\n";
+        wcout << L"Введите номер выбранного товара: ";
+        wcin >> itemChoice;
+
+        switch (itemChoice) {
+        case 1:
+            wcout << L"Вы выбрали Кола.\n";
+            totalAmount += 150.0;
+            break;
+        case 2:
+            wcout << L"Вы выбрали Попкорн.\n";
+            totalAmount += 100.0;
+            break;
+        case 3:
+            wcout << L"Вы выбрали Чипсы.\n";
+            totalAmount += 120.0;
+            break;
+        case 4:
+            wcout << L"Вы выбрали Соки.\n";
+            totalAmount += 130.0;
+            break;
+        case 5:
+            wcout << L"Вы выбрали пропустить этот шаг.\n";
+            moreItems = false; // Заканчиваем выбор товаров
+            break;
+        default:
+            wcout << L"Некорректный выбор. Пожалуйста, попробуйте снова.\n";
+            continue;
+        }
+
+        // Запрос о продолжении выбора
+        if (itemChoice != 5) { // Пропускаем вопрос, если выбрано "Нет, спасибо"
+            wstring addMore;
+            wcout << L"Хотите добавить ещё товары? (Y/N): ";
+            wcin >> addMore;
+            if (addMore != L"Yes" && addMore != L"yes") {
+                moreItems = false; // Заканчиваем выбор товаров
+            }
+        }
+
+        wcout << L"Общая сумма с учетом выбранных товаров: " << totalAmount << L" рублей.\n";
+    }
+}
+
+
+// Функция для выбора способа оплаты
+void choosePaymentMethod(double totalAmount) {
+    int paymentChoice;
+    wcout << L"--- Способы оплаты ---\n";
+    wcout << L"1. Наличными\n";
+    wcout << L"2. Картой\n";
+    wcout << L"3. Электронный кошелёк\n";
+    wcout << L"Введите номер выбранного способа оплаты: ";
+    wcin >> paymentChoice;
+
+    switch (paymentChoice) {
+    case 1:
+        wcout << L"Вы выбрали оплату наличными. Общая сумма: " << totalAmount << L" рублей.\n";
+        break;
+    case 2:
+        wcout << L"Вы выбрали оплату картой. Общая сумма: " << totalAmount << L" рублей.\n";
+        break;
+    case 3:
+        wcout << L"Вы выбрали оплату электронным кошельком. Общая сумма: " << totalAmount << L" рублей.\n";
+        break;
+    default:
+        wcout << L"Некорректный выбор. Пожалуйста, попробуйте снова.\n";
+        choosePaymentMethod(totalAmount);
+        return;
+    }
+
+    wcout << L"Спасибо за ваш выбор! Транзакция завершена.\n";
+}
+
+void choosingPlace(Session& session, int day) {
+    DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+    setCursorPosition(0, y);
+
+    int choice;
+    int cnt_error_messeg = 0;
+    double totalCost = 0;
+    // Выбор способа бронирования
+    while (true) {
+
+        if (cnt_error_messeg >= 3) {
+            ClearScreenFromPosition(0, 42);
+            cnt_error_messeg = 0;
+            continue;
+        }
+        wcout << L"Выберите способ бронирования мест:\n";
+        wcout << L"1. Автоподбор мест\n";
+        wcout << L"2. Ручной выбор мест\n";
+        wcout << L"0 Вернуться назад\n";
+        wcout << L"Введите ваш выбор: ";
+
+        if (!correctInput(choice)) {
+            if (choice != 1 && choice != 2) {
+                cnt_error_messeg += 3;
+                wcout << L"Некорректный ввод. Введите 1 или 2.\n";
+            }
+            continue;
+        }
+
+        if (choice == 0)
+            sessionSelection(day);
+
+        if (choice == 1) { // Автоподбор мест
+            int cnt_places, bookedRow;
+            vector<int> bookedRows; // Список забронированных рядов
+            vector<int> bookedPlaces; // Список забронированных мест
+            while (true) {
+                if (cnt_error_messeg > 3) {
+                    ClearScreenFromPosition(0, 42);
+                    cnt_error_messeg = 0;
+                    continue;
+                }
+                wcout << L"Введите количество мест (меньше 16): ";
+
+                if (!correctInput(cnt_places)) {
+                    ++cnt_error_messeg;
+                    wcout << L"Некорректный ввод. Введите количество мест заново.\n";
+                    continue;
+                }
+
+                if (cnt_places <= 0 || cnt_places > 16) {
+                    ++cnt_error_messeg;
+                    wcout << L"Количество мест вне диапазона. Пожалуйста, введите корректное количество.\n";
+                    continue;
+                }
+
+                if (!aoutoChoosingPlace(session, cnt_places, bookedRow, bookedRows, bookedPlaces, totalCost)) {
+                    wcout << L"К сожалению, не удалось найти " << cnt_places << L" свободных рядом мест.\n";
+                    ++cnt_error_messeg;
+                    continue;
+                }
+
+
+                wcout << L"Места успешно забронированы.\n";
+
+                // Вывод всех деталей билета
+                printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost);
+                chooseAdditionalItems(totalCost);
+                choosePaymentMethod(totalCost);
+                break;
+            }
+            break;
+
+        }
+        else if (choice == 2) { // Ручной выбор мест
+            int cnt_places, row, place;
+            vector<int> bookedRows; // Список забронированных рядов
+            vector<int> bookedPlaces; // Список забронированных мест
+            while (true) {
+                if (cnt_error_messeg > 3) {
+                    ClearScreenFromPosition(0, 42);
+                    cnt_error_messeg = 0;
+                    continue;
+                }
+                wcout << L"Сколько мест вы хотите купить? ";
+                if (!correctInput(cnt_places)) {
+                    ++cnt_error_messeg;
+                    wcout << L"Некорректный ввод. Введите количество мест заново.\n";
+                    continue;
+                }
+
+                if (cnt_places <= 0 || cnt_places > 16) {
+                    ++cnt_error_messeg;
+                    wcout << L"Количество мест вне диапазона. Пожалуйста, введите корректное количество.\n";
+                    continue;
+                }
+
+                for (int i = 0; i < cnt_places; ++i) {
+                    while (true) {
+                        if (cnt_error_messeg > 3) {
+                            ClearScreenFromPosition(0, 42);
+                            cnt_error_messeg = 0;
+                            continue;
+                        }
+                        wcout << L"Введите номер ряда: ";
+                        if (!correctInput(row)) {
+                            ++cnt_error_messeg;
+                            wcout << L"Некорректный ввод. Введите номер ряда заново.\n";
+                            continue;
+                        }
+
+                        --row; // Приведение к индексации с 0
+                        if (row < 0 || row >= session.rows.size()) {
+                            ++cnt_error_messeg;
+                            wcout << L"Номер ряда вне диапазона. Введите корректный номер ряда.\n";
+                            continue;
+                        }
+
+                        wcout << L"Введите номер места: ";
+                        if (!correctInput(place)) {
+                            ++cnt_error_messeg;
+                            wcout << L"Некорректный ввод. Введите номер места заново.\n";
+                            continue;
+                        }
+
+                        if (place <= 0 || place >= session.rows[row].seats.size() - 1) {
+                            ++cnt_error_messeg;
+                            wcout << L"Номер места вне диапазона. Введите корректный номер места.\n";
+                            continue;
+                        }
+
+                        if (session.rows[row].seats[place].status == L"x" || session.rows[row].seats[place].status == L"0") {
+                            ++cnt_error_messeg;
+                            wcout << L"Место занято, выберите другое.\n";
+                            continue;
+                        }
+                        ClearScreen();
+                        // Если место свободно, бронируем его
+                        session.rows[row].seats[place].status = L"x";
+                        session.rows[row].seats[place].color = L"violet";
+                        DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+                        wcout << L"Место успешно забронировано.\n";
+                        session.rows[row].seats[place].color = L"red";
+                        totalCost += session.rows[row].seats[place].cost;
+                        bookedRows.push_back(row);
+                        bookedPlaces.push_back(place);
+                        break;
+                    }
+                }
+                printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost);
+                chooseAdditionalItems(totalCost);
+                choosePaymentMethod(totalCost);
+                break;
+            }
+            break;// завершение программы.
+        }
+    }
 }
 
 #endif // HEADER_H
