@@ -150,12 +150,10 @@ void detailedInform() { // Функция выводящая детали фил
 }
 
 
-
-
 void sessionSelection(int day) { // Выбор сеанса
     //wcout << L"\n" << fileIn("cimema_info.txt") << endl;
     ClearScreen();
-    short int input;
+    
 
     switch (day) { // изменение расписания в зависсимости от дня (сейчас ничего не меняется)
     case 1:
@@ -170,12 +168,20 @@ void sessionSelection(int day) { // Выбор сеанса
     }
 
     wcout << L"Выберите фильм который хотите посмотреть" << endl;
-    wcout << L"Введите 111 чтобы посмотреть расписание на следующий день" << endl;
-    wcout << L"Введите 222 чтобы посмотреть расписание на предыдущий день" << endl;
+    wcout << L"Введите 111 чтобы посмотреть расписание на 1 день" << endl;
+    wcout << L"Введите 222 чтобы посмотреть расписание на 2 день" << endl;
+    wcout << L"Введите 333 чтобы посмотреть расписание на 3 день" << endl;
     //wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
 	wcout << L"Введите номер сеанса, на который хотите пойти" << endl << endl;
     wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
-    wcin >> input;
+    //wcin >> input;
+    
+     int input;
+    while (true) {
+        if (correctInput(input) && input >0 && input <= 333)
+            break;
+        wcout << L"Ошибка ввода попробуйте ещё раз\n";
+    }
     ClearScreen();
     if (input == 0) {
         movieSelection();
@@ -183,54 +189,35 @@ void sessionSelection(int day) { // Выбор сеанса
     else {
 
     }
-    if (input == 111 && day < 3) {
+    if (input == 111) {
 		ClearScreen();
-		sessionSelection(day + 1);
+        day = 1;
+		sessionSelection(day);
 
 	}
-	else if (input == 222 && day > 1) {
+	else if (input == 222) {
 		ClearScreen();
-		sessionSelection(day - 1);
+        day = 2;
+		sessionSelection(day);
+
+	}else if (input == 333) {
+		ClearScreen();
+        day = 3;
+		sessionSelection(day);
 
 	}
     else {        
-        int numbers_1_day = Days.day_one.Cinema_room_1.size();
-        int numbers_2_day = Days.day_one.Cinema_room_2.size() + Days.day_one.Cinema_room_1.size();
-        int numbers_3_day = Days.day_one.Cinema_room_3.size() +  Days.day_one.Cinema_room_2.size() + Days.day_one.Cinema_room_1.size();
-        
-        if (day == 1 ) {
-            if (input <= numbers_1_day) {
-                choosingPlace(Days.day_one.Cinema_room_1[input - 1], day);
+        int numbers_1_day = Days.trio_days[day - 1].Cinema_room_1.size();
+        int numbers_2_day = Days.trio_days[day - 1].Cinema_room_2.size() + Days.trio_days[day - 1].Cinema_room_1.size();
+        int numbers_3_day = Days.trio_days[day - 1].Cinema_room_3.size() +  Days.trio_days[day - 1].Cinema_room_2.size() + Days.trio_days[day - 1].Cinema_room_1.size();
+        if (input <= numbers_1_day) {
+                choosingPlace(Days.trio_days[day-1].Cinema_room_1[input - 1], day);
             }
             else if (input > numbers_1_day && input <= numbers_2_day) 
-               choosingPlace(Days.day_one.Cinema_room_2[input - numbers_1_day - 1], day);
+               choosingPlace(Days.trio_days[day - 1].Cinema_room_2[input - numbers_1_day - 1], day);
            
             else if (input > numbers_2_day && input <= numbers_3_day) 
-               choosingPlace(Days.day_one.Cinema_room_3[input - numbers_2_day - 1], day);
-           
-        }
-        else if (day == 2 ) {
-           if (input <= numbers_1_day){
-               choosingPlace(Days.day_two.Cinema_room_1[input - 1], day);
-           }
-           else if (input > numbers_1_day && input <= numbers_2_day, day) {
-               choosingPlace(Days.day_two.Cinema_room_2[input - numbers_1_day - 1], day);
-           }
-           else if (input > numbers_2_day && input <= numbers_3_day) {
-               choosingPlace(Days.day_two.Cinema_room_3[input - numbers_2_day - 1], day);
-           }
-        }
-        else if (day == 3 ) {
-           if (input <= numbers_1_day){
-               choosingPlace(Days.day_two.Cinema_room_1[input - 1], day);
-           }
-           else if (input > numbers_1_day && input <= numbers_2_day) {
-               choosingPlace(Days.day_two.Cinema_room_2[input - numbers_1_day - 1], day);
-           }
-           else if (input > numbers_2_day && input <= numbers_3_day) {
-               choosingPlace(Days.day_two.Cinema_room_3[input - numbers_2_day - 1], day);
-           }
-        }
+               choosingPlace(Days.trio_days[day - 1].Cinema_room_3[input - numbers_2_day - 1], day);
     }
 
     
@@ -470,36 +457,18 @@ wstring fileIn(const string& fname) {
     return converter.from_bytes(utf16_content);
 }
 
-// вывод всех сеансов ввиде зала  //для понимания кода 
-void demoVis_All_sessions(Day& day_one, const int rowCount, const int placeCount) {
-    fullScreen();
-    for (int i = 0; i < day_one.Cinema_room_1.size(); ++i) {
-        DrawSession(day_one.Cinema_room_1[i], rowCount, placeCount);
-        waitForInput();
-        ClearScreen();
-
-    }
-
-    for (int i = 0; i < day_one.Cinema_room_2.size(); ++i) {
-        DrawSession(day_one.Cinema_room_2[i], rowCount, placeCount);
-        waitForInput();
-        ClearScreen();
-    }
-
-    for (int i = 0; i < day_one.Cinema_room_3.size(); ++i) {
-        DrawSession(day_one.Cinema_room_3[i], rowCount, placeCount);
-        waitForInput();
-        ClearScreen();
-    }
-}
 
 
 
 void generationTrioDays(TrioDays& trio)
 {
-    GenerationDay(trio.day_one, fileIn("sessions_day_one.txt"), rowCount, placeCount); // генерация всех сеансов первого дня
-    GenerationDay(trio.day_two, fileIn("sessions_day_two.txt"), rowCount, placeCount); // генерация всех сеансов второго дня
-    GenerationDay(trio.day_three, fileIn("sessions_day_three.txt"), rowCount, placeCount); // генерация всех сеансов третьего дня
+    Day day_one, day_two, day_three;
+    GenerationDay(day_one, fileIn("sessions_day_one.txt"), rowCount, placeCount); // генерация всех сеансов первого дня
+    GenerationDay(day_two, fileIn("sessions_day_two.txt"), rowCount, placeCount); // генерация всех сеансов второго дня
+    GenerationDay(day_three, fileIn("sessions_day_three.txt"), rowCount, placeCount); // генерация всех сеансов третьего дня
+    trio.trio_days.push_back(day_one);
+    trio.trio_days.push_back(day_two);
+    trio.trio_days.push_back(day_three);
 }
 
 
