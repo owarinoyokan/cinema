@@ -60,6 +60,8 @@ struct Session {
 	vector<Row> rows;
 	wstring film_name;
 	wstring time_film;
+	wstring genre;
+	wstring duration;
 };
 
 //структура Сеанса
@@ -204,10 +206,12 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
 }
 
 // Генерация зала
-void GenerationRoom(Session& session, const int rowCount, const int placeCount, wstring name, wstring time_f) {
+void GenerationRoom(Session& session, const int rowCount, const int placeCount, wstring name, wstring time_f, wstring genre, wstring duration) {
 	session.rows.resize(rowCount);
 	session.film_name = name;
 	session.time_film = time_f;
+	session.genre = genre;
+	session.duration = duration;
 	for (int i = 0; i < rowCount; ++i) {
 		session.rows[i].seats.resize(placeCount);
 		for (int j = 0; j < placeCount; ++j) {
@@ -261,20 +265,16 @@ void removeCarriageReturn(std::wstring& line) {
 
 // Генерация дня с чтением из файла
 void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
-
-	// Читаем файл в строку
 	wstringstream stream(filename);
 	wstring line;
 	vector<Session>* currentSessionGroup = nullptr;
 
 	while (getline(stream, line)) {
-		removeCarriageReturn(line); // Удаляем \r из строки
-
-		line = replaceDash(line);  // Замена длинных дефисов
+		removeCarriageReturn(line);
+		line = replaceDash(line);
 		if (line.empty()) {
-			continue; // Игнорируем пустые строки
+			continue;
 		}
-
 
 		if (line == L"Cinema room 1") {
 			currentSessionGroup = &day.Cinema_room_1;
@@ -288,7 +288,7 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 		else if (currentSessionGroup && !line.empty() && iswdigit(line[0])) {
 			int sessionCount = 0;
 			try {
-				sessionCount = stoi(line); // Преобразуем строку в число
+				sessionCount = stoi(line);
 				currentSessionGroup->resize(sessionCount);
 			}
 			catch (const exception&) {
@@ -297,7 +297,7 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 			}
 
 			for (int i = 0; i < sessionCount; ++i) {
-				wstring timeRange, filmName;
+				wstring timeRange, filmName, genre, duration;
 
 				if (!getline(stream, timeRange) || timeRange.empty()) {
 					wcerr << L"Ошибка: Некорректное или отсутствует время фильма." << endl;
@@ -309,10 +309,22 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 					return;
 				}
 
+				if (!getline(stream, genre) || genre.empty()) {
+					wcerr << L"Ошибка: Некорректный или отсутствует жанр фильма." << endl;
+					return;
+				}
+
+				if (!getline(stream, duration) || duration.empty()) {
+					wcerr << L"Ошибка: Некорректная или отсутствует продолжительность фильма." << endl;
+					return;
+				}
+
 				(*currentSessionGroup)[i].film_name = filmName;
 				(*currentSessionGroup)[i].time_film = timeRange;
+				(*currentSessionGroup)[i].genre = genre;
+				(*currentSessionGroup)[i].duration = duration;
 
-				GenerationRoom((*currentSessionGroup)[i], rowCount, placeCount, filmName, timeRange);
+				GenerationRoom((*currentSessionGroup)[i], rowCount, placeCount, filmName, timeRange, genre, duration);
 			}
 		}
 		else {
@@ -321,6 +333,8 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 		}
 	}
 }
+
+
 
 
 //Очистка экрана :
@@ -456,22 +470,27 @@ bool aoutoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector
 	return false; // Если ни одного подходящего участка не найдено
 }
 // Функция для вывода всех деталей билета
-void printTicketDetails(const vector<int>& bookedRows, const vector<int>& bookedPlaces, int cnt_places, double totalCost) {
+void printTicketDetails(const vector<int>& bookedRows, const vector<int>& bookedPlaces, int cnt_places, double totalCost, const wstring& filmName, const wstring& filmTime, const wstring& genre, const wstring& duration) {
 	wcout << L"\n---------- Билет ----------\n";
+	wcout << L"Фильм: " << filmName << L"\n";
+	wcout << L"Жанр: " << genre << L"\n";
+	wcout << L"Сеанс: " << filmTime << L"\n";
+	wcout << L"Продолжительность: " << duration << L"\n\n";
 
 	wcout << L"Забронированные места:\n";
 	for (size_t i = 0; i < bookedRows.size(); ++i) {
-		wcout << L"Ряд: " << bookedRows[i] + 1  // Приведение к человеческому виду
-			<< L", Место: " << bookedPlaces[i]; // Приведение к человеческому виду
+		wcout << L"Ряд: " << bookedRows[i] + 1
+			<< L", Место: " << bookedPlaces[i];
 		if (i < bookedRows.size() - 1) {
-			wcout << L" | "; // Разделяем места
+			wcout << L" | ";
 		}
 	}
 
 	wcout << L"\nКоличество билетов: " << cnt_places << L"\n";
-	wcout << L"Общая стоимость: " << totalCost << L" рублей.\n"; // Здесь можно изменить валюту по необходимости
+	wcout << L"Общая стоимость: " << totalCost << L" рублей.\n";
 	wcout << L"--------------------------------\n";
 }
+
 
 void chooseAdditionalItems(double& totalAmount) {
 	short int itemChoice;
@@ -623,7 +642,7 @@ void choosingPlace(Session& session, int day) {
 				wcout << L"Места успешно забронированы.\n";
 
 				// Вывод всех деталей билета
-				printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost);
+				printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost, session.film_name, session.time_film, session.genre, session.duration);
 				chooseAdditionalItems(totalCost);
 				choosePaymentMethod(totalCost);
 				break;
@@ -706,7 +725,7 @@ void choosingPlace(Session& session, int day) {
 						break;
 					}
 				}
-				printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost);
+				printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost, session.film_name, session.time_film, session.genre, session.duration);
 				chooseAdditionalItems(totalCost);
 				choosePaymentMethod(totalCost);
 				break;
