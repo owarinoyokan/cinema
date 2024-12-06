@@ -5,7 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
-#include <string>
+#include <string> // Для работы со строками
 #include <algorithm>
 #include <chrono>
 #include <fstream>
