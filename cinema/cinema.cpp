@@ -26,8 +26,6 @@ wstring fileIn(const string& fname); // Функция для чтения фа�
 void sessionSelection(int);
 int listFilmFromTheDay(int day, int filmNumber);
 
-
-
 void extranceToCinema() { // Функция входа в кино, предлагает самый первый выбор
     short int input;
     //wcout << L"\n" << fileIn(" file name ") << endl; // Вывод файла
@@ -35,7 +33,10 @@ void extranceToCinema() { // Функция входа в кино, предла
     wcout << L"Нажмите '1', чтобы выбрать фильм" << endl;
     wcout << L"Нажмите '0', чтобы выйти" << endl;
     wcin >> input;
+
     ClearScreen(); // Очистка консоли
+    ClearScreen(); // Очистка консоли
+
     switch (input) {
     case 1:
         movieSelection(); // Функция выводяшая список фильмов с краткой информацией
@@ -65,6 +66,7 @@ void availablePromo() { // Функция для просмотра доспуп
 }
 
 void movieSelection() { // Функция выводяшая список фильмов с краткой информацией
+
     short int input;
     wcout << L"\n" << fileIn("cinema_info.txt") << endl; // Вывод файла
     wcout << L"Нажмите '1', чтобы выбрать сеанс" << endl;
@@ -481,6 +483,10 @@ int main() {
     for (int i = 0; i < 2; i++) {
         PressCtrlMinus();
     }
+
+    wcout << fileIn("6104.txt") << endl;
+    
+    system("pause");
 
     ClearScreen();      // Очистка консоли
 
