@@ -476,7 +476,7 @@ void generationTrioDays(TrioDays& trio)
 
 
 
-int main() {
+int main() {    // commit
     // Настройка широких символов для потока вывода
     setMode16();
     fullScreen();
