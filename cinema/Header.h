@@ -206,28 +206,25 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
 	++y;
 	wcout << setw(67) << session.film_name << endl;
 	++y;
-	setCursorPosition(1, y);
-	for (int line = 1; line < 129; ++line) { wcout << L"_"; }
+	setCursorPosition(0, y);
+	wcout << L"│";
+	for (int line = 1; line < 129; ++line) { wcout << L"─"; }
 	++y;
-	wcout << L"\n|";
+	wcout << L"│\n│";
 	for (int i = session.rows.size() - 1; i >= 0; --i) {
 		setCursorPosition(1, y - 1);
-		for (int ozer_line = 0; ozer_line < 4; ++ozer_line) { setCursorPosition(0, ++y); wcout << L"|"; }
+		for (int ozer_line = 0; ozer_line < 4; ++ozer_line) { setCursorPosition(0, ++y); wcout << L"│"; }
 		y -= 4;
-		//wcout << L"|\n|\n|\n|\n|\n";
-		if (i > rowCount - 1) {
 
-		}
-		else{
-			drawRow(y, session.rows[i], i + 1);
-		}
+		drawRow(y, session.rows[i], i + 1);
+		
 		--y;
-		for (int ozer_line = 0; ozer_line < 5; ++ozer_line) { setCursorPosition(129, ++y); wcout << L"|"; }
+		for (int ozer_line = 0; ozer_line < 5; ++ozer_line) { setCursorPosition(129, ++y); wcout << L"│"; }
 		y -= 5;
 		y += BOX_HEIGHT + 2;
 	}
 	setCursorPosition(1, y);
-	for (int line = 0; line < 128; ++line) { wcout << L"_"; }
+	for (int line = 0; line < 128; ++line) { wcout << L"─"; }
 	++y;
 	setCursorPosition(0, y);
 
