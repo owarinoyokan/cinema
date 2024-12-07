@@ -12,6 +12,8 @@
 #include <windows.h>
 
 
+
+
 using namespace std;    // Пространство имен
 using namespace Config;    // Пространство имен
 
@@ -35,7 +37,7 @@ void extranceToCinema() { // Функция входа в кино, предла
     wcin >> input;
 
     ClearScreen(); // Очистка консоли
-    ClearScreen(); // Очистка консоли
+
 
     switch (input) {
     case 1:
@@ -180,16 +182,13 @@ void sessionSelection(int day) { // Выбор сеанса
 
     int input;
     while (true) {
-        if (correctInput(input) && input > 0 && input <= 333)
+        if (correctInput(input) && input >= 0 && input <= 333)
             break;
         wcout << L"Ошибка ввода попробуйте ещё раз\n";
     }
     ClearScreen();
     if (input == 0) {
         movieSelection();
-    }
-    else {
-
     }
     if (input == 111) {
         ClearScreen();
@@ -500,7 +499,6 @@ int main() {    // commit
     /*
     choosingPlace(Days.day_one.Cinema_room_1[0]);*/
     //waitForInput();
-    ClearScreen();
 
 
     wcout << L"Проект кинотеатра.🎬" << endl;

@@ -15,6 +15,7 @@
 #include <io.h>         // Äëÿ ðàáîòû ñ _setmode
 #include <locale>       // Äëÿ ðàáîòû ñ êîäèðîâêàìè
 #include <fcntl.h>      // Äëÿ ðåæèìà _O_U16TEXT
+#include <map>
 
 
 using namespace std;
@@ -103,15 +104,20 @@ int stringToInt(const wstring& str) {
 
 // Функции отрисовки
 // Функция отрисовки занятого места
-void drawOccupiedBox(int& x, int y, wstring& clr) {
-	if (clr == L"red")
-		SetColor(12, 12);
-	else
-		if (clr == L"violet") {
-			SetColor(13, 13);
-		}
+void drawGrayOccupiedBox(int& x, int y) {
+	SetColor(8, 8);
+	setCursorPosition(x, y + 1);
+	wcout << L"|    |";
+	setCursorPosition(x, y + 2);
+	wcout << L"| " << L" " << L" " << L" |";
+	setCursorPosition(x, y + 3);
+	wcout << L"|____|";
+	SetColor(15, 0);
+	x += BOX_WIDTH + 1;
+}
 
-
+void drawVioletOccupiedBox(int& x, int y) {
+	SetColor(13, 13);
 	setCursorPosition(x, y + 1);
 	wcout << L"|    |";
 	setCursorPosition(x, y + 2);
@@ -135,30 +141,29 @@ void drawRowNumberBox(int& x, int y, int rowNumber) {
 // Функция отрисовки дешёвого свободного места
 void drawWhiteAvailableBox(int& x, int y, const wstring& number) {
 	SetColor(15, 0);
-	setCursorPosition(x, y);
-	wcout << L" ____ ";
+
 	setCursorPosition(x, y + 1);
-	wcout << L"|    |";
+	SetColor(0, 15);
+	wcout << L"      ";
 	setCursorPosition(x, y + 2);
-	wcout << L"| " << (stringToInt(number) < 10 ? L" " : L"") << number << L" |";
+	wcout << L"  " << (stringToInt(number) < 10 ? L" " : L"") << number << L"  ";
 	setCursorPosition(x, y + 3);
-	wcout << L"|____|";
+	wcout << L"      ";
+	SetColor(15, 0);
 	x += BOX_WIDTH + 1;
 }
 
 // Функция отрисовки дорогого свободного места
 void drawYellowAvailableBox(int& x, int y, const wstring& number) {
-	SetColor(14, 0);
-	setCursorPosition(x, y);
-	wcout << L" ____ ";
 	setCursorPosition(x, y + 1);
-	wcout << L"|    |";
+	SetColor(0, 14);
+	wcout << L"      ";
 	setCursorPosition(x, y + 2);
-	wcout << L"| " << (stringToInt(number) < 10 ? L" " : L"") << number << L" |";
+	wcout << L"  " << (stringToInt(number) < 10 ? L" " : L"") << number << L"  ";
 	setCursorPosition(x, y + 3);
-	wcout << L"|____|";
-	x += BOX_WIDTH + 1;
+	wcout << L"      ";
 	SetColor(15, 0);
+	x += BOX_WIDTH + 1;
 }
 
 // Рисуем рамку для конкретного места
@@ -167,8 +172,12 @@ void drawBox(int& x, int y, const Seat& seat, int rowNumber) {
 		drawWhiteAvailableBox(x, y, seat.status);
 	}
 	else if (seat.status == L"x") {
-		wstring clr = seat.color;
-		drawOccupiedBox(x, y, clr);
+		if (seat.color == L"red") {
+			drawGrayOccupiedBox(x, y);
+		}
+		else if (seat.color == L"violet") {
+			drawVioletOccupiedBox(x, y);
+		}
 	}
 	else if (seat.status == L"0") {
 		drawRowNumberBox(x, y, rowNumber);
@@ -180,7 +189,7 @@ void drawBox(int& x, int y, const Seat& seat, int rowNumber) {
 
 //// Отрисовка ряда
 void drawRow(int y, const Row& row, int rowNumber) {
-	int x = 0;
+	int x = 2;
 	for (const auto& seat : row.seats) {
 		drawBox(x, y, seat, rowNumber);
 	}
@@ -197,10 +206,29 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
 	++y;
 	wcout << setw(67) << session.film_name << endl;
 	++y;
+	setCursorPosition(1, y);
+	for (int line = 1; line < 129; ++line) { wcout << L"_"; }
+	++y;
+	wcout << L"\n|";
 	for (int i = session.rows.size() - 1; i >= 0; --i) {
-		drawRow(y, session.rows[i], i + 1);
+		setCursorPosition(1, y - 1);
+		for (int ozer_line = 0; ozer_line < 4; ++ozer_line) { setCursorPosition(0, ++y); wcout << L"|"; }
+		y -= 4;
+		//wcout << L"|\n|\n|\n|\n|\n";
+		if (i > rowCount - 1) {
+
+		}
+		else{
+			drawRow(y, session.rows[i], i + 1);
+		}
+		--y;
+		for (int ozer_line = 0; ozer_line < 5; ++ozer_line) { setCursorPosition(129, ++y); wcout << L"|"; }
+		y -= 5;
 		y += BOX_HEIGHT + 2;
 	}
+	setCursorPosition(1, y);
+	for (int line = 0; line < 128; ++line) { wcout << L"_"; }
+	++y;
 	setCursorPosition(0, y);
 
 }
@@ -406,10 +434,9 @@ void waitForInput() {
 	cin.clear();
 }
 
-// Функция для проверки ввода числа
 bool correctInput(int& number) {
 	wstring input;
-	getline(wcin, input); // Читаем строку
+	getline(wcin, input); // Читаем строку из wcin
 	if (input.empty()) {
 		return false; // Проверка на пустой ввод
 	}
@@ -718,7 +745,7 @@ void choosingPlace(Session& session, int day) {
 						session.rows[row].seats[place].color = L"violet";
 						DrawSession(session, session.rows.size(), session.rows[0].seats.size());
 						wcout << L"Место успешно забронировано.\n";
-						session.rows[row].seats[place].color = L"red";
+						session.rows[row].seats[place].color = L"gray";
 						totalCost += session.rows[row].seats[place].cost;
 						bookedRows.push_back(row);
 						bookedPlaces.push_back(place);
