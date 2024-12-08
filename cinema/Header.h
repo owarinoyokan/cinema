@@ -218,7 +218,7 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
 		if (i > rowCount - 1) {
 
 		}
-		else{
+		else {
 			drawRow(y, session.rows[i], i + 1);
 		}
 		--y;
