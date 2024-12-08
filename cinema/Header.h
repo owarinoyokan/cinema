@@ -520,84 +520,249 @@ void printTicketDetails(const vector<int>& bookedRows, const vector<int>& booked
 
 
 void chooseAdditionalItems(double& totalAmount) {
-	short int itemChoice;
 	bool moreItems = true; // Флаг для продолжения выбора товаров
+	std::vector<std::wstring> selectedItems; // Список выбранных товаров
 
 	while (moreItems) {
-		wcout << L"--- Дополнительные товары ---\n";
-		wcout << L"1. Кола (150 рублей)\n";
-		wcout << L"2. Попкорн (100 рублей)\n";
-		wcout << L"3. Чипсы (120 рублей)\n";
-		wcout << L"4. Соки (130 рублей)\n";
-		wcout << L"5. Нет, спасибо\n";
-		wcout << L"Введите номер выбранного товара: ";
-		wcin >> itemChoice;
+		int categoryChoice;
+		wcout << L"--- Выберите категорию ---\n";
+		wcout << L"1. Напитки\n";
+		wcout << L"2. Попкорн\n";
+		wcout << L"3. Сладости\n";
+		wcout << L"4. Закуски\n";
+		wcout << L"5. Десерты\n";
+		wcout << L"6. Наборы\n";
+		wcout << L"7. Завершить выбор\n";
+		wcout << L"Введите номер выбранной категории: ";
 
-		switch (itemChoice) {
-		case 1:
-			wcout << L"Вы выбрали Кола.\n";
-			totalAmount += 150.0;
-			break;
-		case 2:
-			wcout << L"Вы выбрали Попкорн.\n";
-			totalAmount += 100.0;
-			break;
-		case 3:
-			wcout << L"Вы выбрали Чипсы.\n";
-			totalAmount += 120.0;
-			break;
-		case 4:
-			wcout << L"Вы выбрали Соки.\n";
-			totalAmount += 130.0;
-			break;
-		case 5:
-			wcout << L"Вы выбрали пропустить этот шаг.\n";
-			moreItems = false; // Заканчиваем выбор товаров
-			break;
-		default:
-			wcout << L"Некорректный выбор. Пожалуйста, попробуйте снова.\n";
+		if (!correctInput(categoryChoice) || categoryChoice < 1 || categoryChoice > 7) {
+			wcout << L"Некорректный ввод. Попробуйте снова.\n";
 			continue;
 		}
 
-		// Запрос о продолжении выбора
-		if (itemChoice != 5) { // Пропускаем вопрос, если выбрано "Нет, спасибо"
-			wstring addMore;
-			wcout << L"Хотите добавить ещё товары? (Y/N): ";
-			wcin >> addMore;
-			if (addMore != L"Yes" && addMore != L"yes") {
-				moreItems = false; // Заканчиваем выбор товаров
-			}
+		if (categoryChoice == 7) { // Завершение выбора
+			wcout << L"Вы завершили выбор дополнительных товаров.\n";
+			break;
 		}
 
-		wcout << L"Общая сумма с учетом выбранных товаров: " << totalAmount << L" рублей.\n";
+		bool backToCategory = false; // Флаг возврата в меню категорий
+		while (!backToCategory) {
+			int itemChoice;
+			switch (categoryChoice) {
+			case 1: // Напитки
+				wcout << L"--- Напитки ---\n";
+				wcout << L"1. Вода (0.5 л) - 30 рублей\n";
+				wcout << L"2. Газированная вода (0.5 л) - 35 рублей\n";
+				wcout << L"3. Сок (0.5 л) - 60 рублей\n";
+				wcout << L"4. Кола (0.5 л) - 60 рублей\n";
+				wcout << L"5. Кофе (300 мл) - 100 рублей\n";
+				wcout << L"6. Чай (300 мл) - 50 рублей\n";
+				wcout << L"7. Вернуться назад\n";
+				wcout << L"Введите номер выбранного товара: ";
+				if (!correctInput(itemChoice) || itemChoice < 1 || itemChoice > 7) {
+					wcout << L"Некорректный выбор. Попробуйте снова.\n";
+					continue;
+				}
+				if (itemChoice == 7) { // Возврат в меню категорий
+					backToCategory = true;
+					break;
+				}
+				switch (itemChoice) {
+				case 1: totalAmount += 30; selectedItems.push_back(L"Вода (0.5 л)"); break;
+				case 2: totalAmount += 35; selectedItems.push_back(L"Газированная вода (0.5 л)"); break;
+				case 3: totalAmount += 60; selectedItems.push_back(L"Сок (0.5 л)"); break;
+				case 4: totalAmount += 60; selectedItems.push_back(L"Кола (0.5 л)"); break;
+				case 5: totalAmount += 100; selectedItems.push_back(L"Кофе (300 мл)"); break;
+				case 6: totalAmount += 50; selectedItems.push_back(L"Чай (300 мл)"); break;
+				}
+				break;
+
+			case 2: // Попкорн
+				wcout << L"--- Попкорн ---\n";
+				wcout << L"1. Малый попкорн - 150 рублей\n";
+				wcout << L"2. Средний попкорн - 200 рублей\n";
+				wcout << L"3. Большой попкорн - 250 рублей\n";
+				wcout << L"4. Вернуться назад\n";
+				wcout << L"Введите номер выбранного товара: ";
+				if (!correctInput(itemChoice) || itemChoice < 1 || itemChoice > 4) {
+					wcout << L"Некорректный выбор. Попробуйте снова.\n";
+					continue;
+				}
+				if (itemChoice == 4) { // Возврат в меню категорий
+					backToCategory = true;
+					break;
+				}
+				switch (itemChoice) {
+				case 1: totalAmount += 150; selectedItems.push_back(L"Малый попкорн"); break;
+				case 2: totalAmount += 200; selectedItems.push_back(L"Средний попкорн"); break;
+				case 3: totalAmount += 250; selectedItems.push_back(L"Большой попкорн"); break;
+				}
+				break;
+
+			case 3: // Сладости
+				wcout << L"--- Сладости ---\n";
+				wcout << L"1. Шоколадный батончик - 50 рублей\n";
+				wcout << L"2. Чипсы - 100 рублей\n";
+				wcout << L"3. Орешки (150 г) - 150 рублей\n";
+				wcout << L"4. Вернуться назад\n";
+				wcout << L"Введите номер выбранного товара: ";
+				if (!correctInput(itemChoice) || itemChoice < 1 || itemChoice > 4) {
+					wcout << L"Некорректный выбор. Попробуйте снова.\n";
+					continue;
+				}
+				if (itemChoice == 4) { // Возврат в меню категорий
+					backToCategory = true;
+					break;
+				}
+				switch (itemChoice) {
+				case 1: totalAmount += 50; selectedItems.push_back(L"Шоколадный батончик"); break;
+				case 2: totalAmount += 100; selectedItems.push_back(L"Чипсы"); break;
+				case 3: totalAmount += 150; selectedItems.push_back(L"Орешки (150 г)"); break;
+				}
+				break;
+
+			case 4: // Закуски
+				wcout << L"--- Закуски ---\n";
+				wcout << L"1. Хот-дог - 150 рублей\n";
+				wcout << L"2. Бургер - 200 рублей\n";
+				wcout << L"3. Начос с сыром - 200 рублей\n";
+				wcout << L"4. Вернуться назад\n";
+				wcout << L"Введите номер выбранного товара: ";
+				if (!correctInput(itemChoice) || itemChoice < 1 || itemChoice > 4) {
+					wcout << L"Некорректный выбор. Попробуйте снова.\n";
+					continue;
+				}
+				if (itemChoice == 4) { // Возврат в меню категорий
+					backToCategory = true;
+					break;
+				}
+				switch (itemChoice) {
+				case 1: totalAmount += 150; selectedItems.push_back(L"Хот-дог"); break;
+				case 2: totalAmount += 200; selectedItems.push_back(L"Бургер"); break;
+				case 3: totalAmount += 200; selectedItems.push_back(L"Начос с сыром"); break;
+				}
+				break;
+
+			case 5: // Десерты
+				wcout << L"--- Десерты ---\n";
+				wcout << L"1. Мороженое - 120 рублей\n";
+				wcout << L"2. Тортик - 150 рублей\n";
+				wcout << L"3. Печенье (2 шт) - 70 рублей\n";
+				wcout << L"4. Вернуться назад\n";
+				wcout << L"Введите номер выбранного товара: ";
+				if (!correctInput(itemChoice) || itemChoice < 1 || itemChoice > 4) {
+					wcout << L"Некорректный выбор. Попробуйте снова.\n";
+					continue;
+				}
+				if (itemChoice == 4) { // Возврат в меню категорий
+					backToCategory = true;
+					break;
+				}
+				switch (itemChoice) {
+				case 1: totalAmount += 120; selectedItems.push_back(L"Мороженое"); break;
+				case 2: totalAmount += 150; selectedItems.push_back(L"Тортик"); break;
+				case 3: totalAmount += 70; selectedItems.push_back(L"Печенье (2 шт)"); break;
+				}
+				break;
+
+			case 6: // Наборы
+				wcout << L"--- Наборы ---\n";
+				wcout << L"1. Попкорн (малый) + сок/кола - 180 рублей\n";
+				wcout << L"2. Попкорн (средний) + сок/кола - 230 рублей\n";
+				wcout << L"3. Хот-дог + сок/кола + чипсы - 280 рублей\n";
+				wcout << L"4. Вернуться назад\n";
+				wcout << L"Введите номер выбранного товара: ";
+				if (!correctInput(itemChoice) || itemChoice < 1 || itemChoice > 4) {
+					wcout << L"Некорректный выбор. Попробуйте снова.\n";
+					continue;
+				}
+				if (itemChoice == 4) { // Возврат в меню категорий
+					backToCategory = true;
+					break;
+				}
+				switch (itemChoice) {
+				case 1: totalAmount += 180; selectedItems.push_back(L"Попкорн (малый) + сок/кола"); break;
+				case 2: totalAmount += 230; selectedItems.push_back(L"Попкорн (средний) + сок/кола"); break;
+				case 3: totalAmount += 280; selectedItems.push_back(L"Хот-дог + сок/кола + чипсы"); break;
+				}
+				break;
+			}
+
+			if (backToCategory) break; // Возвращаемся к выбору категории
+		}
 	}
+	wcout << L"\nВы выбрали:\n";
+	for (const auto& item : selectedItems) {
+		wcout << L"- " << item << L"\n";
+	}
+	wcout << L"Общая сумма с учётом выбранных товаров: " << totalAmount << L" рублей.\n";
 }
+
+
+
+
+
+
+
 
 
 // Функция для выбора способа оплаты
 void choosePaymentMethod(double totalAmount) {
 	int paymentChoice;
-	wcout << L"--- Способы оплаты ---\n";
-	wcout << L"1. Наличными\n";
-	wcout << L"2. Картой\n";
-	wcout << L"3. Электронный кошелёк\n";
-	wcout << L"Введите номер выбранного способа оплаты: ";
-	wcin >> paymentChoice;
+	wstring promoCode;
+	map<wstring, double> promoCodes = {
+		{L"DISCOUNT10", 0.10}, // Промокод на скидку 10%
+		{L"DISCOUNT20", 0.20}, // Промокод на скидку 20%
+		{L"FREESNACK", 0.15}   // Промокод на скидку 15%
+	};
 
-	switch (paymentChoice) {
-	case 1:
-		wcout << L"Вы выбрали оплату наличными. Общая сумма: " << totalAmount << L" рублей.\n";
+	// Ввод промокода
+	wcout << L"--- Промокод ---\n";
+	wcout << L"Если у вас есть промокод, введите его. Иначе нажмите Enter: ";
+	getline(wcin, promoCode);
+
+	// Применение промокода
+	if (!promoCode.empty()) {
+		if (promoCodes.find(promoCode) != promoCodes.end()) {
+			double discount = promoCodes[promoCode];
+			double discountAmount = totalAmount * discount;
+			totalAmount -= discountAmount;
+			wcout << L"Промокод принят! Скидка: " << discountAmount << L" рублей.\n";
+			wcout << L"Итоговая сумма с учётом скидки: " << totalAmount << L" рублей.\n";
+		}
+		else {
+			wcout << L"Некорректный промокод. Сумма без изменений.\n";
+		}
+	}
+	else {
+		wcout << L"Промокод не введён. Сумма без изменений.\n";
+	}
+
+	// Выбор способа оплаты
+	while (true) {
+		wcout << L"--- Способы оплаты ---\n";
+		wcout << L"1. Наличными\n";
+		wcout << L"2. Картой\n";
+		wcout << L"3. Электронный кошелёк\n";
+		wcout << L"Введите номер выбранного способа оплаты: ";
+
+		if (!correctInput(paymentChoice) || paymentChoice < 1 || paymentChoice > 3) {
+			wcout << L"Некорректный ввод. Попробуйте снова.\n";
+			continue;
+		}
+
+		switch (paymentChoice) {
+		case 1:
+			wcout << L"Вы выбрали оплату наличными. Общая сумма: " << totalAmount << L" рублей.\n";
+			break;
+		case 2:
+			wcout << L"Вы выбрали оплату картой. Общая сумма: " << totalAmount << L" рублей.\n";
+			break;
+		case 3:
+			wcout << L"Вы выбрали оплату электронным кошельком. Общая сумма: " << totalAmount << L" рублей.\n";
+			break;
+		}
 		break;
-	case 2:
-		wcout << L"Вы выбрали оплату картой. Общая сумма: " << totalAmount << L" рублей.\n";
-		break;
-	case 3:
-		wcout << L"Вы выбрали оплату электронным кошельком. Общая сумма: " << totalAmount << L" рублей.\n";
-		break;
-	default:
-		wcout << L"Некорректный выбор. Пожалуйста, попробуйте снова.\n";
-		choosePaymentMethod(totalAmount);
-		return;
 	}
 
 	wcout << L"Спасибо за ваш выбор! Транзакция завершена.\n";
