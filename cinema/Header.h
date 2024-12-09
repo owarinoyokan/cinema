@@ -257,35 +257,63 @@ wstring replaceDash(wstring str) {
 	return str;
 }
 
-// Удаление символа \r из строки
-void removeCarriageReturn(std::wstring& line) {
-	line.erase(std::remove(line.begin(), line.end(), L'\r'), line.end());
+void cleanString(wstring& str) {
+	// Удаляем переносы строк и другие невидимые символы
+	str.erase(remove(str.begin(), str.end(), L'\r'), str.end());
+	str.erase(remove(str.begin(), str.end(), L'\n'), str.end());
+	str.erase(remove_if(str.begin(), str.end(), [](wchar_t c) {
+		return iswspace(c) && c != L' ';
+		}), str.end());
+}
+
+// Функция для удаления "\r" последующей очистки данных
+void removeCarriageReturn(wstring& line) {
+	line.erase(remove(line.begin(), line.end(), L'\r'), line.end());
+	cleanString(line); // Чистим строку после удаления символов
 }
 
 
-// Генерация дня с чтением из файла
-void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
-	wstringstream stream(filename);
+/// <summary>
+/// Генерация данных для сеансов кино на основе данных из файла.
+/// Считывает информацию о залах, сеансах и их деталях из файла и загружает их в структуру данных.
+/// </summary>
+/// <param name="day">Структура данных, содержащая информацию о всех сеансах в трех залах</param>
+/// <param name="filename">Имя файла, содержащего данные о сеансах</param>
+/// <param name="rowCount">Количество рядов в зале (используется для размещения мест)</param>
+/// <param name="placeCount">Количество мест в ряду (используется для размещения мест)</param>
+void GenerationDay(Day& day, const wstring& filename, int rowCount, int placeCount) {
+	wstringstream file(filename);
+	
+
+	// Устанавливаем кодировку UTF-8
+	file.imbue(locale(locale(), new codecvt_utf8<wchar_t>));
+
 	wstring line;
 	vector<Session>* currentSessionGroup = nullptr;
 
-	while (getline(stream, line)) {
+	wcout << L"Содержимое файла:\n";
+	while (getline(file, line)) {
 		removeCarriageReturn(line);
 		line = replaceDash(line);
-		if (line.empty()) {
+
+		if (line.empty()) continue;
+
+		// Обработка залов
+		if (line.find(L"Cinema room 1") != wstring::npos) {
+			currentSessionGroup = &day.Cinema_room_1;
+			continue;
+		}
+		if (line.find(L"Cinema room 2") != wstring::npos) {
+			currentSessionGroup = &day.Cinema_room_2;
+			continue;
+		}
+		if (line.find(L"Cinema room 3") != wstring::npos) {
+			currentSessionGroup = &day.Cinema_room_3;
 			continue;
 		}
 
-		if (line == L"Cinema room 1") {
-			currentSessionGroup = &day.Cinema_room_1;
-		}
-		else if (line == L"Cinema room 2") {
-			currentSessionGroup = &day.Cinema_room_2;
-		}
-		else if (line == L"Cinema room 3") {
-			currentSessionGroup = &day.Cinema_room_3;
-		}
-		else if (currentSessionGroup && !line.empty() && iswdigit(line[0])) {
+		// Обработка количества сеансов
+		if (currentSessionGroup && iswdigit(line[0])) {
 			int sessionCount = 0;
 			try {
 				sessionCount = stoi(line);
@@ -297,39 +325,36 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 			}
 
 			for (int i = 0; i < sessionCount; ++i) {
-				wstring timeRange, filmName, genre, duration;
+				Session session;
 
-				if (!getline(stream, timeRange) || timeRange.empty()) {
+				if (!getline(file, session.time_film) || session.time_film.empty()) {
 					wcerr << L"Ошибка: Некорректное или отсутствует время фильма." << endl;
 					return;
 				}
 
-				if (!getline(stream, filmName) || filmName.empty()) {
+				if (!getline(file, session.film_name) || session.film_name.empty()) {
 					wcerr << L"Ошибка: Некорректное или отсутствует название фильма." << endl;
 					return;
 				}
 
-				if (!getline(stream, genre) || genre.empty()) {
+				if (!getline(file, session.genre) || session.genre.empty()) {
 					wcerr << L"Ошибка: Некорректный или отсутствует жанр фильма." << endl;
 					return;
 				}
 
-				if (!getline(stream, duration) || duration.empty()) {
+				if (!getline(file, session.duration) || session.duration.empty()) {
 					wcerr << L"Ошибка: Некорректная или отсутствует продолжительность фильма." << endl;
 					return;
 				}
 
-				(*currentSessionGroup)[i].film_name = filmName;
-				(*currentSessionGroup)[i].time_film = timeRange;
-				(*currentSessionGroup)[i].genre = genre;
-				(*currentSessionGroup)[i].duration = duration;
+				cleanString(session.time_film);
+				cleanString(session.film_name);
+				cleanString(session.genre);
+				cleanString(session.duration);
 
-				GenerationRoom((*currentSessionGroup)[i], rowCount, placeCount, filmName, timeRange, genre, duration);
+				GenerationRoom(session, rowCount, placeCount, session.film_name, session.time_film, session.genre, session.duration);
+				(*currentSessionGroup)[i] = session;
 			}
-		}
-		else {
-			wcerr << L"Ошибка: Неизвестная строка в файле." << endl;
-			return;
 		}
 	}
 }
@@ -355,7 +380,7 @@ void ClearScreen() {
 
 
 /// <summary>
-/// Очистка экрана с определённой позиции и доконца
+/// Очистка экрана с определённой позиции и до конца
 /// </summary>
 /// <param name="startX">Позиция Х</param>
 /// <param name="startY">Позиция Y</param>
@@ -429,6 +454,87 @@ bool correctInput(int& number) {
 	return true; // Успех
 }
 
+/// <summary>
+/// Функция фильтрует сеансы кинотеатра по запросу пользователя, предоставляя возможность 
+/// многократного использования фильтра через интерактивный интерфейс.
+/// </summary>
+/// <param name="trio_days">Ссылка на объект TrioDays, содержащий данные о сеансах за три дня.</param>
+/// <remarks>
+/// Пользователь вводит ключевое слово (например, часть названия фильма или жанра), 
+/// а функция ищет совпадения среди всех доступных сеансов. Результаты отображаются с указанием 
+/// дня, зала, времени, названия и других данных о сеансе.
+/// После каждой фильтрации пользователю предлагается возможность повторить поиск или завершить фильтрацию.
+/// </remarks>
+void filterSessions(const TrioDays& trio_days) {
+	bool repeatFiltering = true; // Флаг для управления повторением фильтрации
+
+	while (repeatFiltering) { // Цикл для многократного использования фильтра
+		wcout << L"Введите ключевое слово для поиска (например, название фильма или жанр): ";
+		wstring query;
+		wcin.ignore(); // Сбрасываем буфер ввода
+		getline(wcin, query);
+
+		// Преобразуем запрос пользователя в нижний регистр
+		transform(query.begin(), query.end(), query.begin(), ::towlower);
+
+		wcout << L"Пользователь ввел запрос: " << query << L"\n";
+
+		bool found = false;
+
+		// Перебираем все сеансы для поиска совпадений
+		for (size_t dayIndex = 0; dayIndex < trio_days.trio_days.size(); ++dayIndex) {
+			const Day& day = trio_days.trio_days[dayIndex];
+			vector<vector<Session>> allRooms = { day.Cinema_room_1, day.Cinema_room_2, day.Cinema_room_3 };
+
+			for (size_t roomIndex = 0; roomIndex < allRooms.size(); ++roomIndex) {
+				const vector<Session>& room = allRooms[roomIndex];
+				for (const auto& session : room) {
+
+					// Нормализуем данные сеансов
+					wstring sessionFilmLower = session.film_name;
+					wstring sessionGenreLower = session.genre;
+
+					cleanString(sessionFilmLower);
+					cleanString(sessionGenreLower);
+
+					transform(sessionFilmLower.begin(), sessionFilmLower.end(), sessionFilmLower.begin(), ::towlower);
+					transform(sessionGenreLower.begin(), sessionGenreLower.end(), sessionGenreLower.begin(), ::towlower);
+
+					// Проверяем совпадения
+					if (sessionFilmLower.find(query) != wstring::npos ||
+						sessionGenreLower.find(query) != wstring::npos) {
+						found = true;
+
+						wcout << L"Найдено совпадение:\n";
+						wcout << L"День: " << dayIndex + 1
+							<< L", Зал: " << roomIndex + 1
+							<< L", Название: " << session.film_name
+							<< L", Жанр: " << session.genre
+							<< L", Время: " << session.time_film
+							<< L", Продолжительность: " << session.duration << L"\n";
+					}
+				}
+			}
+		}
+
+		if (!found) 
+			wcout << L"Совпадений не найдено.\n";
+		
+		wcout << L"\nХотите выполнить фильтрацию снова? (1 - Да, 0 - Нет): ";
+		int choice;
+		wcin >> choice;
+
+		if (choice == 1) {
+			repeatFiltering = true; // Повторяем фильтрацию
+		}
+		else if (choice == 0) {
+			repeatFiltering = false; // Завершаем цикл
+		}
+		else {
+			wcout << L"Некорректный ввод. Пожалуйста, введите 1 для продолжения или 0 для выхода.\n";
+		}
+	}
+}
 
 
 

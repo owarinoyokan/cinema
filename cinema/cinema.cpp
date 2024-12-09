@@ -25,6 +25,7 @@ void detailedInform(); // Функция выводящая детали фил�
 wstring fileIn(const string& fname); // Функция для чтения файла с широкими символами
 void sessionSelection(int);
 int listFilmFromTheDay(int day, int filmNumber);
+void filterSessions(const TrioDays& trio_days); // Функция фильтра фильмов по названию или жанру
 
 void extranceToCinema() { // Функция входа в кино, предлагает самый первый выбор
     short int input;
@@ -134,6 +135,7 @@ void movieSelection() { // Функция выводяшая список фил
         //    break;
     case 3:
         // место для функции фильтра
+        filterSessions(Days);
         break;
     case 0:
         extranceToCinema(); // Возврат назад (к предыдущей функции)
