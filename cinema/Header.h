@@ -172,7 +172,7 @@ void drawBox(int& x, int y, const Seat& seat, int rowNumber) {
 		drawWhiteAvailableBox(x, y, seat.status);
 	}
 	else if (seat.status == L"x") {
-		if (seat.color == L"red") {
+		if (seat.color == L"gray") {
 			drawGrayOccupiedBox(x, y);
 		}
 		else if (seat.color == L"violet") {
@@ -197,37 +197,36 @@ void drawRow(int y, const Row& row, int rowNumber) {
 
 /// <summary>
 /// Эта функция отрисовывает весь зал
+/// <summary>
+/// Эта функция отрисовывает весь зал
 /// </summary>
 /// <param name="session">сеанс</param>
 /// <param name="rowCount"> количество рядов</param>
 /// <param name="placeCount">количество мест</param>
 void DrawSession(Session& session, int rowCount, int placeCount) {
-	wcout << setw(65) << session.time_film << endl;
+	wcout << setw((130 / 2) + (session.time_film.size() / 2)) << session.time_film << endl;
 	++y;
-	wcout << setw(67) << session.film_name << endl;
+	wcout << setw((130 / 2) + (session.film_name.size() / 2)) << session.film_name << endl;
 	++y;
-	setCursorPosition(1, y);
-	for (int line = 1; line < 129; ++line) { wcout << L"_"; }
+	setCursorPosition(0, y);
+	wcout << L"│";
+	for (int line = 1; line < 129; ++line) { wcout << L"─"; }
 	++y;
-	wcout << L"\n|";
+	wcout << L"│\n│";
 	for (int i = session.rows.size() - 1; i >= 0; --i) {
 		setCursorPosition(1, y - 1);
-		for (int ozer_line = 0; ozer_line < 4; ++ozer_line) { setCursorPosition(0, ++y); wcout << L"|"; }
+		for (int ozer_line = 0; ozer_line < 4; ++ozer_line) { setCursorPosition(0, ++y); wcout << L"│"; }
 		y -= 4;
-		//wcout << L"|\n|\n|\n|\n|\n";
-		if (i > rowCount - 1) {
 
-		}
-		else {
-			drawRow(y, session.rows[i], i + 1);
-		}
+		drawRow(y, session.rows[i], i + 1);
+
 		--y;
-		for (int ozer_line = 0; ozer_line < 5; ++ozer_line) { setCursorPosition(129, ++y); wcout << L"|"; }
+		for (int ozer_line = 0; ozer_line < 5; ++ozer_line) { setCursorPosition(129, ++y); wcout << L"│"; }
 		y -= 5;
 		y += BOX_HEIGHT + 2;
 	}
 	setCursorPosition(1, y);
-	for (int line = 0; line < 128; ++line) { wcout << L"_"; }
+	for (int line = 0; line < 128; ++line) { wcout << L"─"; }
 	++y;
 	setCursorPosition(0, y);
 
@@ -250,7 +249,7 @@ void GenerationRoom(Session& session, const int rowCount, const int placeCount, 
 				int rand_not_free = rand() % CHANSE_NOT_FREE_PLACES; // шанс что место уже занято 
 				if (rand_not_free == 0) {
 					session.rows[i].seats[j].status = L"x"; // сохранение состояния текущего места
-					session.rows[i].seats[j].color = L"red"; // установка цвета текущего места
+					session.rows[i].seats[j].color = L"gray"; // установка цвета текущего места
 				}
 				else {
 					session.rows[i].seats[j].status = to_wstring(j); // сохранение состояния текущего места
@@ -366,17 +365,37 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 
 
 //Очистка экрана :
+//void ClearScreen() {
+//	y = 0;
+//	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+//	CONSOLE_SCREEN_BUFFER_INFO csbi;
+//	DWORD count, cellCount;
+//	COORD homeCoords = { 0, 0 };
+//
+//	if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+//		cellCount = csbi.dwSize.X * csbi.dwSize.Y; // Исправлено
+//		FillConsoleOutputCharacter(hConsole, ' ', cellCount, homeCoords, &count);
+//		FillConsoleOutputAttribute(hConsole, csbi.wAttributes, cellCount, homeCoords, &count);
+//		SetConsoleCursorPosition(hConsole, homeCoords);
+//	}
+//}
 void ClearScreen() {
 	y = 0;
+	// Получаем дескриптор консоли
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	DWORD count, cellCount;
-	COORD homeCoords = { 0, 0 };
+	COORD homeCoords = { 0, 0 }; // Координаты для верхнего левого угла
 
+	// Получаем информацию о буфере консоли
 	if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
-		cellCount = csbi.dwSize.X * csbi.dwSize.Y; // Исправлено
+		cellCount = csbi.dwSize.X * csbi.dwSize.Y; // Общее количество ячеек
+
+		// Заполняем буфер пробелами
 		FillConsoleOutputCharacter(hConsole, ' ', cellCount, homeCoords, &count);
+		// Устанавливаем предыдущие атрибуты для очищенных ячеек
 		FillConsoleOutputAttribute(hConsole, csbi.wAttributes, cellCount, homeCoords, &count);
+		// Перемещаем курсор обратно в верхний левый угол
 		SetConsoleCursorPosition(hConsole, homeCoords);
 	}
 }
@@ -431,27 +450,26 @@ void PressCtrlMinus() {
 
 void waitForInput() {
 	system("pause");
-	cin.clear();
 }
 
 bool correctInput(int& number) {
 	wstring input;
-	getline(wcin, input); // Читаем строку из wcin
-	if (input.empty()) {
-		return false; // Проверка на пустой ввод
+
+	// Читаем всю строку ввода
+	getline(wcin, input); // Используем getline для получения всей строки
+
+	// Проверяем на пустую строку и строку, состоящую только из пробелов
+	if (input.empty() || input.find_first_not_of(L" \n\r\t") == wstring::npos) {
+		return false; // Ввод не может быть пустым
 	}
-	try {
-		size_t pos;
-		number = stoi(input, &pos); // Пробуем преобразовать строку в число
-		if (pos != input.size()) {
-			return false; // Если есть лишние символы
-		}
-	}
-	catch (const invalid_argument&) {
-		return false; // Если преобразование не удалось
-	}
-	catch (const out_of_range&) {
-		return false; // Если число выходит за пределы
+
+	// Создаем wstringstream для преобразования строки в число
+	wstringstream ss(input);
+	ss >> number; // Пробуем прочитать целое число из wstringstream
+
+	// Проверяем, успешно ли было преобразование
+	if (ss.fail() || !ss.eof()) { // Исправлено: добавлен оператор ||
+		return false; // Если преобразование не удалось или остались лишние символы
 	}
 	return true; // Успех
 }
@@ -482,7 +500,7 @@ bool aoutoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector
 					ClearScreen();
 					DrawSession(session, session.rows.size(), session.rows[0].seats.size());
 					for (int k = start_index; k < start_index + cnt_places; ++k) {
-						session.rows[i].seats[k].color = L"red";
+						session.rows[i].seats[k].color = L"gray";
 					}
 					return true; // Возвращаем успех
 				}
