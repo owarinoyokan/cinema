@@ -182,6 +182,7 @@ void sessionSelection(int day) { // Выбор сеанса
 
     int input;
     while (true) {
+        
         if (correctInput(input) && input >= 0 && input <= 333)
             break;
         wcout << L"Ошибка ввода попробуйте ещё раз\n";
@@ -477,7 +478,9 @@ void generationTrioDays(TrioDays& trio)
 
 int main() {    // commit
     // Настройка широких символов для потока вывода
+
     setMode16();
+
     fullScreen();
     for (int i = 0; i < 2; i++) {
         PressCtrlMinus();
@@ -503,6 +506,7 @@ int main() {    // commit
 
     wcout << L"Проект кинотеатра.🎬" << endl;
     wcout << L"Тестовый запуск" << endl;
+
 
     extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
 
