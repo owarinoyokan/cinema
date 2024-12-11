@@ -537,184 +537,88 @@ void printTicketDetails(const vector<int>& bookedRows, const vector<int>& booked
 }
 
 
-void chooseAdditionalItems(double& totalAmount) {
-	bool moreItems = true; // Флаг для продолжения выбора товаров
-	std::vector<std::wstring> selectedItems; // Список выбранных товаров
 
-	while (moreItems) {
-		int categoryChoice;
-		wcout << L"--- Выберите категорию ---\n";
-		wcout << L"1. Напитки\n";
-		wcout << L"2. Попкорн\n";
-		wcout << L"3. Сладости\n";
-		wcout << L"4. Закуски\n";
-		wcout << L"5. Десерты\n";
-		wcout << L"6. Наборы\n";
-		wcout << L"7. Завершить выбор\n";
-		wcout << L"Введите номер выбранной категории: ";
+void displayMenuFromFile(const wstring& menuFile) {
+	wifstream file(menuFile, ios::binary);
+	if (!file.is_open()) {
+		wcout << L"Ошибка: Не удалось открыть файл меню " << menuFile << L".\n";
+		return;
+	}
 
-		if (!correctInput(categoryChoice) || categoryChoice < 1 || categoryChoice > 7) {
+	file.imbue(locale(locale::empty(), new codecvt_utf8_utf16<wchar_t>()));
+	wstring line;
+
+	// Чтение и вывод меню из файла
+	while (getline(file, line)) {
+		wcout << line << endl;
+	}
+
+	file.close();
+}
+bool correctInputQuantity(int& quantity) {
+	wstring input;
+	wcin >> input;
+
+	try {
+		quantity = stoi(input);  // Преобразуем введенную строку в количество
+		return quantity >= 1;  // Количество должно быть хотя бы 1
+	}
+	catch (...) {
+		return false;  // Если не удается преобразовать или количество меньше 1, возвращаем false
+	}
+}
+
+
+void loadAndShowBuffetMenu(double& totalCost) {
+	// Визуальная часть меню выводится из файла
+	displayMenuFromFile(L"МЕНЮ.txt");
+
+	// Заранее определенные пункты меню и их стоимость
+	map<int, double> menuOptions = {
+		{1, 30.0}, {2, 35.0}, {3, 50.0}, {4, 60.0}, {5, 100.0},
+		{6, 50.0}, {7, 150.0}, {8, 200.0}, {9, 250.0}, {10, 50.0},
+		{11, 60.0}, {12, 150.0}, {13, 100.0}, {14, 150.0}, {15, 200.0},
+		{16, 200.0}, {17, 100.0}, {18, 180.0}, {19, 230.0}, {20, 280.0}
+	};
+
+	// Логика обработки выбора пользователя
+	while (true) {
+		// Очистка экрана перед каждым новым запросом
+
+		// Снова выводим меню
+
+		int choice;
+		wcout << L"Введите номер вашего выбора (0 для завершения): ";
+		if (!correctInput(choice)) {
 			wcout << L"Некорректный ввод. Попробуйте снова.\n";
 			continue;
 		}
 
-		if (categoryChoice == 7) { // Завершение выбора
-			wcout << L"Вы завершили выбор дополнительных товаров.\n";
-			break;
+		if (choice == 0) {
+			wcout << L"Завершение выбора.\n";
+			return;
 		}
 
-		bool backToCategory = false; // Флаг возврата в меню категорий
-		while (!backToCategory) {
-			int itemChoice;
-			switch (categoryChoice) {
-			case 1: // Напитки
-				wcout << L"--- Напитки ---\n";
-				wcout << L"1. Вода (0.5 л) - 30 рублей\n";
-				wcout << L"2. Газированная вода (0.5 л) - 35 рублей\n";
-				wcout << L"3. Сок (0.5 л) - 60 рублей\n";
-				wcout << L"4. Кола (0.5 л) - 60 рублей\n";
-				wcout << L"5. Кофе (300 мл) - 100 рублей\n";
-				wcout << L"6. Чай (300 мл) - 50 рублей\n";
-				wcout << L"7. Вернуться назад\n";
-				wcout << L"Введите номер выбранного товара: ";
-				if (!correctInput(itemChoice) || itemChoice < 1 || itemChoice > 7) {
-					wcout << L"Некорректный выбор. Попробуйте снова.\n";
-					continue;
-				}
-				if (itemChoice == 7) { // Возврат в меню категорий
-					backToCategory = true;
-					break;
-				}
-				switch (itemChoice) {
-				case 1: totalAmount += 30; selectedItems.push_back(L"Вода (0.5 л)"); break;
-				case 2: totalAmount += 35; selectedItems.push_back(L"Газированная вода (0.5 л)"); break;
-				case 3: totalAmount += 60; selectedItems.push_back(L"Сок (0.5 л)"); break;
-				case 4: totalAmount += 60; selectedItems.push_back(L"Кола (0.5 л)"); break;
-				case 5: totalAmount += 100; selectedItems.push_back(L"Кофе (300 мл)"); break;
-				case 6: totalAmount += 50; selectedItems.push_back(L"Чай (300 мл)"); break;
-				}
-				break;
-
-			case 2: // Попкорн
-				wcout << L"--- Попкорн ---\n";
-				wcout << L"1. Малый попкорн - 150 рублей\n";
-				wcout << L"2. Средний попкорн - 200 рублей\n";
-				wcout << L"3. Большой попкорн - 250 рублей\n";
-				wcout << L"4. Вернуться назад\n";
-				wcout << L"Введите номер выбранного товара: ";
-				if (!correctInput(itemChoice) || itemChoice < 1 || itemChoice > 4) {
-					wcout << L"Некорректный выбор. Попробуйте снова.\n";
-					continue;
-				}
-				if (itemChoice == 4) { // Возврат в меню категорий
-					backToCategory = true;
-					break;
-				}
-				switch (itemChoice) {
-				case 1: totalAmount += 150; selectedItems.push_back(L"Малый попкорн"); break;
-				case 2: totalAmount += 200; selectedItems.push_back(L"Средний попкорн"); break;
-				case 3: totalAmount += 250; selectedItems.push_back(L"Большой попкорн"); break;
-				}
-				break;
-
-			case 3: // Сладости
-				wcout << L"--- Сладости ---\n";
-				wcout << L"1. Шоколадный батончик - 50 рублей\n";
-				wcout << L"2. Чипсы - 100 рублей\n";
-				wcout << L"3. Орешки (150 г) - 150 рублей\n";
-				wcout << L"4. Вернуться назад\n";
-				wcout << L"Введите номер выбранного товара: ";
-				if (!correctInput(itemChoice) || itemChoice < 1 || itemChoice > 4) {
-					wcout << L"Некорректный выбор. Попробуйте снова.\n";
-					continue;
-				}
-				if (itemChoice == 4) { // Возврат в меню категорий
-					backToCategory = true;
-					break;
-				}
-				switch (itemChoice) {
-				case 1: totalAmount += 50; selectedItems.push_back(L"Шоколадный батончик"); break;
-				case 2: totalAmount += 100; selectedItems.push_back(L"Чипсы"); break;
-				case 3: totalAmount += 150; selectedItems.push_back(L"Орешки (150 г)"); break;
-				}
-				break;
-
-			case 4: // Закуски
-				wcout << L"--- Закуски ---\n";
-				wcout << L"1. Хот-дог - 150 рублей\n";
-				wcout << L"2. Бургер - 200 рублей\n";
-				wcout << L"3. Начос с сыром - 200 рублей\n";
-				wcout << L"4. Вернуться назад\n";
-				wcout << L"Введите номер выбранного товара: ";
-				if (!correctInput(itemChoice) || itemChoice < 1 || itemChoice > 4) {
-					wcout << L"Некорректный выбор. Попробуйте снова.\n";
-					continue;
-				}
-				if (itemChoice == 4) { // Возврат в меню категорий
-					backToCategory = true;
-					break;
-				}
-				switch (itemChoice) {
-				case 1: totalAmount += 150; selectedItems.push_back(L"Хот-дог"); break;
-				case 2: totalAmount += 200; selectedItems.push_back(L"Бургер"); break;
-				case 3: totalAmount += 200; selectedItems.push_back(L"Начос с сыром"); break;
-				}
-				break;
-
-			case 5: // Десерты
-				wcout << L"--- Десерты ---\n";
-				wcout << L"1. Мороженое - 120 рублей\n";
-				wcout << L"2. Тортик - 150 рублей\n";
-				wcout << L"3. Печенье (2 шт) - 70 рублей\n";
-				wcout << L"4. Вернуться назад\n";
-				wcout << L"Введите номер выбранного товара: ";
-				if (!correctInput(itemChoice) || itemChoice < 1 || itemChoice > 4) {
-					wcout << L"Некорректный выбор. Попробуйте снова.\n";
-					continue;
-				}
-				if (itemChoice == 4) { // Возврат в меню категорий
-					backToCategory = true;
-					break;
-				}
-				switch (itemChoice) {
-				case 1: totalAmount += 120; selectedItems.push_back(L"Мороженое"); break;
-				case 2: totalAmount += 150; selectedItems.push_back(L"Тортик"); break;
-				case 3: totalAmount += 70; selectedItems.push_back(L"Печенье (2 шт)"); break;
-				}
-				break;
-
-			case 6: // Наборы
-				wcout << L"--- Наборы ---\n";
-				wcout << L"1. Попкорн (малый) + сок/кола - 180 рублей\n";
-				wcout << L"2. Попкорн (средний) + сок/кола - 230 рублей\n";
-				wcout << L"3. Хот-дог + сок/кола + чипсы - 280 рублей\n";
-				wcout << L"4. Вернуться назад\n";
-				wcout << L"Введите номер выбранного товара: ";
-				if (!correctInput(itemChoice) || itemChoice < 1 || itemChoice > 4) {
-					wcout << L"Некорректный выбор. Попробуйте снова.\n";
-					continue;
-				}
-				if (itemChoice == 4) { // Возврат в меню категорий
-					backToCategory = true;
-					break;
-				}
-				switch (itemChoice) {
-				case 1: totalAmount += 180; selectedItems.push_back(L"Попкорн (малый) + сок/кола"); break;
-				case 2: totalAmount += 230; selectedItems.push_back(L"Попкорн (средний) + сок/кола"); break;
-				case 3: totalAmount += 280; selectedItems.push_back(L"Хот-дог + сок/кола + чипсы"); break;
-				}
-				break;
+		// Проверяем, что выбранный пункт существует
+		auto it = menuOptions.find(choice);
+		if (it != menuOptions.end()) {
+			int quantity;
+			wcout << L"Введите количество: ";
+			if (!correctInputQuantity(quantity)) {
+				wcout << L"Некорректное количество. Попробуйте снова.\n";
+				continue;
 			}
 
-			if (backToCategory) break; // Возвращаемся к выбору категории
+			// Добавляем стоимость в общий заказ с учетом количества
+			totalCost += it->second * quantity;
+			wcout << L"Вы добавили " << quantity << L" шт. пункта " << choice << L" на сумму " << it->second * quantity << L" рублей.\n";
+		}
+		else {
+			wcout << L"Некорректный выбор. Попробуйте снова.\n";
 		}
 	}
-	wcout << L"\nВы выбрали:\n";
-	for (const auto& item : selectedItems) {
-		wcout << L"- " << item << L"\n";
-	}
-	wcout << L"Общая сумма с учётом выбранных товаров: " << totalAmount << L" рублей.\n";
 }
+
 
 
 
@@ -850,10 +754,14 @@ void choosingPlace(Session& session, int day) {
 
 
 				wcout << L"Места успешно забронированы.\n";
+				Sleep(1000);  // Задержка в 2000 миллисекунд (2 секунды)
+				system("cls");
 
 				// Вывод всех деталей билета
+				loadAndShowBuffetMenu(totalCost);
+				Sleep(1000);  // Задержка в 2000 миллисекунд (2 секунды)
+				system("cls");
 				printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost, session.film_name, session.time_film, session.genre, session.duration);
-				chooseAdditionalItems(totalCost);
 				choosePaymentMethod(totalCost);
 				break;
 			}
@@ -935,8 +843,12 @@ void choosingPlace(Session& session, int day) {
 						break;
 					}
 				}
+				Sleep(1000);  // Задержка в 2000 миллисекунд (2 секунды)
+				system("cls");
+				loadAndShowBuffetMenu(totalCost);
+				Sleep(1000);
+				system("cls");
 				printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost, session.film_name, session.time_film, session.genre, session.duration);
-				chooseAdditionalItems(totalCost);
 				choosePaymentMethod(totalCost);
 				break;
 			}
