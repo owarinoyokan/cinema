@@ -183,7 +183,7 @@ void sessionSelection(int day) { // Выбор сеанса
     int input;
     while (true) {
         
-        if (correctInput(input) && input >= 0 && input <= 333)
+        if (correctInput(input) && ((day == 1 && input <= 12) || (day != 1 && input <= 11 ) || input == 0 || input == 111 || input == 222 || input == 333))
             break;
         wcout << L"Ошибка ввода попробуйте ещё раз\n";
     }
@@ -479,7 +479,7 @@ void generationTrioDays(TrioDays& trio)
 int main() {    // commit
     // Настройка широких символов для потока вывода
 
-    setMode16();
+     setMode16();
 
     fullScreen();
     for (int i = 0; i < 2; i++) {

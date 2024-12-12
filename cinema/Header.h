@@ -11,10 +11,10 @@
 #include <fstream>
 #include <sstream>
 #include <thread>
-#include <codecvt>      // Äëÿ ïðåîáðàçîâàíèÿ UTF-16 â wide string
-#include <io.h>         // Äëÿ ðàáîòû ñ _setmode
-#include <locale>       // Äëÿ ðàáîòû ñ êîäèðîâêàìè
-#include <fcntl.h>      // Äëÿ ðåæèìà _O_U16TEXT
+#include <codecvt>      
+#include <io.h>         
+#include <locale>       
+#include <fcntl.h>      
 #include <map>
 
 
@@ -25,7 +25,7 @@ namespace Config {
 	int y = 0;
 	constexpr const int BOX_WIDTH = 6;              // Ширина бокса
 	constexpr const int BOX_HEIGHT = 3;             // Высота бокса
-	constexpr const int CHANSE_NOT_FREE_PLACES = 8; // Вероятность занятого места
+	constexpr const int CHANSE_NOT_FREE_PLACES = 5; // Вероятность занятого места
 	constexpr const int row_distance = 3; // дистанция для генерации дорогих мест для ряда
 	constexpr const int column_distance = 5; // дистанция для генерации дорогих мест для мест 
 	constexpr const int expensive_place = 450; // стоимость дорогого места
@@ -63,6 +63,44 @@ struct Session {
 	wstring time_film;
 	wstring genre;
 	wstring duration;
+
+	int max_count_free_places_in_one_row() { // работает пока не так как я задумал (должно быть максимальное количество свободных мест подряд)
+		int max = -1;
+		int number_max_row = 0;
+		int number_row = 0;
+		for (const auto& row : rows) {
+			int cnt_free_places = cnt_free_places_in_row(row);
+			++number_row;
+			if (max < cnt_free_places)
+				max = cnt_free_places;
+		}
+		return max;
+	}
+
+	/// <summary>
+	/// количество свободных мест в ряду
+	/// </summary>
+	/// <param name="row">Ряд</param>
+	/// <returns></returns>
+	int cnt_free_places_in_row(Row row) {
+		int free_count_places_in_row = 0;
+		for (const auto& seat : row.seats) {
+			if (seat.status != L"x" && seat.status != L"0")
+				++free_count_places_in_row;
+		}
+		return free_count_places_in_row;
+	}
+	/// <summary>
+	/// количество свободных мест в зале 
+	/// </summary>
+	/// <returns></returns>
+	int cnt_free_places_in_session() {
+		int free_count_places = 0;
+		for (const auto& row : rows) {
+			free_count_places += cnt_free_places_in_row(row);
+		}
+		return free_count_places;
+	}
 };
 
 //структура Сеанса
@@ -71,11 +109,10 @@ struct Day {
 	vector<Session> Cinema_room_2;
 	vector<Session> Cinema_room_3;
 };
+
 struct TrioDays {
 	vector <Day> trio_days;
 };
-
-
 
 void SetColor(int text, int background) {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (background << 4) | text);
@@ -96,6 +133,7 @@ bool isNumber(const wstring& str) {
 	}
 	return true;
 }
+
 // Преобразование строки в число
 int stringToInt(const wstring& str) {
 	return stoi(str);
@@ -135,8 +173,6 @@ void drawRowNumberBox(int& x, int y, int rowNumber) {
 	wcout << L"Row " << rowNumber;
 	x += BOX_WIDTH + 1;
 }
-
-
 
 // Функция отрисовки дешёвого свободного места
 void drawWhiteAvailableBox(int& x, int y, const wstring& number) {
@@ -362,23 +398,6 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 }
 
 
-
-
-//Очистка экрана :
-//void ClearScreen() {
-//	y = 0;
-//	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-//	CONSOLE_SCREEN_BUFFER_INFO csbi;
-//	DWORD count, cellCount;
-//	COORD homeCoords = { 0, 0 };
-//
-//	if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
-//		cellCount = csbi.dwSize.X * csbi.dwSize.Y; // Исправлено
-//		FillConsoleOutputCharacter(hConsole, ' ', cellCount, homeCoords, &count);
-//		FillConsoleOutputAttribute(hConsole, csbi.wAttributes, cellCount, homeCoords, &count);
-//		SetConsoleCursorPosition(hConsole, homeCoords);
-//	}
-//}
 void ClearScreen() {
 	y = 0;
 	// Получаем дескриптор консоли
@@ -476,7 +495,7 @@ bool correctInput(int& number) {
 
 
 
-
+//авто выбор мест
 bool aoutoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector<int>& bookedRows, vector<int>& bookedPlaces, double& totalCost) {
 	for (int i = 0; i < session.rows.size(); ++i) {
 		int cnt = 0;  // Счётчик свободных мест подряд
@@ -514,6 +533,7 @@ bool aoutoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector
 	}
 	return false; // Если ни одного подходящего участка не найдено
 }
+
 // Функция для вывода всех деталей билета
 void printTicketDetails(const vector<int>& bookedRows, const vector<int>& bookedPlaces, int cnt_places, double totalCost, const wstring& filmName, const wstring& filmTime, const wstring& genre, const wstring& duration) {
 	wcout << L"\n---------- Билет ----------\n";
@@ -555,6 +575,7 @@ void displayMenuFromFile(const wstring& menuFile) {
 
 	file.close();
 }
+
 bool correctInputQuantity(int& quantity) {
 	wstring input;
 	wcin >> input;
@@ -567,7 +588,6 @@ bool correctInputQuantity(int& quantity) {
 		return false;  // Если не удается преобразовать или количество меньше 1, возвращаем false
 	}
 }
-
 
 void loadAndShowBuffetMenu(double& totalCost) {
 	// Визуальная часть меню выводится из файла
@@ -618,15 +638,6 @@ void loadAndShowBuffetMenu(double& totalCost) {
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
 
 // Функция для выбора способа оплаты
 void choosePaymentMethod(double totalAmount) {
@@ -690,6 +701,7 @@ void choosePaymentMethod(double totalAmount) {
 	wcout << L"Спасибо за ваш выбор! Транзакция завершена.\n";
 }
 
+//выбор места
 void choosingPlace(Session& session, int day) {
 	DrawSession(session, session.rows.size(), session.rows[0].seats.size());
 	setCursorPosition(0, y);
@@ -705,16 +717,21 @@ void choosingPlace(Session& session, int day) {
 			cnt_error_messeg = 0;
 			continue;
 		}
+		//int max_free_row = session.max_count_free_places_in_one_row();
+		int all_free_places = session.cnt_free_places_in_session();
+		wcout << L"Количество свобоных мест в зале равно: " << all_free_places  <<"\n";
+		//wcout << L"Максимальное количество свободных мест в ряду: " << max_free_row <<"\n"; // посчёст мест не подряд
 		wcout << L"Выберите способ бронирования мест:\n";
 		wcout << L"1. Автоподбор мест\n";
 		wcout << L"2. Ручной выбор мест\n";
 		wcout << L"0 Вернуться назад\n";
 		wcout << L"Введите ваш выбор: ";
 
-		if (!correctInput(choice)) {
+		if (!correctInput(choice) || (choice != 1 && choice != 2)) {
 			if (choice != 1 && choice != 2) {
 				cnt_error_messeg += 3;
 				wcout << L"Некорректный ввод. Введите 1 или 2.\n";
+				continue;
 			}
 			continue;
 		}
