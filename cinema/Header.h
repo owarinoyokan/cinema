@@ -537,27 +537,32 @@ bool aoutoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector
 // Функция для вывода всех деталей билета
 void printTicketDetails(const vector<int>& bookedRows, const vector<int>& bookedPlaces, int cnt_places, double totalCost, const wstring& filmName, const wstring& filmTime, const wstring& genre, const wstring& duration) {
 	wcout << L"\n---------- Билет ----------\n";
-	wcout << L"Фильм: " << filmName << L"\n";
-	wcout << L"Жанр: " << genre << L"\n";
-	wcout << L"Сеанс: " << filmTime << L"\n";
-	wcout << L"Продолжительность: " << duration << L"\n\n";
-
+	wcout << L"Фильм:        " << filmName << L"\n";  // Печать названия фильма
+	wcout << L"Жанр:         " << genre << L"\n";  // Печать жанра фильма
+	wcout << L"Сеанс:        " << filmTime << L"\n";  // Печать времени сеанса
+	wcout << L"Продолжительность: " << duration << L"\n";
+	wcout << L"\n";
 	wcout << L"Забронированные места:\n";
+
+	int placesInRow = 0;  // Счётчик мест в строке
+
+	// Перебираем все забронированные места
 	for (size_t i = 0; i < bookedRows.size(); ++i) {
-		wcout << L"Ряд: " << bookedRows[i] + 1
-			<< L", Место: " << bookedPlaces[i];
-		if (i < bookedRows.size() - 1) {
-			wcout << L" | ";
+		// Добавляем номер ряда и место
+		wcout << L"Ряд: " << bookedRows[i] + 1 << L", Место: " << bookedPlaces[i];
+		placesInRow++;  // Увеличиваем счётчик мест в текущей строке
+
+		// Если 4 места в строке, переходим на новую строку
+		if (placesInRow % 3 == 0 && i < bookedRows.size() - 1) {
+			wcout << L"\n------------------------------\n";
+		}
+		else if (i < bookedRows.size() - 1) {
+			wcout << L"   -  ";  // Разделяем места дефисом
 		}
 	}
-
 	wcout << L"\nКоличество билетов: " << cnt_places << L"\n";
 	wcout << L"Общая стоимость: " << totalCost << L" рублей.\n";
-	wcout << L"--------------------------------\n";
 }
-
-
-
 void displayMenuFromFile(const wstring& menuFile) {
 	wifstream file(menuFile, ios::binary);
 	if (!file.is_open()) {
@@ -588,7 +593,6 @@ bool correctInputQuantity(int& quantity) {
 		return false;  // Если не удается преобразовать или количество меньше 1, возвращаем false
 	}
 }
-
 void loadAndShowBuffetMenu(double& totalCost) {
 	// Визуальная часть меню выводится из файла
 	displayMenuFromFile(L"МЕНЮ.txt");
@@ -603,17 +607,19 @@ void loadAndShowBuffetMenu(double& totalCost) {
 
 	// Логика обработки выбора пользователя
 	while (true) {
-		// Очистка экрана перед каждым новым запросом
-
 		// Снова выводим меню
-
 		int choice;
 		wcout << L"Введите номер вашего выбора (0 для завершения): ";
-		if (!correctInput(choice)) {
+
+		// Проверка на корректный ввод
+		while (!correctInput(choice) || choice > 20) {
+			ClearScreenFromPosition(0, 49);
 			wcout << L"Некорректный ввод. Попробуйте снова.\n";
-			continue;
+
 		}
 
+
+		// Проверка на завершение выбора
 		if (choice == 0) {
 			wcout << L"Завершение выбора.\n";
 			return;
@@ -624,13 +630,18 @@ void loadAndShowBuffetMenu(double& totalCost) {
 		if (it != menuOptions.end()) {
 			int quantity;
 			wcout << L"Введите количество: ";
-			if (!correctInputQuantity(quantity)) {
+
+			// Проверка на корректный ввод количества
+			while (!correctInput(quantity)) {
+				ClearScreenFromPosition(0, 50);
 				wcout << L"Некорректное количество. Попробуйте снова.\n";
-				continue;
+				wcin.clear();               // Очищаем флаг ошибки ввода// Игнорируем остаточные символы
 			}
+
 
 			// Добавляем стоимость в общий заказ с учетом количества
 			totalCost += it->second * quantity;
+			ClearScreenFromPosition(0, 50);
 			wcout << L"Вы добавили " << quantity << L" шт. пункта " << choice << L" на сумму " << it->second * quantity << L" рублей.\n";
 		}
 		else {
@@ -638,7 +649,6 @@ void loadAndShowBuffetMenu(double& totalCost) {
 		}
 	}
 }
-
 // Функция для выбора способа оплаты
 void choosePaymentMethod(double totalAmount) {
 	int paymentChoice;
@@ -650,25 +660,42 @@ void choosePaymentMethod(double totalAmount) {
 	};
 
 	// Ввод промокода
-	wcout << L"--- Промокод ---\n";
-	wcout << L"Если у вас есть промокод, введите его. Иначе нажмите Enter: ";
-	getline(wcin, promoCode);
+	while (true) {
+		wcout << L"--- Промокод ---\n";
+		wcout << L"Если у вас есть промокод, введите его. Иначе нажмите Enter: ";
+		getline(wcin, promoCode);
 
-	// Применение промокода
-	if (!promoCode.empty()) {
-		if (promoCodes.find(promoCode) != promoCodes.end()) {
-			double discount = promoCodes[promoCode];
-			double discountAmount = totalAmount * discount;
-			totalAmount -= discountAmount;
-			wcout << L"Промокод принят! Скидка: " << discountAmount << L" рублей.\n";
-			wcout << L"Итоговая сумма с учётом скидки: " << totalAmount << L" рублей.\n";
+		// Применение промокода
+		if (!promoCode.empty()) {
+			// Проверка на корректность промокода
+			if (promoCodes.find(promoCode) != promoCodes.end()) {
+				double discount = promoCodes[promoCode];
+				double discountAmount = totalAmount * discount;
+				totalAmount -= discountAmount;
+				wcout << L"Промокод принят! Скидка: " << discountAmount << L" рублей.\n";
+				wcout << L"Итоговая сумма с учётом скидки: " << totalAmount << L" рублей.\n";
+				break;  // Выход из цикла, если промокод принят
+			}
+			else {
+				wcout << L"Некорректный промокод. Попробуйте снова.\n";
+			}
 		}
 		else {
-			wcout << L"Некорректный промокод. Сумма без изменений.\n";
+			wcout << L"Промокод не введён. Сумма без изменений.\n";
+			break;  // Выход из цикла, если промокод не введён
 		}
-	}
-	else {
-		wcout << L"Промокод не введён. Сумма без изменений.\n";
+
+		// Запрос на повторный ввод
+		wcout << L"Хотите ввести промокод ещё раз? (y/n): ";
+		wchar_t choice;
+		wcin >> choice;
+		wcin.ignore(INT_MAX, L'\n'); // Очищаем оставшиеся символы после ввода
+		ClearScreenFromPosition(0, 12);
+
+		if (choice != L'yes' && choice != L'Yes') {
+			wcout << L"Применение промокода завершено. Сумма без изменений.\n";
+			break;  // Выход из цикла, если пользователь не хочет вводить промокод
+		}
 	}
 
 	// Выбор способа оплаты
@@ -679,10 +706,13 @@ void choosePaymentMethod(double totalAmount) {
 		wcout << L"3. Электронный кошелёк\n";
 		wcout << L"Введите номер выбранного способа оплаты: ";
 
-		if (!correctInput(paymentChoice) || paymentChoice < 1 || paymentChoice > 3) {
+		while (!correctInput(paymentChoice) || paymentChoice < 1 || paymentChoice > 3) {
+			ClearScreenFromPosition(0, 20);
 			wcout << L"Некорректный ввод. Попробуйте снова.\n";
-			continue;
 		}
+
+
+		// Если ввод корректный, очищаем сообщения об ошибке
 
 		switch (paymentChoice) {
 		case 1:
