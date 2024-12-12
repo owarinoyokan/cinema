@@ -713,7 +713,7 @@ void choosingPlace(Session& session, int day) {
 	while (true) {
 
 		if (cnt_error_messeg >= 3) {
-			ClearScreenFromPosition(0, 42);
+			ClearScreenFromPosition(0, 36);
 			cnt_error_messeg = 0;
 			continue;
 		}
@@ -727,7 +727,7 @@ void choosingPlace(Session& session, int day) {
 		wcout << L"0 Вернуться назад\n";
 		wcout << L"Введите ваш выбор: ";
 
-		if (!correctInput(choice) || (choice != 1 && choice != 2)) {
+		if (!correctInput(choice) || (choice != 1 && choice != 2 && choice != 0)) {
 			if (choice != 1 && choice != 2) {
 				cnt_error_messeg += 3;
 				wcout << L"Некорректный ввод. Введите 1 или 2.\n";

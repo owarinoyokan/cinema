@@ -225,10 +225,10 @@ void sessionSelection(int day) { // Выбор сеанса
 
 
 
-    /* input = listFilmFromTheDay(day, input); // возвращаяем номер фильма зная день и его номер в расписании дня
+    //input = listFilmFromTheDay(day, input); // возвращаяем номер фильма зная день и его номер в расписании дня
 
 
-     ClearScreen();
+     /*ClearScreen();
 
 
      //switch (input) { // выводим все сеансы на данный фильм
@@ -268,32 +268,37 @@ void sessionSelection(int day) { // Выбор сеанса
      //case 1012:
      //    wcout << L"\n" << fileIn("Lab Wars.txt") << endl; // Лабные Войны: Эпизод 5
      //    break;
-     //}
+     //}*/
 
 
      // Создаем map для соответствия между номерами сеансов и именами файлов
-     map<int, string> sessionFiles = {
-         {1001, "Gone with the session.txt"},
-         {1002, "Shrek.txt"},
-         {1003, "Back to the compiler.txt"},
-         {1004, "And deadlines are tight.txt"},
-         {1005, "Lord of the Lab.txt"},
-         {1006, "Titanic.txt"},
-         {1007, "Debagger 2.txt"},
-         {1008, "Garry Coder.txt"},
-         {1009, "Matrix.txt"},
-         {1010, "Fifth algorithm.txt"},
-         {1011, "People in black pixels.txt"},
-         {1012, "Lab Wars.txt"}
-     };
+     //map<int, string> sessionFiles = {
+     //    {1001, "Gone with the session.txt"},
+     //    {1002, "Shrek.txt"},
+     //    {1003, "Back to the compiler.txt"},
+     //    {1004, "And deadlines are tight.txt"},
+     //    {1005, "Lord of the Lab.txt"},
+     //    {1006, "Titanic.txt"},
+     //    {1007, "Debagger 2.txt"},
+     //    {1008, "Garry Coder.txt"},
+     //    {1009, "Matrix.txt"},
+     //    {1010, "Fifth algorithm.txt"},
+     //    {1011, "People in black pixels.txt"},
+     //    {1012, "Lab Wars.txt"}
+     //};
 
-     // Проверяем, есть ли input в map
-     if (sessionFiles.find(input) != sessionFiles.end()) {
-         wcout << L"\n" << fileIn(sessionFiles[input]) << endl; // Выводим содержимое файла
-     }
-     else {
-         wcout << L"Сеанс не найден." << endl; // Обработка случая, если input не найден
-     }*/
+     //// Проверяем, есть ли input в map
+     //if (sessionFiles.find(input) != sessionFiles.end()) {
+     //    wcout << L"\n" << fileIn(sessionFiles[input]) << endl; // Выводим содержимое файла
+     //    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+     //    int input;
+     //    wcin >> input;  
+     //    if (input == 0)
+     //       sessionSelection(day);
+     //}
+     //else {
+     //    wcout << L"Сеанс не найден." << endl; // Обработка случая, если input не найден
+     //}
 
 
 
