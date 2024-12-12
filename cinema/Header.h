@@ -400,23 +400,24 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 
 void ClearScreen() {
 	y = 0;
-	// Получаем дескриптор консоли
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	DWORD count, cellCount;
-	COORD homeCoords = { 0, 0 }; // Координаты для верхнего левого угла
+	//// Получаем дескриптор консоли
+	//HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	//CONSOLE_SCREEN_BUFFER_INFO csbi;
+	//DWORD count, cellCount;
+	//COORD homeCoords = { 0, 0 }; // Координаты для верхнего левого угла
 
-	// Получаем информацию о буфере консоли
-	if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
-		cellCount = csbi.dwSize.X * csbi.dwSize.Y; // Общее количество ячеек
+	//// Получаем информацию о буфере консоли
+	//if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+	//	cellCount = csbi.dwSize.X * csbi.dwSize.Y; // Общее количество ячеек
 
-		// Заполняем буфер пробелами
-		FillConsoleOutputCharacter(hConsole, ' ', cellCount, homeCoords, &count);
-		// Устанавливаем предыдущие атрибуты для очищенных ячеек
-		FillConsoleOutputAttribute(hConsole, csbi.wAttributes, cellCount, homeCoords, &count);
-		// Перемещаем курсор обратно в верхний левый угол
-		SetConsoleCursorPosition(hConsole, homeCoords);
-	}
+	//	// Заполняем буфер пробелами
+	//	FillConsoleOutputCharacter(hConsole, ' ', cellCount, homeCoords, &count);
+	//	// Устанавливаем предыдущие атрибуты для очищенных ячеек
+	//	FillConsoleOutputAttribute(hConsole, csbi.wAttributes, cellCount, homeCoords, &count);
+	//	// Перемещаем курсор обратно в верхний левый угол
+	//	SetConsoleCursorPosition(hConsole, homeCoords);
+	//}
+	system("cls");
 }
 
 
