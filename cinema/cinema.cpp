@@ -311,9 +311,9 @@ void sessionSelection(int day) { // Выбор сеанса
          break;
      case 1002:
          sessions_film.resize(3);
-         sessions_film[0] = Days.trio_days[0].Cinema_room_1[1];
-         sessions_film[1] = Days.trio_days[1].Cinema_room_2[2];
-         sessions_film[2] = Days.trio_days[2].Cinema_room_2[0];
+         sessions_film[0] = Days.trio_days[0].Cinema_room_1[0];
+         sessions_film[1] = Days.trio_days[1].Cinema_room_2[0];
+         sessions_film[2] = Days.trio_days[2].Cinema_room_2[1];
          break;
      case 1003:
          sessions_film.resize(2);
@@ -324,7 +324,7 @@ void sessionSelection(int day) { // Выбор сеанса
          sessions_film.resize(3);
          sessions_film[0] = Days.trio_days[0].Cinema_room_3[3];
          sessions_film[1] = Days.trio_days[1].Cinema_room_1[2];
-         sessions_film[2] = Days.trio_days[2].Cinema_room_1[3];
+         sessions_film[2] = Days.trio_days[2].Cinema_room_1[2];
          break;
      case 1005:
          sessions_film.resize(4);
@@ -354,9 +354,9 @@ void sessionSelection(int day) { // Выбор сеанса
          break;
      case 1009:
          sessions_film.resize(3);
-         sessions_film[0] = Days.trio_days[0].Cinema_room_2[1];
+         sessions_film[0] = Days.trio_days[0].Cinema_room_2[0];
          sessions_film[1] = Days.trio_days[0].Cinema_room_3[2];
-         sessions_film[2] = Days.trio_days[2].Cinema_room_3[0];
+         sessions_film[2] = Days.trio_days[1].Cinema_room_3[0];
          break;
      case 1010:
          sessions_film.resize(2);
@@ -371,8 +371,8 @@ void sessionSelection(int day) { // Выбор сеанса
          break;
      case 1012:
          sessions_film.resize(2);
-         sessions_film[0] = Days.trio_days[2].Cinema_room_3[3];
-         sessions_film[1] = Days.trio_days[3].Cinema_room_1[3];
+         sessions_film[0] = Days.trio_days[1].Cinema_room_3[3];
+         sessions_film[1] = Days.trio_days[2].Cinema_room_1[3];
          break;
      }
 
