@@ -54,7 +54,7 @@ char keyTracing() {
     }
 }
 
-void tracingUD(short int& c) {
+void tracingUD(short int& c) { // Проверка на нажатие вверх и вниз
     char a = keyTracing();
     Sleep(200); // Задержка (0.2 сек), иначе за 1 нажатие будет выполнено много раз
     switch (a) {
@@ -72,7 +72,7 @@ void tracingUD(short int& c) {
     }
 }
 
-void tracingLR(short int& c) {
+void tracingLR(short int& c) { // Проверка на нажатие лево и право
     char a = keyTracing();
     Sleep(200); // Задержка (0.2 сек), иначе за 1 нажатие будет выполнено много раз
     switch (a) {
@@ -94,30 +94,18 @@ void extranceToCinema() { // Функция входа в кино, предла
     short int input = 1;
     ClearScreen();
     wcout << fileIn("6104.txt") << endl;
-    //wcout << L"Что вы желаете сделать?" << endl;
-    //wcout << L"Нажмите '1', чтобы выбрать фильм" << endl;
-    //wcout << L"Нажмите '0', чтобы выйти" << endl;
-    //wcin >> input;
-    //ClearScreen(); // Очистка консоли
-    //switch (input) {
-    //case 1:
-    //    movieSelection(); // Функция выводяшая список фильмов с краткой информацией
-    //    break;
-    //case 0:
-    //    closeWindow();
-    //    break;
     wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
     wcout << L"Нажимайте на стелочки" << endl;
     wcout << L"выбрать фильм <---" << endl;
     wcout << L"выйти" << endl;
 
-    short int input_A;
+    short int prevInput;
     while (true) {
-        input_A = input; // input_A - это пердыдущее значение input
+        prevInput = input; // input_A - это пердыдущее значение input
         tracingUD(input);
         switch (input) {
         case 200:
-            switch (input_A) {
+            switch (prevInput) {
             case 1:
                 movieSelection(); // Функция выводяшая список фильмов с краткой информацией
                 break;
@@ -158,53 +146,77 @@ void extranceToCinema() { // Функция входа в кино, предла
 
 void availablePromo() { // Функция для просмотра доспупных акций
     ClearScreen();
-    short int input;
+    short int input = 1;
+    short int prevInput;
     wcout << L"\n" << fileIn("Actions.txt") << endl; // Вывод файла
+    //wcout << L"Список доступных акций ... " << endl;
     wcout << L"Список доступных акций ... " << endl;
-    wcout << L"Введите номер акции, чтобы посмотреть подробное описание" << endl;
-    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
-    wcout << L"Нажмите '1', чтобы испытать удачу в игре" << endl;
-    wcin >> input;
-    ClearScreen();
-    if (input == 0)
-        movieSelection(); // Возврат назад (к предыдущей функции)
-    else if (input == 1) {
-        TheActionGame();
+    wcout << L"Используйте стелочки, чтобы посмотреть подробное описание" << endl;
+    wcout << L"чтобы испытать удачу в игре <---" << endl;
+    wcout << L"чтобы вернуться назад" << endl;
+    //wcout << L"Введите номер акции, чтобы посмотреть подробное описание" << endl;
+    //wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+    //wcout << L"Нажмите '1', чтобы испытать удачу в игре" << endl;
+    //wcin >> input;
+    //ClearScreen();
+    //if (input == 0)
+    //    movieSelection(); // Возврат назад (к предыдущей функции)
+    //else if (input == 1) {
+    //    TheActionGame();
+    //}
+    while (true) {
+        prevInput = input;
+        tracingUD(input);
+        switch (input) {
+        case 200:
+            switch (prevInput) {
+            case 0:
+                movieSelection(); // Возврат назад (к предыдущей функции)
+                break;
+            case 1:
+                TheActionGame();
+                break;
+            }
+            break;
+        case 1:
+            ClearScreen();
+            wcout << L"\n" << fileIn("Actions.txt") << endl;
+            wcout << L"Список доступных акций ... " << endl;
+            wcout << L"Используйте стелочки, чтобы посмотреть подробное описание" << endl;
+            wcout << L"чтобы испытать удачу в игре <---" << endl;
+            wcout << L"чтобы вернуться назад" << endl;
+            break;
+        case 0:
+            ClearScreen();
+            wcout << L"\n" << fileIn("Actions.txt") << endl;
+            wcout << L"Список доступных акций ... " << endl;
+            wcout << L"Используйте стелочки, чтобы посмотреть подробное описание" << endl;
+            wcout << L"чтобы испытать удачу в игре" << endl;
+            wcout << L"чтобы вернуться назад <---" << endl;
+            break;
+        default:
+            ClearScreen();
+            wcout << L"\n" << fileIn("Actions.txt") << endl;
+            wcout << L"Введенно неверное значение" << endl;
+            wcout << L"Список доступных акций ... " << endl;
+            wcout << L"Используйте стелочки, чтобы посмотреть подробное описание" << endl;
+            wcout << L"чтобы испытать удачу в игре <---" << endl;
+            wcout << L"чтобы вернуться назад" << endl;
+            input = 1;
+            break;
+        }
     }
 }
 
 void movieSelection() { // Функция выводяшая список фильмов с краткой информацией
     ClearScreen();
-    short int input = 0;
-    //wcout << L"\n" << fileIn("cinema_info.txt") << endl; // Вывод файла
-    //wcout << L"Нажмите '1', чтобы выбрать сеанс" << endl;
-    //wcout << L"Нажмите '2', чтобы посмотреть доступные акции" << endl;
-    //wcout << L"Нажмите '3', чтобы использовать фильтр" << endl;
-    //wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
-    //wcin >> input;
-    //ClearScreen();
-    //switch (input) {
-    //case 1:
-    //    //choosingPlace(); // выбор сеанса >> меню выбора места >> после выбора мест использовать функцию оплаты
-
-    //    sessionSelection(1);
-    //    break;
-    //case 2:
-    //    availablePromo(); // Функция для просмотра доспупных акций
-    //    break;
-    //case 3:
-    //    // место для функции фильтра
-    //    break;
-    //case 0:
-    //    extranceToCinema(); // Возврат назад (к предыдущей функции)
-    //    break;
-    //}
+    short int input = 3;
     wcout << L"\n" << fileIn("cinema_info.txt") << endl; // Вывод файла
     wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
-    wcout << L"чтобы использовать фильтр" << endl;
+    wcout << L"чтобы использовать фильтр <---" << endl;
     wcout << L"чтобы посмотреть доступные акции" << endl;
     wcout << L"чтобы выбрать сеанс" << endl;
-    wcout << L"чтобы вернуться назад <---" << endl;
+    wcout << L"чтобы вернуться назад" << endl;
 
 
     short int prevInput;
@@ -270,11 +282,11 @@ void movieSelection() { // Функция выводяшая список фил
             wcout << L"\n" << fileIn("cinema_info.txt") << endl;
             wcout << L"Введенно неверное значение" << endl;
             wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
-            wcout << L"чтобы использовать фильтр" << endl;
-            wcout << L"чтобы посмотреть доступные акции <---" << endl;
+            wcout << L"чтобы использовать фильтр <---" << endl;
+            wcout << L"чтобы посмотреть доступные акции" << endl;
             wcout << L"чтобы выбрать сеанс" << endl;
             wcout << L"чтобы вернуться назад" << endl;
-            input = 0;
+            input = 3;
             break;
         }
     }
