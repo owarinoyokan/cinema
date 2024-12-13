@@ -231,6 +231,52 @@ void drawRow(int y, const Row& row, int rowNumber) {
 	}
 }
 
+void  rendering_the_cost_of_tickets(int start_y)
+{
+	int x_box = 150;
+	int temp_y = start_y;
+	int temp_y_2 = start_y;
+	for (int ozer_line = 0; ozer_line < 17; ++ozer_line) { setCursorPosition(x_box, ++temp_y); wcout << L"│"; }
+	setCursorPosition(x_box, start_y);
+	wcout << L"┌";
+	++start_y;
+	for (int line = 0; line < 53; ++line) { wcout << L"─"; }
+	wcout << L"┐\n";
+	x_box += 2;
+	++y;
+
+
+	drawYellowAvailableBox(x_box, start_y, L"1");
+	setCursorPosition(x_box + 3, start_y + BOX_HEIGHT - 1);
+	wcout << L"Цена места такого цвета равна " << expensive_place;
+	x_box = 152;
+	start_y += BOX_HEIGHT + 1;
+	drawWhiteAvailableBox(x_box, start_y, L"2");
+	setCursorPosition(x_box + 3, start_y + BOX_HEIGHT - 1);
+	wcout << L"Цена места такого цвета равна " << cheap_place;
+	start_y += BOX_HEIGHT + 1;
+	x_box = 152;
+	drawGrayOccupiedBox(x_box, start_y);
+	setCursorPosition(x_box + 3, start_y + BOX_HEIGHT - 1);
+	wcout << L"Места отмеченные этим цветом - заняты";
+	start_y += BOX_HEIGHT + 1;
+	x_box = 152;
+	drawVioletOccupiedBox(x_box, start_y);
+	setCursorPosition(x_box + 3, start_y + BOX_HEIGHT - 1);
+	wcout << L"Место отмеченные этим цветом выбраны вами";
+	start_y += BOX_HEIGHT + 2;
+	x_box = 150;
+
+	setCursorPosition(x_box, start_y);
+	wcout << L"└";
+
+	for (int ozer_line = 0; ozer_line < 17; ++ozer_line) { setCursorPosition(x_box + 54, ++temp_y_2); wcout << L"│"; }
+	setCursorPosition(++x_box, start_y);
+	for (int line = 1; line < 54; ++line) { wcout << L"─"; }
+	wcout << L"┘\n";
+	x_box += 2;
+}
+
 /// <summary>
 /// Эта функция отрисовывает весь зал
 /// <summary>
@@ -244,11 +290,15 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
 	++y;
 	wcout << setw((130 / 2) + (session.film_name.size() / 2)) << session.film_name << endl;
 	++y;
+	int start_y = y;
 	setCursorPosition(0, y);
-	wcout << L"│";
+	wcout << L"┌";
+
 	for (int line = 1; line < 129; ++line) { wcout << L"─"; }
+	wcout << L"┐\n";
+	setCursorPosition(0, y + 1);
+	wcout << L"│";
 	++y;
-	wcout << L"│\n│";
 	for (int i = session.rows.size() - 1; i >= 0; --i) {
 		setCursorPosition(1, y - 1);
 		for (int ozer_line = 0; ozer_line < 4; ++ozer_line) { setCursorPosition(0, ++y); wcout << L"│"; }
@@ -261,10 +311,15 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
 		y -= 5;
 		y += BOX_HEIGHT + 2;
 	}
-	setCursorPosition(1, y);
-	for (int line = 0; line < 128; ++line) { wcout << L"─"; }
-	++y;
 	setCursorPosition(0, y);
+	wcout << L"└";
+	for (int line = 0; line < 128; ++line) { wcout << L"─"; }
+	wcout << L"┘";
+
+	rendering_the_cost_of_tickets(start_y);
+		
+	setCursorPosition(0, y);
+
 
 }
 
