@@ -400,23 +400,24 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 
 void ClearScreen() {
 	y = 0;
-	// Получаем дескриптор консоли
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	DWORD count, cellCount;
-	COORD homeCoords = { 0, 0 }; // Координаты для верхнего левого угла
+	//// Получаем дескриптор консоли
+	//HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	//CONSOLE_SCREEN_BUFFER_INFO csbi;
+	//DWORD count, cellCount;
+	//COORD homeCoords = { 0, 0 }; // Координаты для верхнего левого угла
 
-	// Получаем информацию о буфере консоли
-	if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
-		cellCount = csbi.dwSize.X * csbi.dwSize.Y; // Общее количество ячеек
+	//// Получаем информацию о буфере консоли
+	//if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+	//	cellCount = csbi.dwSize.X * csbi.dwSize.Y; // Общее количество ячеек
 
-		// Заполняем буфер пробелами
-		FillConsoleOutputCharacter(hConsole, ' ', cellCount, homeCoords, &count);
-		// Устанавливаем предыдущие атрибуты для очищенных ячеек
-		FillConsoleOutputAttribute(hConsole, csbi.wAttributes, cellCount, homeCoords, &count);
-		// Перемещаем курсор обратно в верхний левый угол
-		SetConsoleCursorPosition(hConsole, homeCoords);
-	}
+	//	// Заполняем буфер пробелами
+	//	FillConsoleOutputCharacter(hConsole, ' ', cellCount, homeCoords, &count);
+	//	// Устанавливаем предыдущие атрибуты для очищенных ячеек
+	//	FillConsoleOutputAttribute(hConsole, csbi.wAttributes, cellCount, homeCoords, &count);
+	//	// Перемещаем курсор обратно в верхний левый угол
+	//	SetConsoleCursorPosition(hConsole, homeCoords);
+	//}
+	system("cls");
 }
 
 
@@ -455,8 +456,8 @@ void closeWindow() {
 	keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 }
 
-// функиция смены масштаба
-void PressCtrlMinus() {
+// функиция смены масштаба (-)
+void PressCtrlMinus(int count) {
 	// Эмуляция нажатия клавиши Ctrl
 	keybd_event(VK_CONTROL, 0, 0, 0);
 	// Эмуляция нажатия клавиши "-"
@@ -465,6 +466,26 @@ void PressCtrlMinus() {
 	keybd_event(VK_OEM_MINUS, 0, KEYEVENTF_KEYUP, 0);
 	// Эмуляция отпускания клавиши Ctrl
 	keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
+
+	count--;
+	if (count > 0)
+		PressCtrlMinus(count);
+}
+
+// функиция смены масштаба (+)
+void PressCtrlPlus(int count) {
+	// Эмуляция нажатия клавиши Ctrl
+	keybd_event(VK_CONTROL, 0, 0, 0);
+	// Эмуляция нажатия клавиши "-"
+	keybd_event(VK_OEM_PLUS, 0, 0, 0);
+	// Эмуляция отпускания клавиши "-"
+	keybd_event(VK_OEM_PLUS, 0, KEYEVENTF_KEYUP, 0);
+	// Эмуляция отпускания клавиши Ctrl
+	keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
+
+	count--;
+	if (count > 0)
+		PressCtrlPlus(count);
 }
 
 void waitForInput() {
@@ -595,7 +616,7 @@ bool correctInputQuantity(int& quantity) {
 }
 void loadAndShowBuffetMenu(double& totalCost) {
 	// Визуальная часть меню выводится из файла
-	displayMenuFromFile(L"МЕНЮ.txt");
+	displayMenuFromFile(L"menu.txt");
 
 	// Заранее определенные пункты меню и их стоимость
 	map<int, double> menuOptions = {
@@ -743,13 +764,13 @@ void choosingPlace(Session& session, int day) {
 	while (true) {
 
 		if (cnt_error_messeg >= 3) {
-			ClearScreenFromPosition(0, 42);
+			ClearScreenFromPosition(0, 36);
 			cnt_error_messeg = 0;
 			continue;
 		}
 		//int max_free_row = session.max_count_free_places_in_one_row();
 		int all_free_places = session.cnt_free_places_in_session();
-		wcout << L"Количество свобоных мест в зале равно: " << all_free_places  <<"\n";
+		wcout << L"Количество свобоных мест в зале равно: " << all_free_places << "\n";
 		//wcout << L"Максимальное количество свободных мест в ряду: " << max_free_row <<"\n"; // посчёст мест не подряд
 		wcout << L"Выберите способ бронирования мест:\n";
 		wcout << L"1. Автоподбор мест\n";
@@ -757,7 +778,7 @@ void choosingPlace(Session& session, int day) {
 		wcout << L"0 Вернуться назад\n";
 		wcout << L"Введите ваш выбор: ";
 
-		if (!correctInput(choice) || (choice != 1 && choice != 2)) {
+		if (!correctInput(choice) || (choice != 1 && choice != 2 && choice != 0)) {
 			if (choice != 1 && choice != 2) {
 				cnt_error_messeg += 3;
 				wcout << L"Некорректный ввод. Введите 1 или 2.\n";
