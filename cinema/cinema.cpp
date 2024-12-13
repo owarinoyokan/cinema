@@ -1,4 +1,6 @@
 ﻿#include "Header.h"
+#include "game.h"
+
 #include <iostream>     // Для работы потока ввода и вывода
 #include <io.h>         // Для работы с _setmode 
 #include <locale>       // Для работы с кодировками
@@ -12,12 +14,12 @@
 #include <windows.h>
 
 
-
-
 using namespace std;    // Пространство имен
 using namespace Config;    // Пространство имен
 
+
 TrioDays Days; //глобальная переменная дней
+
 
 void extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
 void availablePromo(); // Функция для просмотра доспупных акций
@@ -28,9 +30,10 @@ wstring fileIn(const string& fname); // Функция для чтения фа�
 void sessionSelection(int);
 int listFilmFromTheDay(int day, int filmNumber);
 
+
 void extranceToCinema() { // Функция входа в кино, предлагает самый первый выбор
     short int input;
-    //wcout << L"\n" << fileIn(" file name ") << endl; // Вывод файла
+    wcout << fileIn("6104.txt") << endl;
     wcout << L"Что вы желаете сделать?" << endl;
     wcout << L"Нажмите '1', чтобы выбрать фильм" << endl;
     wcout << L"Нажмите '0', чтобы выйти" << endl;
@@ -43,9 +46,6 @@ void extranceToCinema() { // Функция входа в кино, предла
     case 1:
         movieSelection(); // Функция выводяшая список фильмов с краткой информацией
         break;
-    case 3:
-        // место под ф-ю буфета
-        break;
     case 0:
         closeWindow();
         break;
@@ -54,16 +54,17 @@ void extranceToCinema() { // Функция входа в кино, предла
 
 void availablePromo() { // Функция для просмотра доспупных акций
     short int input;
-    //wcout << L"\n" << fileIn(" file name ") << endl; // Вывод файла
+    wcout << L"\n" << fileIn("Actions.txt") << endl; // Вывод файла
     wcout << L"Список доступных акций ... " << endl;
     wcout << L"Введите номер акции, чтобы посмотреть подробное описание" << endl;
     wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+    wcout << L"Нажмите '1', чтобы испытать удачу в игре" << endl;
     wcin >> input;
     ClearScreen();
     if (input == 0)
         movieSelection(); // Возврат назад (к предыдущей функции)
-    else {
-        // место для функции выводящей подробную информацию про акции
+    else if (input == 1) {
+        TheActionGame();
     }
 }
 
@@ -86,54 +87,6 @@ void movieSelection() { // Функция выводяшая список фил
     case 2:
         availablePromo(); // Функция для просмотра доспупных акций
         break;
-        //case 21:
-        //    wcout << L"\n" << fileIn("Gone with the session.txt") << endl; // Унесённые сессией        
-        //    //detailedInform(); // Функция выводящая детали фильма
-        //    break;
-        //case 22:
-        //    wcout << L"\n" << fileIn("Back to the compiler.txt") << endl; // Назад к компилятору      
-        //    //detailedInform(); // Функция выводящая детали фильма
-        //    break;
-        //case 23:
-        //    wcout << L"\n" << fileIn("And deadlines are tight.txt") << endl; // А дедлайны здесь жесткие      
-        //    //detailedInform(); // Функция выводящая детали фильма
-        //    break;
-        //case 24:
-        //    wcout << L"\n" << fileIn("Lord of the Lab.txt") << endl; // Властелин лаб: возвращение сеньора       
-        //    //detailedInform(); // Функция выводящая детали фильма
-        //    break;
-        //case 25:
-        //    wcout << L"\n" << fileIn("Titanic.txt") << endl; // Титаник: крах программы        
-        //    //detailedInform(); // Функция выводящая детали фильма
-        //    break;
-        //case 26:
-        //    wcout << L"\n" << fileIn("Debagger 2.txt") << endl; // Дебаггер 2: Судный день компиляции      
-        //    //detailedInform(); // Функция выводящая детали фильма
-        //    break;
-        //case 27:
-        //    wcout << L"\n" << fileIn("Garry Coder.txt") << endl; // Гарри Кодер и C++       
-        //    //detailedInform(); // Функция выводящая детали фильма
-        //    break;
-        //case 28:
-        //    wcout << L"\n" << fileIn("Matrix.txt") << endl; // Матрица данных        
-        //    //detailedInform(); // Функция выводящая детали фильма
-        //    break;
-        //case 29:
-        //    wcout << L"\n" << fileIn("Fifth algorithm.txt") << endl; // Пятый алгоритм      
-        //    //detailedInform(); // Функция выводящая детали фильма
-        //    break;
-        //case 210:
-        //    wcout << L"\n" << fileIn("People in black pixels.txt") << endl; // Люди в Черных пикселях      
-        //    //detailedInform(); // Функция выводящая детали фильма
-        //    break;
-        //case 211:
-        //    wcout << L"\n" << fileIn("Lab Wars.txt") << endl; // Лабные Войны: Эпизод 5        
-        //    //detailedInform(); // Функция выводящая детали фильма
-        //    break;
-        //case 212:
-        //    wcout << L"\n" << fileIn("Shrek.txt") << endl; // Шрек и болото багов        
-        //    //detailedInform(); // Функция выводящая детали фильма
-        //    break;
     case 3:
         // место для функции фильтра
         break;
@@ -183,7 +136,7 @@ void sessionSelection(int day) { // Выбор сеанса
     int input;
     while (true) {
         
-        if (correctInput(input) && ((day == 1 && input <= 12) || (day != 1 && input <= 11 ) || input == 0 || input == 111 || input == 222 || input == 333))
+        if (correctInput(input) && ((day == 1 && input <= 12) || (day != 1 && input <= 11) || input == 0 || input == 111 || input == 222 || input == 333))
             break;
         wcout << L"Ошибка ввода попробуйте ещё раз\n";
     }
@@ -209,7 +162,7 @@ void sessionSelection(int day) { // Выбор сеанса
         sessionSelection(day);
 
     }
-    else {
+    /*else {
         int numbers_1_day = Days.trio_days[day - 1].Cinema_room_1.size();
         int numbers_2_day = Days.trio_days[day - 1].Cinema_room_2.size() + Days.trio_days[day - 1].Cinema_room_1.size();
         int numbers_3_day = Days.trio_days[day - 1].Cinema_room_3.size() + Days.trio_days[day - 1].Cinema_room_2.size() + Days.trio_days[day - 1].Cinema_room_1.size();
@@ -221,14 +174,11 @@ void sessionSelection(int day) { // Выбор сеанса
 
         else if (input > numbers_2_day && input <= numbers_3_day)
             choosingPlace(Days.trio_days[day - 1].Cinema_room_3[input - numbers_2_day - 1], day);
-    }
+    }*/
 
+    input = listFilmFromTheDay(day, input); // возвращаяем номер фильма зная день и его номер в расписании дня
 
-
-    /* input = listFilmFromTheDay(day, input); // возвращаяем номер фильма зная день и его номер в расписании дня
-
-
-     ClearScreen();
+    /* ClearScreen();
 
 
      //switch (input) { // выводим все сеансы на данный фильм
@@ -268,35 +218,136 @@ void sessionSelection(int day) { // Выбор сеанса
      //case 1012:
      //    wcout << L"\n" << fileIn("Lab Wars.txt") << endl; // Лабные Войны: Эпизод 5
      //    break;
-     //}
+     //}*/
 
 
-     // Создаем map для соответствия между номерами сеансов и именами файлов
-     map<int, string> sessionFiles = {
-         {1001, "Gone with the session.txt"},
-         {1002, "Shrek.txt"},
-         {1003, "Back to the compiler.txt"},
-         {1004, "And deadlines are tight.txt"},
-         {1005, "Lord of the Lab.txt"},
-         {1006, "Titanic.txt"},
-         {1007, "Debagger 2.txt"},
-         {1008, "Garry Coder.txt"},
-         {1009, "Matrix.txt"},
-         {1010, "Fifth algorithm.txt"},
-         {1011, "People in black pixels.txt"},
-         {1012, "Lab Wars.txt"}
-     };
+    // Создаем map для соответствия между номерами сеансов и именами файлов
+        map<int, string> sessionFiles = {
+            {1001, "Gone with the session.txt"},
+            {1002, "Shrek.txt"},
+            {1003, "Back to the compiler.txt"},
+            {1004, "And deadlines are tight.txt"},
+            {1005, "Lord of the Lab.txt"},
+            {1006, "Titanic.txt"},
+            {1007, "Debagger 2.txt"},
+            {1008, "Garry Coder.txt"},
+            {1009, "Matrix.txt"},
+            {1010, "Fifth algorithm.txt"},
+            {1011, "People in black pixels.txt"},
+            {1012, "Lab Wars.txt"}
+    };
+    /*map<int, vector<Session>> session_day = {
+        {1001, "Gone with the session.txt"},
+        {1002, "Shrek.txt"},
+        {1003, "Back to the compiler.txt"},
+        {1004, "And deadlines are tight.txt"},
+        {1005, "Lord of the Lab.txt"},
+        {1006, "Titanic.txt"},
+        {1007, "Debagger 2.txt"},
+        {1008, "Garry Coder.txt"},
+        {1009, "Matrix.txt"},
+        {1010, "Fifth algorithm.txt"},
+        {1011, "People in black pixels.txt"},
+        {1012, "Lab Wars.txt"}
+    };*/
 
-     // Проверяем, есть ли input в map
-     if (sessionFiles.find(input) != sessionFiles.end()) {
-         wcout << L"\n" << fileIn(sessionFiles[input]) << endl; // Выводим содержимое файла
-     }
-     else {
-         wcout << L"Сеанс не найден." << endl; // Обработка случая, если input не найден
-     }*/
+    vector<Session> sessions_film; //сеансы выбранного фильма 
+
+    switch (input) {
+    case 1001:
+        sessions_film.resize(2);
+        sessions_film[0] = Days.trio_days[0].Cinema_room_2[1];
+        sessions_film[1] = Days.trio_days[1].Cinema_room_3[1];
+        break;
+    case 1002:
+        sessions_film.resize(3);
+        sessions_film[0] = Days.trio_days[0].Cinema_room_1[0];
+        sessions_film[1] = Days.trio_days[1].Cinema_room_2[0];
+        sessions_film[2] = Days.trio_days[2].Cinema_room_2[1];
+        break;
+    case 1003:
+        sessions_film.resize(2);
+        sessions_film[0] = Days.trio_days[1].Cinema_room_2[1];
+        sessions_film[1] = Days.trio_days[2].Cinema_room_1[2];
+        break;
+    case 1004:
+        sessions_film.resize(3);
+        sessions_film[0] = Days.trio_days[0].Cinema_room_3[3];
+        sessions_film[1] = Days.trio_days[1].Cinema_room_1[2];
+        sessions_film[2] = Days.trio_days[2].Cinema_room_1[2];
+        break;
+    case 1005:
+        sessions_film.resize(4);
+        sessions_film[0] = Days.trio_days[0].Cinema_room_1[2];
+        sessions_film[1] = Days.trio_days[0].Cinema_room_2[3];
+        sessions_film[2] = Days.trio_days[1].Cinema_room_1[3];
+        sessions_film[3] = Days.trio_days[2].Cinema_room_3[2];
+        break;
+    case 1006:
+        sessions_film.resize(3);
+        sessions_film[0] = Days.trio_days[0].Cinema_room_2[2];
+        sessions_film[1] = Days.trio_days[1].Cinema_room_1[1];
+        sessions_film[2] = Days.trio_days[2].Cinema_room_2[2];
+        break;
+    case 1007:
+        sessions_film.resize(3);
+        sessions_film[0] = Days.trio_days[0].Cinema_room_1[1];
+        sessions_film[1] = Days.trio_days[1].Cinema_room_2[2];
+        sessions_film[2] = Days.trio_days[2].Cinema_room_2[0];
+        break;
+    case 1008:
+        sessions_film.resize(4);
+        sessions_film[0] = Days.trio_days[0].Cinema_room_1[3];
+        sessions_film[1] = Days.trio_days[1].Cinema_room_3[2];
+        sessions_film[2] = Days.trio_days[2].Cinema_room_2[3];
+        sessions_film[3] = Days.trio_days[2].Cinema_room_3[1];
+        break;
+    case 1009:
+        sessions_film.resize(3);
+        sessions_film[0] = Days.trio_days[0].Cinema_room_2[0];
+        sessions_film[1] = Days.trio_days[0].Cinema_room_3[2];
+        sessions_film[2] = Days.trio_days[1].Cinema_room_3[0];
+        break;
+    case 1010:
+        sessions_film.resize(2);
+        sessions_film[0] = Days.trio_days[0].Cinema_room_3[0];
+        sessions_film[1] = Days.trio_days[1].Cinema_room_1[0];
+        break;
+    case 1011:
+        sessions_film.resize(3);
+        sessions_film[0] = Days.trio_days[0].Cinema_room_3[1];
+        sessions_film[1] = Days.trio_days[2].Cinema_room_1[0];
+        sessions_film[2] = Days.trio_days[2].Cinema_room_3[0];
+        break;
+    case 1012:
+        sessions_film.resize(2);
+        sessions_film[0] = Days.trio_days[1].Cinema_room_3[3];
+        sessions_film[1] = Days.trio_days[2].Cinema_room_1[3];
+        break;
+    }
 
 
 
+
+    // Проверяем, есть ли input в map
+    if (sessionFiles.find(input) != sessionFiles.end()) {
+        wcout << L"\n" << fileIn(sessionFiles[input]) << endl; // Выводим содержимое файла
+        wcout << L"Выберите сеанс введите число от 1 до " << sessions_film.size() << " \n";
+        wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+        int input_2;
+        wcin >> input_2;
+        if (input_2 == 0) {
+            sessionSelection(day);
+        }
+        else if (input_2 > 0 && input_2 <= sessions_film.size()) {
+            ClearScreen();
+            choosingPlace(sessions_film[input_2 - 1], day);
+        }
+    }
+
+    else {
+        wcout << L"Сеанс не найден." << endl; // Обработка случая, если input не найден
+    }
 }
 
 int listFilmFromTheDay(int day, int filmNumber) { // выводит номер фильма от его номера в таблице и от дня
@@ -474,54 +525,28 @@ void generationTrioDays(TrioDays& trio)
     trio.trio_days.push_back(day_three);
 }
 
-
-
-int main() {    // commit
-    // Настройка широких символов для потока вывода
-
-     setMode16();
-
+void ConsoleMode() {
+    // открытие консоли в полном экране
     fullScreen();
-    for (int i = 0; i < 2; i++) {
-        PressCtrlMinus();
-    }
 
-    wcout << fileIn("6104.txt") << endl;
-    
-    system("pause");
+    // Настройка широких символов для потока вывода
+    setMode16();
 
-    ClearScreen();      // Очистка консоли
+    // Название для консоли
+    SetConsoleTitle(L"Кинотеатр \"6104\"");
+
+    // Масштаб -1
+    PressCtrlMinus(1);
+}
+
+int main() {
+    // Установка параметров консоли
+    ConsoleMode();
 
     srand(time(0));
-
     generationTrioDays(Days); // генерация всех 3х дней
 
-
-    ///*demoVis_All_sessions(day_one, rowCount, placeCount); ///вывод всех сеансов ввиде зала
-    //waitForInput();*/
-    /*
-    choosingPlace(Days.day_one.Cinema_room_1[0]);*/
-    //waitForInput();
-
-
-    wcout << L"Проект кинотеатра.🎬" << endl;
-    wcout << L"Тестовый запуск" << endl;
-
-
     extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
-
-
-
-    //waitForInput();
-    //closeWindow();
-
-
-
-    // Запись в файл
-    //fileOut("example.txt");
-
-    // Чтение файла
-    //wcout << L"Содержимое файла: " << fileIn("example.txt") << endl;
 
     return 0;
 }
