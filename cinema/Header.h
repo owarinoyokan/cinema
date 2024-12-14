@@ -18,6 +18,7 @@
 #include <map>
 #include <cctype>
 
+void selectionDay(int day);
 void displayFilmDescription(const std::wstring& filmName);
 
 using namespace std;
@@ -362,6 +363,11 @@ void GenerationRoom(Session& session, const int rowCount, const int placeCount, 
 	}
 }
 
+void EnterClear() {
+	keybd_event(VK_NEXT, 0, 0, 0); // Нажатие Page Down
+	keybd_event(VK_NEXT, 0, KEYEVENTF_KEYUP, 0); // Отпуск Page Down
+}
+
 void fullScreen() {
 	COORD coord;
 	SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
@@ -616,7 +622,8 @@ void filterSessions(const TrioDays& trio_days) {
 		ClearScreen();
 		wcout << L"Введите ключевое слово для поиска (например, название фильма или жанр): ";
 		wstring query;
-		wcin.ignore();
+		FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
+
 		getline(wcin, query);
 
 		if (query.empty()) {
@@ -977,27 +984,28 @@ void choosePaymentMethod(double totalAmount) {
 void choosingPlace(Session& session, int day) {
 	DrawSession(session, session.rows.size(), session.rows[0].seats.size());
 	setCursorPosition(0, y);
-
+	wcin.ignore();
 	int choice;
 	int cnt_error_messeg = 0;
 	double totalCost = 0;
 	// Выбор способа бронирования
+	//int max_free_row = session.max_count_free_places_in_one_row();
+	int all_free_places = session.cnt_free_places_in_session();
+	wcout << L"Количество свобоных мест в зале равно: " << all_free_places << "\n";
+	//wcout << L"Максимальное количество свободных мест в ряду: " << max_free_row <<"\n"; // посчёст мест не подряд
+	wcout << L"Выберите способ бронирования мест:\n";
+	wcout << L"1. Автоподбор мест\n";
+	wcout << L"2. Ручной выбор мест\n";
+	wcout << L"0 Вернуться назад\n";
+	wcout << L"Введите ваш выбор: ";
 	while (true) {
 
 		if (cnt_error_messeg >= 3) {
-			ClearScreenFromPosition(0, 36);
+			ClearScreenFromPosition(18, 40);
 			cnt_error_messeg = 0;
 			continue;
 		}
-		//int max_free_row = session.max_count_free_places_in_one_row();
-		int all_free_places = session.cnt_free_places_in_session();
-		wcout << L"Количество свобоных мест в зале равно: " << all_free_places << "\n";
-		//wcout << L"Максимальное количество свободных мест в ряду: " << max_free_row <<"\n"; // посчёст мест не подряд
-		wcout << L"Выберите способ бронирования мест:\n";
-		wcout << L"1. Автоподбор мест\n";
-		wcout << L"2. Ручной выбор мест\n";
-		wcout << L"0 Вернуться назад\n";
-		wcout << L"Введите ваш выбор: ";
+		
 
 		if (!correctInput(choice) || (choice != 1 && choice != 2 && choice != 0)) {
 			if (choice != 1 && choice != 2) {
@@ -1009,7 +1017,8 @@ void choosingPlace(Session& session, int day) {
 		}
 
 		if (choice == 0)
-			sessionSelection(day);
+			ClearScreen();
+			selectionDay(day);
 
 		if (choice == 1) { // Автоподбор мест
 			int cnt_places, bookedRow;
