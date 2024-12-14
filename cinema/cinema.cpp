@@ -12,6 +12,7 @@
 #include <sstream>      // Для работы с строковыми потоками
 #include <vector>       // Сами знаете
 #include <map>
+#include <limits>
 #include <windows.h>
 
 
@@ -227,16 +228,20 @@ void movieSelection() { // Функция выводяшая список фил
             switch (prevInput) {
             case 3:
                 // место для функции фильтра
+                ClearScreen();
                 filterMenu();
                 break;
             case 2:
+                ClearScreen();
                 availablePromo(); // Функция для просмотра доспупных акций
                 break;
             case 1:
                 //sessionSelection(1);
+                ClearScreen();
                 selectionDay(1);
                 break;
             case 0:
+                ClearScreen();
                 extranceToCinema(); // Возврат назад (к предыдущей функции)
                 break;
             }
@@ -303,7 +308,6 @@ void detailedInform() { // Функция выводящая детали фил
 }
 
 void selectionDay(int day) {
-    ClearScreen();
     short int prevInput, inp = 0;
     wcout << L"\n" << fileIn("AllMovDay_1.txt") << endl;
     wcout << L"Нажимайте на стрелочки <- ->, чтобы выбрать день. Нажмите SPACE, чтобы зафиксировать день" << endl;
@@ -312,6 +316,7 @@ void selectionDay(int day) {
         tracingLR(inp);
         switch (inp) {
         case 200:
+
             sessionSelection(prevInput + 1);
         case 2:
             ClearScreen();
@@ -343,119 +348,9 @@ void selectionDay(int day) {
     }
 }
 
-void sessionSelection(int day) { // Выбор сеанса
-    //wcout << L"\n" << fileIn("cimema_info.txt") << endl;
-    //ClearScreen();
-    //switch (day) { // изменение расписания в зависсимости от дня (сейчас ничего не меняется)
-    //case 1:
-    //    wcout << L"\n" << fileIn("AllMovDay_1.txt") << endl;
-    //    break;
-    //case 2:
-    //    wcout << L"\n" << fileIn("AllMovDay_2.txt") << endl;
-    //    break;
-    //case 3:
-    //    wcout << L"\n" << fileIn("AllMovDay_3.txt") << endl;
-    //    break;
-    //}
-
-    //wcout << L"Выберите фильм который хотите посмотреть" << endl;
-    //wcout << L"Введите 111 чтобы посмотреть расписание на 1 день" << endl;
-    //wcout << L"Введите 222 чтобы посмотреть расписание на 2 день" << endl;
-    //wcout << L"Введите 333 чтобы посмотреть расписание на 3 день" << endl;
-    //wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
-    wcout << L"Введите номер сеанса, на который хотите пойти" << endl << endl;
-    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
-    //wcin >> input;
-
-    int input;
-    while (true) {
-
-        if (correctInput(input) && ((day == 1 && input <= 12) || (day != 1 && input <= 11) || input == 0 || input == 111 || input == 222 || input == 333))
-            break;
-        wcout << L"Ошибка ввода попробуйте ещё раз\n";
-    }
-    ClearScreen();
-    if (input == 0) {
-        movieSelection();
-    }
-    if (input == 111) {
-        ClearScreen();
-        day = 1;
-        sessionSelection(day);
-
-    }
-    else if (input == 222) {
-        ClearScreen();
-        day = 2;
-        sessionSelection(day);
-
-    }
-    else if (input == 333) {
-        ClearScreen();
-        day = 3;
-        sessionSelection(day);
-
-    }
-    /*else {
-        int numbers_1_day = Days.trio_days[day - 1].Cinema_room_1.size();
-        int numbers_2_day = Days.trio_days[day - 1].Cinema_room_2.size() + Days.trio_days[day - 1].Cinema_room_1.size();
-        int numbers_3_day = Days.trio_days[day - 1].Cinema_room_3.size() + Days.trio_days[day - 1].Cinema_room_2.size() + Days.trio_days[day - 1].Cinema_room_1.size();
-        if (input <= numbers_1_day) {
-            choosingPlace(Days.trio_days[day - 1].Cinema_room_1[input - 1], day);
-        }
-        else if (input > numbers_1_day && input <= numbers_2_day)
-            choosingPlace(Days.trio_days[day - 1].Cinema_room_2[input - numbers_1_day - 1], day);
-
-        else if (input > numbers_2_day && input <= numbers_3_day)
-            choosingPlace(Days.trio_days[day - 1].Cinema_room_3[input - numbers_2_day - 1], day);
-    }*/
-
-    input = listFilmFromTheDay(day, input); // возвращаяем номер фильма зная день и его номер в расписании дня
-
-    /* ClearScreen();
-
-
-     //switch (input) { // выводим все сеансы на данный фильм
-     //case 1001:
-     //    wcout << L"\n" << fileIn("Gone with the session.txt") << endl; // Унесённые сессией
-     //    break;
-     //case 1002:
-     //    wcout << L"\n" << fileIn("Shrek.txt") << endl; // Шрек и болото багов
-     //    break;
-     //case 1003:
-     //    wcout << L"\n" << fileIn("Back to the compiler.txt") << endl; // Назад к компилятору
-     //    break;
-     //case 1004:
-     //    wcout << L"\n" << fileIn("And deadlines are tight.txt") << endl; // А дедлайны здесь жесткие
-     //    break;
-     //case 1005:
-     //    wcout << L"\n" << fileIn("Lord of the Lab.txt") << endl; // Властелин лаб: возвращение сеньора
-     //    break;
-     //case 1006:
-     //    wcout << L"\n" << fileIn("Titanic.txt") << endl; // Титаник: крах программы
-     //    break;
-     //case 1007:
-     //    wcout << L"\n" << fileIn("Debagger 2.txt") << endl; // Дебаггер 2: Судный день компиляции
-     //    break;
-     //case 1008:
-     //    wcout << L"\n" << fileIn("Garry Coder.txt") << endl; // Гарри Кодер и C++
-     //    break;
-     //case 1009:
-     //    wcout << L"\n" << fileIn("Matrix.txt") << endl; // Матрица данных
-     //    break;
-     //case 1010:
-     //    wcout << L"\n" << fileIn("Fifth algorithm.txt") << endl; // Пятый алгоритм
-     //    break;
-     //case 1011:
-     //    wcout << L"\n" << fileIn("People in black pixels.txt") << endl; // Люди в Черных пикселях
-     //    break;
-     //case 1012:
-     //    wcout << L"\n" << fileIn("Lab Wars.txt") << endl; // Лабные Войны: Эпизод 5
-     //    break;
-     //}*/
-
-
-     // Создаем map для соответствия между номерами сеансов и именами файлов
+void returnSessions(int day,int input)
+{
+    // Создаем map для соответствия между номерами сеансов и именами файлов
     map<int, string> sessionFiles = {
         {1001, "Gone with the session.txt"},
         {1002, "Shrek.txt"},
@@ -470,20 +365,6 @@ void sessionSelection(int day) { // Выбор сеанса
         {1011, "People in black pixels.txt"},
         {1012, "Lab Wars.txt"}
     };
-    /*map<int, vector<Session>> session_day = {
-        {1001, "Gone with the session.txt"},
-        {1002, "Shrek.txt"},
-        {1003, "Back to the compiler.txt"},
-        {1004, "And deadlines are tight.txt"},
-        {1005, "Lord of the Lab.txt"},
-        {1006, "Titanic.txt"},
-        {1007, "Debagger 2.txt"},
-        {1008, "Garry Coder.txt"},
-        {1009, "Matrix.txt"},
-        {1010, "Fifth algorithm.txt"},
-        {1011, "People in black pixels.txt"},
-        {1012, "Lab Wars.txt"}
-    };*/
 
     vector<Session> sessions_film; //сеансы выбранного фильма 
 
@@ -571,7 +452,8 @@ void sessionSelection(int day) { // Выбор сеанса
         int input_2;
         wcin >> input_2;
         if (input_2 == 0) {
-            sessionSelection(day);
+            ClearScreen();
+            selectionDay(day);
         }
         else if (input_2 > 0 && input_2 <= sessions_film.size()) {
             ClearScreen();
@@ -582,6 +464,162 @@ void sessionSelection(int day) { // Выбор сеанса
     else {
         wcout << L"Сеанс не найден." << endl; // Обработка случая, если input не найден
     }
+}
+
+void sessionSelection(int day) { // Выбор сеанса
+    wcout << L"Введите номер сеанса, на который хотите пойти" << endl << endl;
+    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+    //wcin >> input;
+
+    int input;
+    while (true) {
+        FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
+        if (correctInput(input) && ((day == 1 && input <= 12) || (day != 1 && input <= 11) || input == 0 || input == 111 || input == 222 || input == 333))
+            break;
+        wcout << L"Ошибка ввода попробуйте ещё раз\n";
+    }
+    ClearScreen();
+    if (input == 0) {
+        movieSelection();
+    }
+    if (input == 111) {
+        ClearScreen();
+        day = 1;
+        sessionSelection(day);
+
+    }
+    else if (input == 222) {
+        ClearScreen();
+        day = 2;
+        sessionSelection(day);
+
+    }
+    else if (input == 333) {
+        ClearScreen();
+        day = 3;
+        sessionSelection(day);
+
+    }
+    input = listFilmFromTheDay(day, input); // возвращаяем номер фильма зная день и его номер в расписании дня
+    returnSessions(day, input);
+    //input = listFilmFromTheDay(day, input); // возвращаяем номер фильма зная день и его номер в расписании дня
+
+    //
+
+
+    // // Создаем map для соответствия между номерами сеансов и именами файлов
+    //map<int, string> sessionFiles = {
+    //    {1001, "Gone with the session.txt"},
+    //    {1002, "Shrek.txt"},
+    //    {1003, "Back to the compiler.txt"},
+    //    {1004, "And deadlines are tight.txt"},
+    //    {1005, "Lord of the Lab.txt"},
+    //    {1006, "Titanic.txt"},
+    //    {1007, "Debagger 2.txt"},
+    //    {1008, "Garry Coder.txt"},
+    //    {1009, "Matrix.txt"},
+    //    {1010, "Fifth algorithm.txt"},
+    //    {1011, "People in black pixels.txt"},
+    //    {1012, "Lab Wars.txt"}
+    //};
+    //
+    //vector<Session> sessions_film; //сеансы выбранного фильма 
+
+    //switch (input) {
+    //case 1001:
+    //    sessions_film.resize(2);
+    //    sessions_film[0] = Days.trio_days[0].Cinema_room_2[1];
+    //    sessions_film[1] = Days.trio_days[1].Cinema_room_3[1];
+    //    break;
+    //case 1002:
+    //    sessions_film.resize(3);
+    //    sessions_film[0] = Days.trio_days[0].Cinema_room_1[0];
+    //    sessions_film[1] = Days.trio_days[1].Cinema_room_2[0];
+    //    sessions_film[2] = Days.trio_days[2].Cinema_room_2[1];
+    //    break;
+    //case 1003:
+    //    sessions_film.resize(2);
+    //    sessions_film[0] = Days.trio_days[1].Cinema_room_2[1];
+    //    sessions_film[1] = Days.trio_days[2].Cinema_room_1[2];
+    //    break;
+    //case 1004:
+    //    sessions_film.resize(3);
+    //    sessions_film[0] = Days.trio_days[0].Cinema_room_3[3];
+    //    sessions_film[1] = Days.trio_days[1].Cinema_room_1[2];
+    //    sessions_film[2] = Days.trio_days[2].Cinema_room_1[2];
+    //    break;
+    //case 1005:
+    //    sessions_film.resize(4);
+    //    sessions_film[0] = Days.trio_days[0].Cinema_room_1[2];
+    //    sessions_film[1] = Days.trio_days[0].Cinema_room_2[3];
+    //    sessions_film[2] = Days.trio_days[1].Cinema_room_1[3];
+    //    sessions_film[3] = Days.trio_days[2].Cinema_room_3[2];
+    //    break;
+    //case 1006:
+    //    sessions_film.resize(3);
+    //    sessions_film[0] = Days.trio_days[0].Cinema_room_2[2];
+    //    sessions_film[1] = Days.trio_days[1].Cinema_room_1[1];
+    //    sessions_film[2] = Days.trio_days[2].Cinema_room_2[2];
+    //    break;
+    //case 1007:
+    //    sessions_film.resize(3);
+    //    sessions_film[0] = Days.trio_days[0].Cinema_room_1[1];
+    //    sessions_film[1] = Days.trio_days[1].Cinema_room_2[2];
+    //    sessions_film[2] = Days.trio_days[2].Cinema_room_2[0];
+    //    break;
+    //case 1008:
+    //    sessions_film.resize(4);
+    //    sessions_film[0] = Days.trio_days[0].Cinema_room_1[3];
+    //    sessions_film[1] = Days.trio_days[1].Cinema_room_3[2];
+    //    sessions_film[2] = Days.trio_days[2].Cinema_room_2[3];
+    //    sessions_film[3] = Days.trio_days[2].Cinema_room_3[1];
+    //    break;
+    //case 1009:
+    //    sessions_film.resize(3);
+    //    sessions_film[0] = Days.trio_days[0].Cinema_room_2[0];
+    //    sessions_film[1] = Days.trio_days[0].Cinema_room_3[2];
+    //    sessions_film[2] = Days.trio_days[1].Cinema_room_3[0];
+    //    break;
+    //case 1010:
+    //    sessions_film.resize(2);
+    //    sessions_film[0] = Days.trio_days[0].Cinema_room_3[0];
+    //    sessions_film[1] = Days.trio_days[1].Cinema_room_1[0];
+    //    break;
+    //case 1011:
+    //    sessions_film.resize(3);
+    //    sessions_film[0] = Days.trio_days[0].Cinema_room_3[1];
+    //    sessions_film[1] = Days.trio_days[2].Cinema_room_1[0];
+    //    sessions_film[2] = Days.trio_days[2].Cinema_room_3[0];
+    //    break;
+    //case 1012:
+    //    sessions_film.resize(2);
+    //    sessions_film[0] = Days.trio_days[1].Cinema_room_3[3];
+    //    sessions_film[1] = Days.trio_days[2].Cinema_room_1[3];
+    //    break;
+    //}
+
+
+
+
+    //// Проверяем, есть ли input в map
+    //if (sessionFiles.find(input) != sessionFiles.end()) {
+    //    wcout << L"\n" << fileIn(sessionFiles[input]) << endl; // Выводим содержимое файла
+    //    wcout << L"Выберите сеанс введите число от 1 до " << sessions_film.size() << " \n";
+    //    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+    //    int input_2;
+    //    wcin >> input_2;
+    //    if (input_2 == 0) {
+    //        sessionSelection(day);
+    //    }
+    //    else if (input_2 > 0 && input_2 <= sessions_film.size()) {
+    //        ClearScreen();
+    //        choosingPlace(sessions_film[input_2 - 1], day);
+    //    }
+    //}
+
+    //else {
+    //    wcout << L"Сеанс не найден." << endl; // Обработка случая, если input не найден
+    //}
 }
 
 int listFilmFromTheDay(int day, int filmNumber) { // выводит номер фильма от его номера в таблице и от дня
