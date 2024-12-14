@@ -759,39 +759,7 @@ void generationTrioDays(TrioDays& trio)
     trio.trio_days.push_back(day_three);
 }
 
-void SetMyIco() {
-    // Получаем дескриптор текущего окна консоли
-    HWND hwnd;
-
-    wchar_t Title[1024];
-
-    // Получаем заголовок окна консоли
-    if (!GetConsoleTitle(Title, sizeof(Title))) {
-        MessageBox(NULL, L"Не удалось получить заголовок консоли!", L"Ошибка", MB_ICONERROR);
-    }
-
-    // Находим окно по заголовку
-    hwnd = FindWindow(NULL, Title);
-    if (!hwnd) {
-        MessageBox(NULL, L"Окно не найдено!", L"Ошибка", MB_ICONERROR);
-    }
-
-    // Загружаем иконку из ресурсов
-    HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE("6104.ico"));
-    if (!hIcon) {
-        MessageBox(NULL, L"Не удалось загрузить иконку из ресурсов!", L"Ошибка", MB_ICONERROR);
-    }
-
-    // Устанавливаем иконку для окна
-    SetClassLongPtr(hwnd, GCLP_HICON, (LONG_PTR)hIcon);
-    SetClassLongPtr(hwnd, GCLP_HICONSM, (LONG_PTR)hIcon); // Устанавливаем маленькую иконку
-
-    MessageBox(NULL, L"Иконка успешно установлена!", L"Информация", MB_OK | MB_ICONINFORMATION);
-}
-
 void ConsoleMode() {
-    // смена иконки
-    SetMyIco();
 
     // открытие консоли в полном экране
     fullScreen();
