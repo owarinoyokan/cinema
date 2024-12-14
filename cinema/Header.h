@@ -16,7 +16,9 @@
 #include <locale>       
 #include <fcntl.h>      
 #include <map>
+#include <cctype>
 
+void displayFilmDescription(const std::wstring& filmName);
 
 using namespace std;
 
@@ -231,6 +233,52 @@ void drawRow(int y, const Row& row, int rowNumber) {
 	}
 }
 
+void  rendering_the_cost_of_tickets(int start_y)
+{
+	int x_box = 150;
+	int temp_y = start_y;
+	int temp_y_2 = start_y;
+	for (int ozer_line = 0; ozer_line < 17; ++ozer_line) { setCursorPosition(x_box, ++temp_y); wcout << L"│"; }
+	setCursorPosition(x_box, start_y);
+	wcout << L"┌";
+	++start_y;
+	for (int line = 0; line < 53; ++line) { wcout << L"─"; }
+	wcout << L"┐\n";
+	x_box += 2;
+	++y;
+
+
+	drawYellowAvailableBox(x_box, start_y, L"1");
+	setCursorPosition(x_box + 3, start_y + BOX_HEIGHT - 1);
+	wcout << L"Цена места такого цвета равна " << expensive_place;
+	x_box = 152;
+	start_y += BOX_HEIGHT + 1;
+	drawWhiteAvailableBox(x_box, start_y, L"2");
+	setCursorPosition(x_box + 3, start_y + BOX_HEIGHT - 1);
+	wcout << L"Цена места такого цвета равна " << cheap_place;
+	start_y += BOX_HEIGHT + 1;
+	x_box = 152;
+	drawGrayOccupiedBox(x_box, start_y);
+	setCursorPosition(x_box + 3, start_y + BOX_HEIGHT - 1);
+	wcout << L"Места отмеченные этим цветом - заняты";
+	start_y += BOX_HEIGHT + 1;
+	x_box = 152;
+	drawVioletOccupiedBox(x_box, start_y);
+	setCursorPosition(x_box + 3, start_y + BOX_HEIGHT - 1);
+	wcout << L"Место отмеченные этим цветом выбраны вами";
+	start_y += BOX_HEIGHT + 2;
+	x_box = 150;
+
+	setCursorPosition(x_box, start_y);
+	wcout << L"└";
+
+	for (int ozer_line = 0; ozer_line < 17; ++ozer_line) { setCursorPosition(x_box + 54, ++temp_y_2); wcout << L"│"; }
+	setCursorPosition(++x_box, start_y);
+	for (int line = 1; line < 54; ++line) { wcout << L"─"; }
+	wcout << L"┘\n";
+	x_box += 2;
+}
+
 /// <summary>
 /// Эта функция отрисовывает весь зал
 /// <summary>
@@ -244,11 +292,15 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
 	++y;
 	wcout << setw((130 / 2) + (session.film_name.size() / 2)) << session.film_name << endl;
 	++y;
+	int start_y = y;
 	setCursorPosition(0, y);
-	wcout << L"│";
+	wcout << L"┌";
+
 	for (int line = 1; line < 129; ++line) { wcout << L"─"; }
+	wcout << L"┐\n";
+	setCursorPosition(0, y + 1);
+	wcout << L"│";
 	++y;
-	wcout << L"│\n│";
 	for (int i = session.rows.size() - 1; i >= 0; --i) {
 		setCursorPosition(1, y - 1);
 		for (int ozer_line = 0; ozer_line < 4; ++ozer_line) { setCursorPosition(0, ++y); wcout << L"│"; }
@@ -261,10 +313,15 @@ void DrawSession(Session& session, int rowCount, int placeCount) {
 		y -= 5;
 		y += BOX_HEIGHT + 2;
 	}
-	setCursorPosition(1, y);
-	for (int line = 0; line < 128; ++line) { wcout << L"─"; }
-	++y;
 	setCursorPosition(0, y);
+	wcout << L"└";
+	for (int line = 0; line < 128; ++line) { wcout << L"─"; }
+	wcout << L"┘";
+
+	rendering_the_cost_of_tickets(start_y);
+
+	setCursorPosition(0, y);
+
 
 }
 
@@ -320,35 +377,63 @@ wstring replaceDash(wstring str) {
 	return str;
 }
 
-// Удаление символа \r из строки
-void removeCarriageReturn(std::wstring& line) {
-	line.erase(std::remove(line.begin(), line.end(), L'\r'), line.end());
+void cleanString(wstring& str) {
+	// Удаляем переносы строк и другие невидимые символы
+	str.erase(remove(str.begin(), str.end(), L'\r'), str.end());
+	str.erase(remove(str.begin(), str.end(), L'\n'), str.end());
+	str.erase(remove_if(str.begin(), str.end(), [](wchar_t c) {
+		return iswspace(c) && c != L' ';
+		}), str.end());
+}
+
+// Функция для удаления "\r" последующей очистки данных
+void removeCarriageReturn(wstring& line) {
+	line.erase(remove(line.begin(), line.end(), L'\r'), line.end());
+	cleanString(line); // Чистим строку после удаления символов
 }
 
 
-// Генерация дня с чтением из файла
-void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
-	wstringstream stream(filename);
+/// <summary>
+/// Генерация данных для сеансов кино на основе данных из файла.
+/// Считывает информацию о залах, сеансах и их деталях из файла и загружает их в структуру данных.
+/// </summary>
+/// <param name="day">Структура данных, содержащая информацию о всех сеансах в трех залах</param>
+/// <param name="filename">Имя файла, содержащего данные о сеансах</param>
+/// <param name="rowCount">Количество рядов в зале (используется для размещения мест)</param>
+/// <param name="placeCount">Количество мест в ряду (используется для размещения мест)</param>
+void GenerationDay(Day& day, const wstring& filename, int rowCount, int placeCount) {
+	wstringstream file(filename);
+
+
+	// Устанавливаем кодировку UTF-8
+	file.imbue(locale(locale(), new codecvt_utf8<wchar_t>));
+
 	wstring line;
 	vector<Session>* currentSessionGroup = nullptr;
 
-	while (getline(stream, line)) {
+	wcout << L"Содержимое файла:\n";
+	while (getline(file, line)) {
 		removeCarriageReturn(line);
 		line = replaceDash(line);
-		if (line.empty()) {
+
+		if (line.empty()) continue;
+
+		// Обработка залов
+		if (line.find(L"Cinema room 1") != wstring::npos) {
+			currentSessionGroup = &day.Cinema_room_1;
+			continue;
+		}
+		if (line.find(L"Cinema room 2") != wstring::npos) {
+			currentSessionGroup = &day.Cinema_room_2;
+			continue;
+		}
+		if (line.find(L"Cinema room 3") != wstring::npos) {
+			currentSessionGroup = &day.Cinema_room_3;
 			continue;
 		}
 
-		if (line == L"Cinema room 1") {
-			currentSessionGroup = &day.Cinema_room_1;
-		}
-		else if (line == L"Cinema room 2") {
-			currentSessionGroup = &day.Cinema_room_2;
-		}
-		else if (line == L"Cinema room 3") {
-			currentSessionGroup = &day.Cinema_room_3;
-		}
-		else if (currentSessionGroup && !line.empty() && iswdigit(line[0])) {
+		// Обработка количества сеансов
+		if (currentSessionGroup && iswdigit(line[0])) {
 			int sessionCount = 0;
 			try {
 				sessionCount = stoi(line);
@@ -360,42 +445,40 @@ void GenerationDay(Day& day, wstring filename, int rowCount, int placeCount) {
 			}
 
 			for (int i = 0; i < sessionCount; ++i) {
-				wstring timeRange, filmName, genre, duration;
+				Session session;
 
-				if (!getline(stream, timeRange) || timeRange.empty()) {
+				if (!getline(file, session.time_film) || session.time_film.empty()) {
 					wcerr << L"Ошибка: Некорректное или отсутствует время фильма." << endl;
 					return;
 				}
 
-				if (!getline(stream, filmName) || filmName.empty()) {
+				if (!getline(file, session.film_name) || session.film_name.empty()) {
 					wcerr << L"Ошибка: Некорректное или отсутствует название фильма." << endl;
 					return;
 				}
 
-				if (!getline(stream, genre) || genre.empty()) {
+				if (!getline(file, session.genre) || session.genre.empty()) {
 					wcerr << L"Ошибка: Некорректный или отсутствует жанр фильма." << endl;
 					return;
 				}
 
-				if (!getline(stream, duration) || duration.empty()) {
+				if (!getline(file, session.duration) || session.duration.empty()) {
 					wcerr << L"Ошибка: Некорректная или отсутствует продолжительность фильма." << endl;
 					return;
 				}
 
-				(*currentSessionGroup)[i].film_name = filmName;
-				(*currentSessionGroup)[i].time_film = timeRange;
-				(*currentSessionGroup)[i].genre = genre;
-				(*currentSessionGroup)[i].duration = duration;
+				cleanString(session.time_film);
+				cleanString(session.film_name);
+				cleanString(session.genre);
+				cleanString(session.duration);
 
-				GenerationRoom((*currentSessionGroup)[i], rowCount, placeCount, filmName, timeRange, genre, duration);
+				GenerationRoom(session, rowCount, placeCount, session.film_name, session.time_film, session.genre, session.duration);
+				(*currentSessionGroup)[i] = session;
 			}
-		}
-		else {
-			wcerr << L"Ошибка: Неизвестная строка в файле." << endl;
-			return;
 		}
 	}
 }
+
 
 
 void ClearScreen() {
@@ -422,7 +505,7 @@ void ClearScreen() {
 
 
 /// <summary>
-/// Очистка экрана с определённой позиции и доконца
+/// Очистка экрана с определённой позиции и до конца
 /// </summary>
 /// <param name="startX">Позиция Х</param>
 /// <param name="startY">Позиция Y</param>
@@ -514,6 +597,144 @@ bool correctInput(int& number) {
 	return true; // Успех
 }
 
+
+/// <summary>
+/// Функция фильтрует сеансы кинотеатра по запросу пользователя, предоставляя возможность 
+/// многократного использования фильтра через интерактивный интерфейс.
+/// </summary>
+/// <param name="trio_days">Ссылка на объект TrioDays, содержащий данные о сеансах за три дня.</param>
+/// <remarks>
+/// Пользователь вводит ключевое слово (например, часть названия фильма или жанра), 
+/// а функция ищет совпадения среди всех доступных сеансов. Результаты отображаются с указанием 
+/// дня, зала, времени, названия и других данных о сеансе.
+/// После каждой фильтрации пользователю предлагается возможность повторить поиск или завершить фильтрацию.
+/// </remarks>
+void filterSessions(const TrioDays& trio_days) {
+	bool repeatFiltering = true;
+
+	while (repeatFiltering) {
+		ClearScreen();
+		wcout << L"Введите ключевое слово для поиска (например, название фильма или жанр): ";
+		wstring query;
+		wcin.ignore();
+		getline(wcin, query);
+
+		if (query.empty()) {
+			wcout << L"Ошибка: ключевое слово не может быть пустым. Попробуйте снова.\n";
+			wcout << L"Нажмите Enter для продолжения...";
+			wcin.ignore();
+			continue;
+		}
+
+		// Преобразуем запрос в нижний регистр
+		locale loc("ru_RU.UTF-8");
+		transform(query.begin(), query.end(), query.begin(),
+			[&loc](wchar_t c) { return tolower(c, loc); });
+
+		vector<wstring> foundFilms;
+		vector<wstring> foundFilmNames;
+
+		// Перебираем все сеансы для поиска совпадений
+		for (size_t dayIndex = 0; dayIndex < trio_days.trio_days.size(); ++dayIndex) {
+			const Day& day = trio_days.trio_days[dayIndex];
+			vector<vector<Session>> allRooms = { day.Cinema_room_1, day.Cinema_room_2, day.Cinema_room_3 };
+
+			for (size_t roomIndex = 0; roomIndex < allRooms.size(); ++roomIndex) {
+				const vector<Session>& room = allRooms[roomIndex];
+				for (const auto& session : room) {
+					// Преобразуем название фильма и жанр в нижний регистр
+					wstring sessionFilmLower = session.film_name;
+					wstring sessionGenreLower = session.genre;
+					cleanString(sessionFilmLower);
+					cleanString(sessionGenreLower);
+					transform(sessionFilmLower.begin(), sessionFilmLower.end(), sessionFilmLower.begin(),
+						[&loc](wchar_t c) { return tolower(c, loc); });
+					transform(sessionGenreLower.begin(), sessionGenreLower.end(), sessionGenreLower.begin(),
+						[&loc](wchar_t c) { return tolower(c, loc); });
+
+					// Проверка на совпадения с запросом
+					if (sessionFilmLower.find(query) != wstring::npos || sessionGenreLower.find(query) != wstring::npos) {
+						foundFilms.push_back(L"День: " + to_wstring(dayIndex + 1) +
+							L", Зал: " + to_wstring(roomIndex + 1) +
+							L", Название: " + session.film_name +
+							L", Жанр: " + session.genre +
+							L", Время: " + session.time_film +
+							L", Продолжительность: " + session.duration);
+						foundFilmNames.push_back(session.film_name);  // Добавляем название фильма
+					}
+				}
+			}
+		}
+
+		// Если совпадения найдены, выводим все найденные фильмы
+		if (!foundFilms.empty()) {
+			wcout << L"Найдено совпадений:\n";
+			for (size_t i = 0; i < foundFilms.size(); ++i) {
+				wcout << L"[" << i + 1 << L"] " << foundFilms[i] << L"\n";
+			}
+
+			wcout << L"\nЧто вы хотите сделать дальше?\n";
+			wcout << L"1. Перейти к описанию найденного фильма\n";
+			wcout << L"2. Заново воспользоваться фильтром\n";
+			wcout << L"3. Вернуться в меню\n";
+			wcout << L"Введите ваш выбор (1-3): ";
+
+			int choice = -1;
+			while (choice != 1 && choice != 2 && choice != 3) {
+				wstring input;
+				getline(wcin, input);
+
+				// Проверка, является ли введенное число числом и находится ли оно в допустимом диапазоне
+				if (isNumber(input)) {
+					choice = std::stoi(input);  // Преобразуем строку в число
+					if (choice != 1 && choice != 2 && choice != 3) {
+						wcout << L"Некорректный выбор. Пожалуйста, выберите 1, 2 или 3.\n";
+					}
+				}
+				else {
+					wcout << L"Ошибка: необходимо ввести число. Пожалуйста, выберите 1, 2 или 3.\n";
+				}
+			}
+
+			switch (choice) {
+			case 1: {
+				// Пользователь выбрал перейти к описанию фильма
+				wcout << L"Введите номер фильма для получения описания: ";
+				int filmIndex = -1;
+				while (filmIndex < 1 || filmIndex > foundFilms.size()) {
+					wstring input;
+					getline(wcin, input);
+
+					// Проверка
+					if (isNumber(input)) {
+						filmIndex = std::stoi(input);
+						if (filmIndex < 1 || filmIndex > foundFilms.size()) {
+							wcout << L"Некорректный номер фильма. Введите число от 1 до " << foundFilms.size() << L".\n";
+						}
+					}
+					else {
+						wcout << L"Ошибка: необходимо ввести число. Пожалуйста, введите номер фильма от 1 до " << foundFilms.size() << L".\n";
+					}
+				}
+
+				// Вызываем функцию для отображения описания выбранного фильма
+				displayFilmDescription(foundFilmNames[filmIndex - 1]);
+				break;
+			}
+			case 2:
+				// Повторить фильтрацию
+				continue;
+			case 3:
+				// Вернуться в меню
+				repeatFiltering = false;
+				break;
+			}
+		}
+		else {
+			wcout << L"Совпадений не найдено.\n";
+		}
+	}
+}
 
 
 //авто выбор мест

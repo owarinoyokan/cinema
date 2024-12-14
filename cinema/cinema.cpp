@@ -1,5 +1,6 @@
 ﻿#include "Header.h"
 #include "game.h"
+#include "ClickTracking.h"
 
 #include <iostream>     // Для работы потока ввода и вывода
 #include <io.h>         // Для работы с _setmode 
@@ -25,74 +26,269 @@ void extranceToCinema(); // Функция входа в кино, предла�
 void availablePromo(); // Функция для просмотра доспупных акций
 void movieSelection(); // Функция выводяшая список фильмов с краткой информацией
 void detailedInform(); // Функция выводящая детали фильма
+void filterSessions(const TrioDays& trio_days); // Функция фильтра фильмов по названию или жанру
+void displayFilmDescription(const wstring& filmName); // Функция для отображения описания
 //void choosingPlace(); // меню выбора места
 wstring fileIn(const string& fname); // Функция для чтения файла с широкими символами
 void sessionSelection(int);
 int listFilmFromTheDay(int day, int filmNumber);
-
+void selectionDay(int day);
 
 void extranceToCinema() { // Функция входа в кино, предлагает самый первый выбор
-    short int input;
-    wcout << fileIn("6104.txt") << endl;
-    wcout << L"Что вы желаете сделать?" << endl;
-    wcout << L"Нажмите '1', чтобы выбрать фильм" << endl;
-    wcout << L"Нажмите '0', чтобы выйти" << endl;
-    wcin >> input;
+    short int input = 1;
+    ClearScreen();
+    wcout << fileIn("CINEWAVE.txt") << endl;
+    wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
+    wcout << L"Нажимайте на стелочки" << endl;
+    wcout << L"выбрать фильм <---" << endl;
+    wcout << L"выйти" << endl;
 
-    ClearScreen(); // Очистка консоли
-
-
-    switch (input) {
-    case 1:
-        movieSelection(); // Функция выводяшая список фильмов с краткой информацией
-        break;
-    case 0:
-        closeWindow();
-        break;
+    short int prevInput;
+    while (true) {
+        prevInput = input; // input_A - это пердыдущее значение input
+        tracingUD(input);
+        switch (input) {
+        case 200:
+            switch (prevInput) {
+            case 1:
+                movieSelection(); // Функция выводяшая список фильмов с краткой информацией
+                break;
+            case 0:
+                closeWindow();
+                break;
+            }
+            break;
+        case 1:
+            ClearScreen();
+            wcout << fileIn("6104.txt") << endl;
+            wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
+            wcout << L"Нажимайте на стелочки" << endl;
+            wcout << L"выбрать фильм <---" << endl;
+            wcout << L"выйти" << endl;
+            break;
+        case 0:
+            ClearScreen();
+            wcout << fileIn("6104.txt") << endl;
+            wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
+            wcout << L"Нажимайте на стелочки" << endl;
+            wcout << L"выбрать фильм" << endl;
+            wcout << L"выйти <---" << endl;
+            break;
+        default:
+            ClearScreen();
+            wcout << fileIn("6104.txt") << endl;
+            wcout << L"Введенно неверное значение" << endl;
+            wcout << L"Что вы желаете сделать?" << endl;
+            wcout << L"Нажимайте на стелочки" << endl;
+            wcout << L"выбрать фильм <---" << endl;
+            wcout << L"выйти" << endl;
+            input = 1;
+            break;
+        }
     }
 }
 
 void availablePromo() { // Функция для просмотра доспупных акций
-    short int input;
-    wcout << L"\n" << fileIn("Actions.txt") << endl; // Вывод файла
-    wcout << L"Список доступных акций ... " << endl;
-    wcout << L"Введите номер акции, чтобы посмотреть подробное описание" << endl;
-    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
-    wcout << L"Нажмите '1', чтобы испытать удачу в игре" << endl;
-    wcin >> input;
     ClearScreen();
-    if (input == 0)
-        movieSelection(); // Возврат назад (к предыдущей функции)
-    else if (input == 1) {
-        TheActionGame();
+    short int input = 1;
+    short int prevInput;
+    wcout << L"\n" << fileIn("Actions.txt") << endl; // Вывод файла
+    //wcout << L"Список доступных акций ... " << endl;
+    wcout << L"Список доступных акций ... " << endl;
+    wcout << L"Используйте стелочки, чтобы посмотреть подробное описание" << endl;
+    wcout << L"чтобы испытать удачу в игре <---" << endl;
+    wcout << L"чтобы вернуться назад" << endl;
+    //wcout << L"Введите номер акции, чтобы посмотреть подробное описание" << endl;
+    //wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
+    //wcout << L"Нажмите '1', чтобы испытать удачу в игре" << endl;
+    //wcin >> input;
+    //ClearScreen();
+    //if (input == 0)
+    //    movieSelection(); // Возврат назад (к предыдущей функции)
+    //else if (input == 1) {
+    //    TheActionGame();
+    //}
+    while (true) {
+        prevInput = input;
+        tracingUD(input);
+        switch (input) {
+        case 200:
+            switch (prevInput) {
+            case 0:
+                movieSelection(); // Возврат назад (к предыдущей функции)
+                break;
+            case 1:
+                TheActionGame();
+                break;
+            }
+            break;
+        case 1:
+            ClearScreen();
+            wcout << L"\n" << fileIn("Actions.txt") << endl;
+            wcout << L"Список доступных акций ... " << endl;
+            wcout << L"Используйте стелочки, чтобы посмотреть подробное описание" << endl;
+            wcout << L"чтобы испытать удачу в игре <---" << endl;
+            wcout << L"чтобы вернуться назад" << endl;
+            break;
+        case 0:
+            ClearScreen();
+            wcout << L"\n" << fileIn("Actions.txt") << endl;
+            wcout << L"Список доступных акций ... " << endl;
+            wcout << L"Используйте стелочки, чтобы посмотреть подробное описание" << endl;
+            wcout << L"чтобы испытать удачу в игре" << endl;
+            wcout << L"чтобы вернуться назад <---" << endl;
+            break;
+        default:
+            ClearScreen();
+            wcout << L"\n" << fileIn("Actions.txt") << endl;
+            wcout << L"Введенно неверное значение" << endl;
+            wcout << L"Список доступных акций ... " << endl;
+            wcout << L"Используйте стелочки, чтобы посмотреть подробное описание" << endl;
+            wcout << L"чтобы испытать удачу в игре <---" << endl;
+            wcout << L"чтобы вернуться назад" << endl;
+            input = 1;
+            break;
+        }
     }
 }
 
-void movieSelection() { // Функция выводяшая список фильмов с краткой информацией
+void displayFilmDescription(const wstring& filmName) {
+    map<wstring, string> filmDescriptions = {
+        {L"Шрек и болото багов", "Shrek.txt"},
+        {L"Унесённые сессией", "Gone with the session.txt"},
+        {L"Назад к компилятору", "Back to the compiler.txt"},
+        {L"А дедлайны здесь жесткие", "And deadlines are tight.txt"},
+        {L"Властелин лаб: возвращение сеньора", "Lord of the Lab.txt"},
+        {L"Титаник: крах программы", "Titanic.txt"},
+        {L"Дебаггер 2: Судный день компиляции", "Debagger 2.txt"},
+        {L"Гарри Кодер и C++", "Garry Coder.txt"},
+        {L"Матрица данных", "Matrix.txt"},
+        {L"Пятый алгоритм", "Fifth algorithm.txt"},
+        {L"Люди в Черных пикселях", "People in black pixels.txt"},
+        {L"Лабные Войны: Эпизод 5", "Lab Wars.txt"}
+    };
 
-    short int input;
-    wcout << L"\n" << fileIn("cinema_info.txt") << endl; // Вывод файла
-    wcout << L"Нажмите '1', чтобы выбрать сеанс" << endl;
-    wcout << L"Нажмите '2', чтобы посмотреть доступные акции" << endl;
-    wcout << L"Нажмите '3', чтобы использовать фильтр" << endl;
-    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
-    wcin >> input;
+    // Преобразуем введенное название фильма в нижний регистр
+    locale loc("ru_RU.UTF-8");
+    wstring formattedFilmName = filmName;
+    transform(formattedFilmName.begin(), formattedFilmName.end(), formattedFilmName.begin(),
+        [&loc](wchar_t c) { return tolower(c, loc); });
+    removeCarriageReturn(formattedFilmName); // Убираем лишние символы
+
+    bool found = false;
+
+    for (const auto& pair : filmDescriptions) {
+        // Преобразуем название фильма из map в нижний регистр
+        wstring filmInMap = pair.first;
+        transform(filmInMap.begin(), filmInMap.end(), filmInMap.begin(),
+            [&loc](wchar_t c) { return tolower(c, loc); });
+        removeCarriageReturn(filmInMap);
+
+        if (filmInMap == formattedFilmName) {
+            wcout << L"\nОписание фильма:\n";
+            wcout << fileIn(pair.second) << endl;
+            found = true;
+        }
+    }
+
+    if (!found)
+        wcout << L"Описание для выбранного фильма не найдено.\n";
+
+    // Пауза перед возвратом в меню
+    wcout << L"\nНажмите Enter, чтобы продолжить...";
+    wcin.ignore();
+    wcin.get();
+}
+
+// Вспомогательная функция фильтра
+void filterMenu() {
+    filterSessions(Days);
     ClearScreen();
-    switch (input) {
-    case 1:
-        //choosingPlace(); // выбор сеанса >> меню выбора места >> после выбора мест использовать функцию оплаты
+    movieSelection();
+}
 
-        sessionSelection(1);
-        break;
-    case 2:
-        availablePromo(); // Функция для просмотра доспупных акций
-        break;
-    case 3:
-        // место для функции фильтра
-        break;
-    case 0:
-        extranceToCinema(); // Возврат назад (к предыдущей функции)
-        break;
+void movieSelection() { // Функция выводяшая список фильмов с краткой информацией
+    ClearScreen();
+    short int input = 3;
+    wcout << L"\n" << fileIn("cinema_info.txt") << endl; // Вывод файла
+    wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
+    wcout << L"чтобы использовать фильтр <---" << endl;
+    wcout << L"чтобы посмотреть доступные акции" << endl;
+    wcout << L"чтобы выбрать сеанс" << endl;
+    wcout << L"чтобы вернуться назад" << endl;
+
+
+    short int prevInput;
+    while (true) {
+        prevInput = input;
+        tracingUD(input);
+        switch (input) {
+        case 200:
+            switch (prevInput) {
+            case 3:
+                // место для функции фильтра
+                filterMenu();
+                break;
+            case 2:
+                availablePromo(); // Функция для просмотра доспупных акций
+                break;
+            case 1:
+                //sessionSelection(1);
+                selectionDay(1);
+                break;
+            case 0:
+                extranceToCinema(); // Возврат назад (к предыдущей функции)
+                break;
+            }
+            break;
+        case 3:
+            ClearScreen();
+            wcout << L"\n" << fileIn("cinema_info.txt") << endl;
+            wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
+            wcout << L"чтобы использовать фильтр <---" << endl;
+            wcout << L"чтобы посмотреть доступные акции" << endl;
+            wcout << L"чтобы выбрать сеанс" << endl;
+            wcout << L"чтобы вернуться назад" << endl;
+            break;
+        case 2:
+            ClearScreen();
+            wcout << L"\n" << fileIn("cinema_info.txt") << endl;
+            wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
+            wcout << L"чтобы использовать фильтр" << endl;
+            wcout << L"чтобы посмотреть доступные акции <---" << endl;
+            wcout << L"чтобы выбрать сеанс" << endl;
+            wcout << L"чтобы вернуться назад" << endl;
+            break;
+        case 1:
+            ClearScreen();
+            wcout << L"\n" << fileIn("cinema_info.txt") << endl;
+            wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
+            wcout << L"чтобы использовать фильтр" << endl;
+            wcout << L"чтобы посмотреть доступные акции" << endl;
+            wcout << L"чтобы выбрать сеанс <---" << endl;
+            wcout << L"чтобы вернуться назад" << endl;
+            break;
+        case 0:
+            ClearScreen();
+            wcout << L"\n" << fileIn("cinema_info.txt") << endl;
+            wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
+            wcout << L"чтобы использовать фильтр" << endl;
+            wcout << L"чтобы посмотреть доступные акции" << endl;
+            wcout << L"чтобы выбрать сеанс" << endl;
+            wcout << L"чтобы вернуться назад <---" << endl;
+            break;
+        default:
+            ClearScreen();
+            wcout << L"\n" << fileIn("cinema_info.txt") << endl;
+            wcout << L"Введенно неверное значение" << endl;
+            wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
+            wcout << L"чтобы использовать фильтр <---" << endl;
+            wcout << L"чтобы посмотреть доступные акции" << endl;
+            wcout << L"чтобы выбрать сеанс" << endl;
+            wcout << L"чтобы вернуться назад" << endl;
+            input = 3;
+            break;
+        }
     }
 }
 
@@ -106,28 +302,66 @@ void detailedInform() { // Функция выводящая детали фил
     movieSelection(); // Возврат назад (к предыдущей функции)
 }
 
+void selectionDay(int day) {
+    ClearScreen();
+    short int prevInput, inp = 0;
+    wcout << L"\n" << fileIn("AllMovDay_1.txt") << endl;
+    wcout << L"Нажимайте на стрелочки <- ->, чтобы выбрать день. Нажмите SPACE, чтобы зафиксировать день" << endl;
+    while (true) {
+        prevInput = inp;
+        tracingLR(inp);
+        switch (inp) {
+        case 200:
+            sessionSelection(prevInput + 1);
+        case 2:
+            ClearScreen();
+            //wcout << L"День 3" << endl;
+            wcout << L"\n" << fileIn("AllMovDay_3.txt") << endl;
+            wcout << L"Нажимайте на стрелочки, чтобы выбрать день. Нажмите SPACE, чтобы зафиксировать день" << endl;
+            break;
+        case 1:
+            ClearScreen();
+            //wcout << L"День 2" << endl;
+            wcout << L"\n" << fileIn("AllMovDay_2.txt") << endl;
+            wcout << L"Нажимайте на стрелочки, чтобы выбрать день. Нажмите SPACE, чтобы зафиксировать день" << endl;
+            break;
+        case 0:
+            ClearScreen();
+            //wcout << L"День 1" << endl;
+            wcout << L"\n" << fileIn("AllMovDay_1.txt") << endl;
+            wcout << L"Нажимайте на стрелочки, чтобы выбрать день. Нажмите SPACE, чтобы зафиксировать день" << endl;
+            break;
+        default:
+            ClearScreen();
+            wcout << L"\n" << fileIn("AllMovDay_1.txt") << endl;
+            wcout << L"Введенно неверное значение" << endl;
+            wcout << L"Нажимайте на стрелочки, чтобы выбрать день. Нажмите SPACE, чтобы зафиксировать день" << endl;
+            inp = 0;
+            break;
+
+        }
+    }
+}
 
 void sessionSelection(int day) { // Выбор сеанса
     //wcout << L"\n" << fileIn("cimema_info.txt") << endl;
-    ClearScreen();
+    //ClearScreen();
+    //switch (day) { // изменение расписания в зависсимости от дня (сейчас ничего не меняется)
+    //case 1:
+    //    wcout << L"\n" << fileIn("AllMovDay_1.txt") << endl;
+    //    break;
+    //case 2:
+    //    wcout << L"\n" << fileIn("AllMovDay_2.txt") << endl;
+    //    break;
+    //case 3:
+    //    wcout << L"\n" << fileIn("AllMovDay_3.txt") << endl;
+    //    break;
+    //}
 
-
-    switch (day) { // изменение расписания в зависсимости от дня (сейчас ничего не меняется)
-    case 1:
-        wcout << L"\n" << fileIn("AllMovDay_1.txt") << endl;
-        break;
-    case 2:
-        wcout << L"\n" << fileIn("AllMovDay_2.txt") << endl;
-        break;
-    case 3:
-        wcout << L"\n" << fileIn("AllMovDay_3.txt") << endl;
-        break;
-    }
-
-    wcout << L"Выберите фильм который хотите посмотреть" << endl;
-    wcout << L"Введите 111 чтобы посмотреть расписание на 1 день" << endl;
-    wcout << L"Введите 222 чтобы посмотреть расписание на 2 день" << endl;
-    wcout << L"Введите 333 чтобы посмотреть расписание на 3 день" << endl;
+    //wcout << L"Выберите фильм который хотите посмотреть" << endl;
+    //wcout << L"Введите 111 чтобы посмотреть расписание на 1 день" << endl;
+    //wcout << L"Введите 222 чтобы посмотреть расписание на 2 день" << endl;
+    //wcout << L"Введите 333 чтобы посмотреть расписание на 3 день" << endl;
     //wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
     wcout << L"Введите номер сеанса, на который хотите пойти" << endl << endl;
     wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
@@ -135,7 +369,7 @@ void sessionSelection(int day) { // Выбор сеанса
 
     int input;
     while (true) {
-        
+
         if (correctInput(input) && ((day == 1 && input <= 12) || (day != 1 && input <= 11) || input == 0 || input == 111 || input == 222 || input == 333))
             break;
         wcout << L"Ошибка ввода попробуйте ещё раз\n";
@@ -221,20 +455,20 @@ void sessionSelection(int day) { // Выбор сеанса
      //}*/
 
 
-    // Создаем map для соответствия между номерами сеансов и именами файлов
-        map<int, string> sessionFiles = {
-            {1001, "Gone with the session.txt"},
-            {1002, "Shrek.txt"},
-            {1003, "Back to the compiler.txt"},
-            {1004, "And deadlines are tight.txt"},
-            {1005, "Lord of the Lab.txt"},
-            {1006, "Titanic.txt"},
-            {1007, "Debagger 2.txt"},
-            {1008, "Garry Coder.txt"},
-            {1009, "Matrix.txt"},
-            {1010, "Fifth algorithm.txt"},
-            {1011, "People in black pixels.txt"},
-            {1012, "Lab Wars.txt"}
+     // Создаем map для соответствия между номерами сеансов и именами файлов
+    map<int, string> sessionFiles = {
+        {1001, "Gone with the session.txt"},
+        {1002, "Shrek.txt"},
+        {1003, "Back to the compiler.txt"},
+        {1004, "And deadlines are tight.txt"},
+        {1005, "Lord of the Lab.txt"},
+        {1006, "Titanic.txt"},
+        {1007, "Debagger 2.txt"},
+        {1008, "Garry Coder.txt"},
+        {1009, "Matrix.txt"},
+        {1010, "Fifth algorithm.txt"},
+        {1011, "People in black pixels.txt"},
+        {1012, "Lab Wars.txt"}
     };
     /*map<int, vector<Session>> session_day = {
         {1001, "Gone with the session.txt"},
@@ -526,6 +760,7 @@ void generationTrioDays(TrioDays& trio)
 }
 
 void ConsoleMode() {
+
     // открытие консоли в полном экране
     fullScreen();
 
