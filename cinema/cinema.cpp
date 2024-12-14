@@ -26,7 +26,7 @@ wstring fileIn(const string& fname); // Функция для чтения фа�
 void sessionSelection(int);
 int listFilmFromTheDay(int day, int filmNumber);
 void filterSessions(const TrioDays& trio_days); // Функция фильтра фильмов по названию или жанру
-
+void displayFilmDescription(const wstring& filmName); // Функция для отображения описания
 void extranceToCinema() { // Функция входа в кино, предлагает самый первый выбор
     short int input;
     //wcout << L"\n" << fileIn(" file name ") << endl; // Вывод файла
@@ -58,12 +58,67 @@ void availablePromo() { // Функция для просмотра доспуп
     wcout << L"Введите номер акции, чтобы посмотреть подробное описание" << endl;
     wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
     wcin >> input;
-    ClearScreen();
+    ClearScreen();      
     if (input == 0)
         movieSelection(); // Возврат назад (к предыдущей функции)
     else {
         // место для функции выводящей подробную информацию про акции
     }
+}
+
+void displayFilmDescription(const wstring& filmName) {
+    map<wstring, string> filmDescriptions = {
+        {L"Шрек и болото багов", "Shrek.txt"},
+        {L"Унесённые сессией", "Gone with the session.txt"},
+        {L"Назад к компилятору", "Back to the compiler.txt"},
+        {L"А дедлайны здесь жесткие", "And deadlines are tight.txt"},
+        {L"Властелин лаб: возвращение сеньора", "Lord of the Lab.txt"},
+        {L"Титаник: крах программы", "Titanic.txt"},
+        {L"Дебаггер 2: Судный день компиляции", "Debagger 2.txt"},
+        {L"Гарри Кодер и C++", "Garry Coder.txt"},
+        {L"Матрица данных", "Matrix.txt"},
+        {L"Пятый алгоритм", "Fifth algorithm.txt"},
+        {L"Люди в Черных пикселях", "People in black pixels.txt"},
+        {L"Лабные Войны: Эпизод 5", "Lab Wars.txt"}
+    };
+
+    // Преобразуем введенное название фильма в нижний регистр
+    locale loc("ru_RU.UTF-8");
+    wstring formattedFilmName = filmName;
+    transform(formattedFilmName.begin(), formattedFilmName.end(), formattedFilmName.begin(),
+        [&loc](wchar_t c) { return tolower(c, loc); });
+    removeCarriageReturn(formattedFilmName); // Убираем лишние символы
+
+    bool found = false;
+
+    for (const auto& pair : filmDescriptions) {
+        // Преобразуем название фильма из map в нижний регистр
+        wstring filmInMap = pair.first;
+        transform(filmInMap.begin(), filmInMap.end(), filmInMap.begin(),
+            [&loc](wchar_t c) { return tolower(c, loc); });
+        removeCarriageReturn(filmInMap);
+
+        if (filmInMap == formattedFilmName) {
+            wcout << L"\nОписание фильма:\n";
+            wcout << fileIn(pair.second) << endl;
+            found = true;
+        }
+    }
+
+    if (!found)
+        wcout << L"Описание для выбранного фильма не найдено.\n";
+
+    // Пауза перед возвратом в меню
+    wcout << L"\nНажмите Enter, чтобы продолжить...";
+    wcin.ignore();
+    wcin.get();
+}
+
+// Вспомогательная функция фильтра
+void filterMenu() {
+    filterSessions(Days);
+    ClearScreen();
+    movieSelection();
 }
 
 void movieSelection() { // Функция выводяшая список фильмов с краткой информацией
@@ -135,7 +190,7 @@ void movieSelection() { // Функция выводяшая список фил
         //    break;
     case 3:
         // место для функции фильтра
-        filterSessions(Days);
+        filterMenu();
         break;
     case 0:
         extranceToCinema(); // Возврат назад (к предыдущей функции)
