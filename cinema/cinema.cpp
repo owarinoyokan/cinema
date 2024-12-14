@@ -1,6 +1,6 @@
 ﻿#include "Header.h"
 #include "game.h"
-#include "ClickTracking.h"
+#include "ClickTracking.h"  // навигация
 
 #include <iostream>     // Для работы потока ввода и вывода
 #include <io.h>         // Для работы с _setmode 
