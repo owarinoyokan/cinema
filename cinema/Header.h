@@ -984,7 +984,7 @@ void choosePaymentMethod(double totalAmount) {
 void choosingPlace(Session& session, int day) {
 	DrawSession(session, session.rows.size(), session.rows[0].seats.size());
 	setCursorPosition(0, y);
-	wcin.ignore();
+	FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
 	int choice;
 	int cnt_error_messeg = 0;
 	double totalCost = 0;
@@ -996,12 +996,12 @@ void choosingPlace(Session& session, int day) {
 	wcout << L"Выберите способ бронирования мест:\n";
 	wcout << L"1. Автоподбор мест\n";
 	wcout << L"2. Ручной выбор мест\n";
-	wcout << L"0 Вернуться назад\n";
+	wcout << L"0. Вернуться назад\n";
 	wcout << L"Введите ваш выбор: ";
 	while (true) {
 
 		if (cnt_error_messeg >= 3) {
-			ClearScreenFromPosition(18, 40);
+			ClearScreenFromPosition(19, 41);
 			cnt_error_messeg = 0;
 			continue;
 		}
@@ -1016,9 +1016,10 @@ void choosingPlace(Session& session, int day) {
 			continue;
 		}
 
-		if (choice == 0)
+		if (choice == 0)		{
 			ClearScreen();
 			selectionDay(day);
+		}
 
 		if (choice == 1) { // Автоподбор мест
 			int cnt_places, bookedRow;
