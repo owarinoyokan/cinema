@@ -1,6 +1,8 @@
 ﻿#ifndef HEADER_H
 #define HEADER_H
 
+#include "Mail.h"
+
 #include <windows.h>
 #include <vector>
 #include <iostream>
@@ -976,7 +978,7 @@ void choosePaymentMethod(double totalAmount) {
 		}
 		break;
 	}
-
+	SendingToMail();
 	wcout << L"Спасибо за ваш выбор! Транзакция завершена.\n";
 }
 

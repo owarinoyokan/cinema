@@ -134,6 +134,7 @@
     <ClInclude Include="ClickTracking.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="Header.h" />
+    <ClInclude Include="Mail.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
