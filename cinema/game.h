@@ -86,6 +86,7 @@ void PrintDiceFace(int number) {
 
 
 void TheActionGame() {
+    ClearScreen();
     srand(time(0));
 
     if (countMove == 3 || lucky == true) {

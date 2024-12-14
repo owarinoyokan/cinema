@@ -131,8 +131,12 @@
     <ClCompile Include="cinema.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ClickTracking.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="Header.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="6104.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
