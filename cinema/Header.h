@@ -784,34 +784,47 @@ bool aoutoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector
 }
 
 // Функция для вывода всех деталей билета
-void printTicketDetails(const vector<int>& bookedRows, const vector<int>& bookedPlaces, int cnt_places, double totalCost, const wstring& filmName, const wstring& filmTime, const wstring& genre, const wstring& duration) {
-	wcout << L"\n---------- Билет ----------\n";
-	wcout << L"Фильм:        " << filmName << L"\n";  // Печать названия фильма
-	wcout << L"Жанр:         " << genre << L"\n";  // Печать жанра фильма
-	wcout << L"Сеанс:        " << filmTime << L"\n";  // Печать времени сеанса
-	wcout << L"Продолжительность: " << duration << L"\n";
-	wcout << L"\n";
-	wcout << L"Забронированные места:\n";
-
-	int placesInRow = 0;  // Счётчик мест в строке
-
-	// Перебираем все забронированные места
-	for (size_t i = 0; i < bookedRows.size(); ++i) {
-		// Добавляем номер ряда и место
-		wcout << L"Ряд: " << bookedRows[i] + 1 << L", Место: " << bookedPlaces[i];
-		placesInRow++;  // Увеличиваем счётчик мест в текущей строке
-
-		// Если 4 места в строке, переходим на новую строку
-		if (placesInRow % 3 == 0 && i < bookedRows.size() - 1) {
-			wcout << L"\n------------------------------\n";
-		}
-		else if (i < bookedRows.size() - 1) {
-			wcout << L"   -  ";  // Разделяем места дефисом
+void printTicketDetails(const vector<int>& bookedRows, const vector<int>& bookedPlaces, int cnt_places, double totalTicketCost, const wstring& filmName, const wstring& filmTime, const wstring& genre, const wstring& duration) {
+	// Формируем строку для отображения мест и рядов
+	wstring places;
+	wstring rows;
+	for (size_t i = 0; i < bookedPlaces.size(); ++i) {
+		rows += to_wstring(bookedRows[i] + 1);
+		places += to_wstring(bookedPlaces[i] + 1);
+		if (i < bookedPlaces.size() - 1) {
+			rows += L", ";
+			places += L", ";
 		}
 	}
-	wcout << L"\nКоличество билетов: " << cnt_places << L"\n";
-	wcout << L"Общая стоимость: " << totalCost << L" рублей.\n";
+	// Красивый и объёмный формат без рамок
+	wcout << L"===========================================\n";
+	wcout << L"               ВАШ БИЛЕТ                   \n";
+	wcout << L"===========================================\n\n";
+
+	wcout << L" Кинотеатр:    Имени \"6104\"\n";
+	wcout << L" -----------------------------------------\n";
+	wcout << L" Фильм:        " << filmName << L"\n";
+	wcout << L" Жанр:         " << genre << L"\n";
+	wcout << L" Время:        " << filmTime << L"\n";
+	wcout << L" Длительность: " << duration << L"\n";
+	wcout << L" -----------------------------------------\n";
+
+	wcout << L" Ваши места: \n";
+	wcout << L" -----------------------------------------\n";
+	wcout << L" Ряды:        " << rows << L"\n";
+	wcout << L" Места:       " << places << L"\n";
+	wcout << L" -----------------------------------------\n";
+
+	wcout << L" Количество билетов: " << cnt_places << L"\n";
+	wcout << L" Итого к оплате:     " << totalTicketCost << L"₽\n";
+	wcout << L" -----------------------------------------\n";
+
+	wcout << L"===========================================\n";
+	wcout << L"       Спасибо за ваш выбор!              \n";
+	wcout << L"     Желаем приятного просмотра!         \n";
+	wcout << L"===========================================\n";
 }
+
 void displayMenuFromFile(const wstring& menuFile) {
 	wifstream file(menuFile, ios::binary);
 	if (!file.is_open()) {
@@ -842,17 +855,34 @@ bool correctInputQuantity(int& quantity) {
 		return false;  // Если не удается преобразовать или количество меньше 1, возвращаем false
 	}
 }
-void loadAndShowBuffetMenu(double& totalCost) {
+void loadAndShowBuffetMenu(double& totalBuffetCost) {
 	// Визуальная часть меню выводится из файла
 	displayMenuFromFile(L"menu.txt");
+	map<int, pair<wstring, double>> menuOptions = {
+		{1, {L"Вода (0.5 л)", 30.0}},
+		{2, {L"Газ. вода (0.5 л)", 35.0}},
+		{3, {L"Сок (0,5 л)", 50.0}},
+		{4, {L"Кола (0,5 л)", 60.0}},
+		{5, {L"Кофе (300 мл)", 100.0}},
+		{6, {L"Чай (300 мл)", 50.0}},
+		{7, {L"Малый попкорн", 150.0}},
+		{8, {L"Средний попкорн", 200.0}},
+		{9, {L"Большой попкорн", 250.0}},
+		{10, {L"Шоколадный батончик", 50.0}},
+		{11, {L"Мороженое стаканчик", 60.0}},
+		{12, {L"Тортик", 150.0}},
+		{13, {L"Орешки в шоколаде", 100.0}},
+		{14, {L"Хот-дог", 150.0}},
+		{15, {L"Бургер", 200.0}},
+		{16, {L"Начос с сыром", 200.0}},
+		{17, {L"Чипсы", 100.0}},
+		{18, {L"Попкорн (мал) + сок/кола", 180.0}},
+		{19, {L"Попкорн (сред) + сок/кола", 230.0}},
+		{20, {L"Хот-дог + сок/кола + чипсы", 280.0}}
+	};
 
 	// Заранее определенные пункты меню и их стоимость
-	map<int, double> menuOptions = {
-		{1, 30.0}, {2, 35.0}, {3, 50.0}, {4, 60.0}, {5, 100.0},
-		{6, 50.0}, {7, 150.0}, {8, 200.0}, {9, 250.0}, {10, 50.0},
-		{11, 60.0}, {12, 150.0}, {13, 100.0}, {14, 150.0}, {15, 200.0},
-		{16, 200.0}, {17, 100.0}, {18, 180.0}, {19, 230.0}, {20, 280.0}
-	};
+
 
 	// Логика обработки выбора пользователя
 	while (true) {
@@ -864,9 +894,7 @@ void loadAndShowBuffetMenu(double& totalCost) {
 		while (!correctInput(choice) || choice > 20) {
 			ClearScreenFromPosition(0, 49);
 			wcout << L"Некорректный ввод. Попробуйте снова.\n";
-
 		}
-
 
 		// Проверка на завершение выбора
 		if (choice == 0) {
@@ -884,14 +912,13 @@ void loadAndShowBuffetMenu(double& totalCost) {
 			while (!correctInput(quantity)) {
 				ClearScreenFromPosition(0, 50);
 				wcout << L"Некорректное количество. Попробуйте снова.\n";
-				wcin.clear();               // Очищаем флаг ошибки ввода// Игнорируем остаточные символы
+				wcin.clear();               // Очищаем флаг ошибки ввода
 			}
 
-
 			// Добавляем стоимость в общий заказ с учетом количества
-			totalCost += it->second * quantity;
+			totalBuffetCost += it->second.second * quantity;
 			ClearScreenFromPosition(0, 50);
-			wcout << L"Вы добавили " << quantity << L" шт. пункта " << choice << L" на сумму " << it->second * quantity << L" рублей.\n";
+			wcout << L"Вы добавили " << quantity << L" шт. '" << it->second.first << L"' на сумму " << it->second.second * quantity << L" рублей.\n";
 		}
 		else {
 			wcout << L"Некорректный выбор. Попробуйте снова.\n";
@@ -899,13 +926,15 @@ void loadAndShowBuffetMenu(double& totalCost) {
 	}
 }
 // Функция для выбора способа оплаты
-void choosePaymentMethod(double totalAmount) {
+void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBuffetCost) {
 	int paymentChoice;
 	wstring promoCode;
+	double summ = totalTicketCost + totalBuffetCost;
 	map<wstring, double> promoCodes = {
-		{L"DISCOUNT10", 0.10}, // Промокод на скидку 10%
-		{L"DISCOUNT20", 0.20}, // Промокод на скидку 20%
-		{L"FREESNACK", 0.15}   // Промокод на скидку 15%
+		{L"DIRECTOR80", 0.80}, // Промокод на скидку 80%
+		{L"LUCKY10", 0.10},    // Промокод из игры (10%)
+		{L"BIGGROUP25", 0.25}, // Промокод из игры (25% на 5 билетов)
+		{L"BEST35", 0.35}      // Промокод из игры (35% на 1 билет)
 	};
 
 	// Ввод промокода
@@ -919,11 +948,36 @@ void choosePaymentMethod(double totalAmount) {
 			// Проверка на корректность промокода
 			if (promoCodes.find(promoCode) != promoCodes.end()) {
 				double discount = promoCodes[promoCode];
-				double discountAmount = totalAmount * discount;
-				totalAmount -= discountAmount;
-				wcout << L"Промокод принят! Скидка: " << discountAmount << L" рублей.\n";
-				wcout << L"Итоговая сумма с учётом скидки: " << totalAmount << L" рублей.\n";
-				break;  // Выход из цикла, если промокод принят
+
+				if (promoCode == L"BIGGROUP25") {
+					// Проверка на количество билетов
+					if (cnt_places == 5) {
+						double discountAmount = totalTicketCost * discount;
+						totalTicketCost -= discountAmount;
+						wcout << L"Промокод BIGGROUP25 принят! Скидка: " << discountAmount << L" рублей.\n";
+						wcout << L"Итоговая сумма с учётом скидки: " << totalTicketCost + totalBuffetCost << L" рублей.\n";
+					}
+					else {
+						wcout << L"Промокод BIGGROUP25 применим только при покупке 5 билетов.\n";
+						continue;
+					}
+				}
+				else if (promoCode == L"BEST35") {
+					// Скидка на каждый билет
+					double discountAmountPerTicket = totalTicketCost * discount / cnt_places;
+					double totalDiscountAmount = discountAmountPerTicket * cnt_places;
+					totalTicketCost -= totalDiscountAmount;
+
+					wcout << L"Промокод BEST35 принят! Скидка на каждый билет: " << discountAmountPerTicket << L" рублей.\n";
+					wcout << L"Итоговая сумма с учётом скидки: " << totalTicketCost + totalBuffetCost << L" рублей.\n";
+				}
+				else {
+					double discountAmount = summ * discount;
+					summ -= discountAmount;
+					wcout << L"Промокод принят! Скидка: " << discountAmount << L" рублей.\n";
+					wcout << L"Итоговая сумма с учётом скидки: " << summ << L" рублей.\n";
+				}
+				break; // Выход из цикла, если промокод принят
 			}
 			else {
 				wcout << L"Некорректный промокод. Попробуйте снова.\n";
@@ -931,7 +985,7 @@ void choosePaymentMethod(double totalAmount) {
 		}
 		else {
 			wcout << L"Промокод не введён. Сумма без изменений.\n";
-			break;  // Выход из цикла, если промокод не введён
+			break; // Выход из цикла, если промокод не введён
 		}
 
 		// Запрос на повторный ввод
@@ -941,9 +995,9 @@ void choosePaymentMethod(double totalAmount) {
 		wcin.ignore(INT_MAX, L'\n'); // Очищаем оставшиеся символы после ввода
 		ClearScreenFromPosition(0, 12);
 
-		if (choice != L'yes' && choice != L'Yes') {
+		if (choice != L'y' && choice != L'Y') {
 			wcout << L"Применение промокода завершено. Сумма без изменений.\n";
-			break;  // Выход из цикла, если пользователь не хочет вводить промокод
+			break; // Выход из цикла, если пользователь не хочет вводить промокод
 		}
 	}
 
@@ -960,18 +1014,16 @@ void choosePaymentMethod(double totalAmount) {
 			wcout << L"Некорректный ввод. Попробуйте снова.\n";
 		}
 
-
 		// Если ввод корректный, очищаем сообщения об ошибке
-
 		switch (paymentChoice) {
 		case 1:
-			wcout << L"Вы выбрали оплату наличными. Общая сумма: " << totalAmount << L" рублей.\n";
+			wcout << L"Вы выбрали оплату наличными. Общая сумма: " << summ << L" рублей.\n";
 			break;
 		case 2:
-			wcout << L"Вы выбрали оплату картой. Общая сумма: " << totalAmount << L" рублей.\n";
+			wcout << L"Вы выбрали оплату картой. Общая сумма: " << summ << L" рублей.\n";
 			break;
 		case 3:
-			wcout << L"Вы выбрали оплату электронным кошельком. Общая сумма: " << totalAmount << L" рублей.\n";
+			wcout << L"Вы выбрали оплату электронным кошельком. Общая сумма: " << summ << L" рублей.\n";
 			break;
 		}
 		break;
@@ -980,6 +1032,7 @@ void choosePaymentMethod(double totalAmount) {
 	wcout << L"Спасибо за ваш выбор! Транзакция завершена.\n";
 }
 
+
 //выбор места
 void choosingPlace(Session& session, int day) {
 	DrawSession(session, session.rows.size(), session.rows[0].seats.size());
@@ -987,7 +1040,8 @@ void choosingPlace(Session& session, int day) {
 	wcin.ignore();
 	int choice;
 	int cnt_error_messeg = 0;
-	double totalCost = 0;
+	double totalTicketCost = 0;
+	double totalBuffetCost = 0;
 	// Выбор способа бронирования
 	//int max_free_row = session.max_count_free_places_in_one_row();
 	int all_free_places = session.cnt_free_places_in_session();
@@ -1044,7 +1098,7 @@ void choosingPlace(Session& session, int day) {
 					continue;
 				}
 
-				if (!aoutoChoosingPlace(session, cnt_places, bookedRow, bookedRows, bookedPlaces, totalCost)) {
+				if (!aoutoChoosingPlace(session, cnt_places, bookedRow, bookedRows, bookedPlaces, totalTicketCost)) {
 					wcout << L"К сожалению, не удалось найти " << cnt_places << L" свободных рядом мест.\n";
 					++cnt_error_messeg;
 					continue;
@@ -1056,11 +1110,11 @@ void choosingPlace(Session& session, int day) {
 				system("cls");
 
 				// Вывод всех деталей билета
-				loadAndShowBuffetMenu(totalCost);
+				loadAndShowBuffetMenu(totalBuffetCost);
 				Sleep(1000);  // Задержка в 2000 миллисекунд (2 секунды)
 				system("cls");
-				printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost, session.film_name, session.time_film, session.genre, session.duration);
-				choosePaymentMethod(totalCost);
+				printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalTicketCost, session.film_name, session.time_film, session.genre, session.duration);
+				choosePaymentMethod(totalTicketCost, cnt_places, totalBuffetCost);
 				break;
 			}
 			break;
@@ -1135,7 +1189,7 @@ void choosingPlace(Session& session, int day) {
 						DrawSession(session, session.rows.size(), session.rows[0].seats.size());
 						wcout << L"Место успешно забронировано.\n";
 						session.rows[row].seats[place].color = L"gray";
-						totalCost += session.rows[row].seats[place].cost;
+						totalTicketCost += session.rows[row].seats[place].cost;
 						bookedRows.push_back(row);
 						bookedPlaces.push_back(place);
 						break;
@@ -1143,11 +1197,11 @@ void choosingPlace(Session& session, int day) {
 				}
 				Sleep(1000);  // Задержка в 2000 миллисекунд (2 секунды)
 				system("cls");
-				loadAndShowBuffetMenu(totalCost);
+				loadAndShowBuffetMenu(totalBuffetCost);
 				Sleep(1000);
 				system("cls");
-				printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalCost, session.film_name, session.time_film, session.genre, session.duration);
-				choosePaymentMethod(totalCost);
+				printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalTicketCost, session.film_name, session.time_film, session.genre, session.duration);
+				choosePaymentMethod(totalTicketCost,cnt_places,totalBuffetCost);
 				break;
 			}
 			break;// завершение программы.
