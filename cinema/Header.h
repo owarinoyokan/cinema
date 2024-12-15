@@ -594,13 +594,20 @@ bool correctInput(int& number) {
 		return false; // Ввод не может быть пустым
 	}
 
+	// Проверка на несколько нулей
+	if (input.length() > 1 && input[0] == L'0') {
+		return false; // Неправильный ввод (несколько нулей)
+	}
+	if (input[0] == L'-') {
+		return false; // Нельзя вводить отрицательное число
+	}
 	// Создаем wstringstream для преобразования строки в число
 	wstringstream ss(input);
 	ss >> number; // Пробуем прочитать целое число из wstringstream
 
 	// Проверяем, успешно ли было преобразование
-	if (ss.fail() || !ss.eof()) { // Исправлено: добавлен оператор ||
-		return false; // Если преобразование не удалось или остались лишние символы
+	if (ss.fail() || !ss.eof()) { // Если преобразование не удалось или остались лишние символы
+		return false;
 	}
 	return true; // Успех
 }
@@ -933,19 +940,6 @@ void displayMenuFromFile(const wstring& menuFile) {
 
 	file.close();
 }
-
-bool correctInputQuantity(int& quantity) {
-	wstring input;
-	wcin >> input;
-
-	try {
-		quantity = stoi(input);  // Преобразуем введенную строку в количество
-		return quantity >= 1;  // Количество должно быть хотя бы 1
-	}
-	catch (...) {
-		return false;  // Если не удается преобразовать или количество меньше 1, возвращаем false
-	}
-}
 void loadAndShowBuffetMenu(double& totalBuffetCost) {
 	// Визуальная часть меню выводится из файла
 	displayMenuFromFile(L"menu.txt");
@@ -972,8 +966,6 @@ void loadAndShowBuffetMenu(double& totalBuffetCost) {
 		{20, {L"Хот-дог + сок/кола + чипсы", 280.0}}
 	};
 
-
-
 	// Логика обработки выбора пользователя
 	while (true) {
 		// Снова выводим меню
@@ -982,7 +974,7 @@ void loadAndShowBuffetMenu(double& totalBuffetCost) {
 
 		// Проверка на корректный ввод
 		while (!correctInput(choice) || choice > 20) {
-			ClearScreenFromPosition(0, 36);
+			ClearScreenFromPosition(0, 35);
 			wcout << L"Некорректный ввод. Попробуйте снова.\n";
 		}
 
@@ -992,6 +984,7 @@ void loadAndShowBuffetMenu(double& totalBuffetCost) {
 			return;
 		}
 
+
 		// Проверяем, что выбранный пункт существует
 		auto it = menuOptions.find(choice);
 		if (it != menuOptions.end()) {
@@ -1000,14 +993,14 @@ void loadAndShowBuffetMenu(double& totalBuffetCost) {
 
 			// Проверка на корректный ввод количества
 			while (!correctInput(quantity)) {
-				ClearScreenFromPosition(0, 36);
+				ClearScreenFromPosition(0, 37);
 				wcout << L"Некорректное количество. Попробуйте снова.\n";
 				wcin.clear();               // Очищаем флаг ошибки ввода
 			}
 
 			// Добавляем стоимость в общий заказ с учетом количества
 			totalBuffetCost += it->second.second * quantity;
-			ClearScreenFromPosition(0, 36);
+			ClearScreenFromPosition(0, 35);
 			wcout << L"Вы добавили " << quantity << L" шт. '" << it->second.first << L"' на сумму " << it->second.second * quantity << L" рублей.\n";
 		}
 		else {
@@ -1315,7 +1308,7 @@ void choosingPlace(Session& session, int day) {
 			cnt_error_messeg = 0;
 			continue;
 		}
-		
+
 
 		if (!correctInput(choice) || (choice != 1 && choice != 2 && choice != 0)) {
 			if (choice != 1 && choice != 2) {
