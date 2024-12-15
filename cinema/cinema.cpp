@@ -21,7 +21,7 @@ void extranceToCinema(); // Функция входа в кино, предла�
 void availablePromo(); // Функция для просмотра доспупных акций
 void movieSelection(); // Функция выводяшая список фильмов с краткой информацией
 void detailedInform(); // Функция выводящая детали фильма
-//void choosingPlace(); // меню выбора места
+void choosingPlace(); // меню выбора места
 wstring fileIn(const string& fname); // Функция для чтения файла с широкими символами
 void sessionSelection(int);
 int listFilmFromTheDay(int day, int filmNumber);

@@ -458,6 +458,7 @@ bool correctInput(int& number) {
 	return true; // Успех
 }
 
+void choosingPlace(Session& session, int day);
 /// <summary>
 /// Функция фильтрует сеансы кинотеатра по запросу пользователя, предоставляя возможность 
 /// многократного использования фильтра через интерактивный интерфейс.
@@ -470,31 +471,67 @@ bool correctInput(int& number) {
 /// После каждой фильтрации пользователю предлагается возможность повторить поиск или завершить фильтрацию.
 /// </remarks>
 void filterSessions(const TrioDays& trio_days) {
-	bool repeatFiltering = true;
+	bool repeatFiltering = true; // Флаг для управления повторением фильтрации
 
-	while (repeatFiltering) {
-		ClearScreen();
-		wcout << L"Введите ключевое слово для поиска (например, название фильма или жанр): ";
-		wstring query;
-		wcin.ignore();
-		getline(wcin, query);
+	while (repeatFiltering) { // Цикл для многократного использования фильтра
+		ClearScreen(); // Очистка экрана перед началом нового ввода
 
-		if (query.empty()) {
-			wcout << L"Ошибка: ключевое слово не может быть пустым. Попробуйте снова.\n";
-			wcout << L"Нажмите Enter для продолжения...";
-			wcin.ignore();
+		// Меню фильтрации
+		wcout << L"╔═════════════════════════════════════╗\n";
+		wcout << L"║          Фильтр фильмов             ║\n";
+		wcout << L"╠═════════════════════════════════════╣\n";
+		wcout << L"║  Поиск: _________________________   ║\n";
+		wcout << L"║                                     ║\n";
+		wcout << L"║  Доступно:                          ║\n";
+		wcout << L"║  1. Поиск по ЖАНРУ                  ║\n";
+		wcout << L"║  2. Поиск по НАЗВАНИЮ               ║\n";
+		wcout << L"║                                     ║\n";
+		wcout << L"╚═════════════════════════════════════╝\n";
+
+		wcout << L"Ваш выбор: ";
+		int searchOption;
+		while (true) {
+			wstring input;
+			getline(wcin, input);
+			try {
+				searchOption = stoi(input); // Преобразуем строку в целое число
+				if (searchOption == 0 || searchOption == 1 || searchOption == 2) break; // Разрешаем только 0, 1, 2
+				wcout << L"Некорректный выбор. Пожалуйста, выберите 1 или 2.\n";
+			}
+			catch (const invalid_argument&) {
+				wcout << L"Ошибка: введите число.\n";
+			}
+			catch (const out_of_range&) {
+				wcout << L"Ошибка: число слишком большое.\n";
+			}
+		}
+
+		// Если пользователь выбрал 0, выходим из цикла
+		if (searchOption == 0) {
+			repeatFiltering = false;
 			continue;
 		}
 
-		// Преобразуем запрос в нижний регистр
+		wcout << L"Введите ключевое слово для поиска (например, название фильма или жанр): ";
+		wstring query;
+		while (true) {
+			getline(wcin, query);
+			if (query.empty()) {
+				wcout << L"Ошибка: ключевое слово не может быть пустым. Попробуйте снова.\n";
+				continue;
+			}
+			break;
+		}
+
+		// Преобразование запроса в нижний регистр
 		locale loc("ru_RU.UTF-8");
 		transform(query.begin(), query.end(), query.begin(),
 			[&loc](wchar_t c) { return tolower(c, loc); });
 
 		vector<wstring> foundFilms;
-		vector<wstring> foundFilmNames;
+		vector<Session> sessionsFound; // Храним найденные сеансы для выбора мест
 
-		// Перебираем все сеансы для поиска совпадений
+		// Поиск совпадений
 		for (size_t dayIndex = 0; dayIndex < trio_days.trio_days.size(); ++dayIndex) {
 			const Day& day = trio_days.trio_days[dayIndex];
 			vector<vector<Session>> allRooms = { day.Cinema_room_1, day.Cinema_room_2, day.Cinema_room_3 };
@@ -512,7 +549,7 @@ void filterSessions(const TrioDays& trio_days) {
 					transform(sessionGenreLower.begin(), sessionGenreLower.end(), sessionGenreLower.begin(),
 						[&loc](wchar_t c) { return tolower(c, loc); });
 
-					// Проверка на совпадения с запросом
+					// Проверка на совпадения
 					if (sessionFilmLower.find(query) != wstring::npos || sessionGenreLower.find(query) != wstring::npos) {
 						foundFilms.push_back(L"День: " + to_wstring(dayIndex + 1) +
 							L", Зал: " + to_wstring(roomIndex + 1) +
@@ -520,73 +557,97 @@ void filterSessions(const TrioDays& trio_days) {
 							L", Жанр: " + session.genre +
 							L", Время: " + session.time_film +
 							L", Продолжительность: " + session.duration);
-						foundFilmNames.push_back(session.film_name);  // Добавляем название фильма
+						sessionsFound.push_back(session); // Сохраняем сеанс для последующего выбора
 					}
 				}
 			}
 		}
 
-		// Если совпадения найдены, выводим все найденные фильмы
 		if (!foundFilms.empty()) {
-			wcout << L"Найдено совпадений:\n";
+			wcout << L"╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\n";
+			wcout << L"║         СПИСОК ПОДОБРАННЫХ ФИЛЬМОВ                                                                                                                                                       ║\n";
+			wcout << L"╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n";
 			for (size_t i = 0; i < foundFilms.size(); ++i) {
-				wcout << L"[" << i + 1 << L"] " << foundFilms[i] << L"\n";
+				wcout << L"║ [" << (i + 1) << L"] " << foundFilms[i] << L"\n";
 			}
+			wcout << L"╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\n";
 
+			// Меню выбора действия
 			wcout << L"\nЧто вы хотите сделать дальше?\n";
 			wcout << L"1. Перейти к описанию найденного фильма\n";
-			wcout << L"2. Заново воспользоваться фильтром\n";
-			wcout << L"3. Вернуться в меню\n";
-			wcout << L"Введите ваш выбор (1-3): ";
+			wcout << L"2. Перейти к выбору мест для сеанса\n";
+			wcout << L"3. Заново воспользоваться фильтром\n";
+			wcout << L"4. Вернуться в меню\n";
+			wcout << L"Введите ваш выбор (1-4): ";
 
 			int choice = -1;
-			while (choice != 1 && choice != 2 && choice != 3) {
+			while (choice < 1 || choice > 4) {
 				wstring input;
 				getline(wcin, input);
-
-				// Проверка, является ли введенное число числом и находится ли оно в допустимом диапазоне
-				if (isNumber(input)) {
-					choice = std::stoi(input);  // Преобразуем строку в число
-					if (choice != 1 && choice != 2 && choice != 3) {
-						wcout << L"Некорректный выбор. Пожалуйста, выберите 1, 2 или 3.\n";
+				try {
+					choice = stoi(input);
+					if (choice < 1 || choice > 4) {
+						wcout << L"Некорректный выбор. Пожалуйста, выберите 1, 2, 3 или 4.\n";
 					}
 				}
-				else {
-					wcout << L"Ошибка: необходимо ввести число. Пожалуйста, выберите 1, 2 или 3.\n";
+				catch (const invalid_argument&) {
+					wcout << L"Ошибка: введите число.\n";
+				}
+				catch (const out_of_range&) {
+					wcout << L"Ошибка: число слишком большое.\n";
 				}
 			}
 
 			switch (choice) {
 			case 1: {
-				// Пользователь выбрал перейти к описанию фильма
 				wcout << L"Введите номер фильма для получения описания: ";
 				int filmIndex = -1;
 				while (filmIndex < 1 || filmIndex > foundFilms.size()) {
 					wstring input;
 					getline(wcin, input);
-
-					// Проверка
-					if (isNumber(input)) {
-						filmIndex = std::stoi(input);
+					try {
+						filmIndex = stoi(input);
 						if (filmIndex < 1 || filmIndex > foundFilms.size()) {
 							wcout << L"Некорректный номер фильма. Введите число от 1 до " << foundFilms.size() << L".\n";
 						}
 					}
-					else {
-						wcout << L"Ошибка: необходимо ввести число. Пожалуйста, введите номер фильма от 1 до " << foundFilms.size() << L".\n";
+					catch (const invalid_argument&) {
+						wcout << L"Ошибка: введите число.\n";
+					}
+					catch (const out_of_range&) {
+						wcout << L"Ошибка: число слишком большое.\n";
 					}
 				}
-
-				// Вызываем функцию для отображения описания выбранного фильма
-				displayFilmDescription(foundFilmNames[filmIndex - 1]);
+				displayFilmDescription(sessionsFound[filmIndex - 1].film_name);
 				break;
 			}
-			case 2:
-				// Повторить фильтрацию
-				continue;
+			case 2: { // Переход к выбору мест
+				wcout << L"Введите номер сеанса для выбора мест: ";
+				int filmIndex = -1;
+				while (filmIndex < 1 || filmIndex > sessionsFound.size()) {
+					wstring input;
+					getline(wcin, input);
+					try {
+						filmIndex = stoi(input);
+						if (filmIndex < 1 || filmIndex > sessionsFound.size()) {
+							wcout << L"Некорректный номер сеанса. Введите число от 1 до " << sessionsFound.size() << L".\n";
+						}
+					}
+					catch (const invalid_argument&) {
+						wcout << L"Ошибка: введите число.\n";
+					}
+					catch (const out_of_range&) {
+						wcout << L"Ошибка: число слишком большое.\n";
+					}
+				}
+				ClearScreen();
+				choosingPlace(sessionsFound[filmIndex - 1], 0); // Передача выбранного сеанса и дня (заменить 0 на нужный день)
+				break;
+			}
 			case 3:
-				// Вернуться в меню
-				repeatFiltering = false;
+				continue; // Повторить фильтрацию
+			case 4:
+				repeatFiltering = false; // Выход из фильтра
 				break;
 			}
 		}
