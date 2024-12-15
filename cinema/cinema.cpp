@@ -61,7 +61,7 @@ void extranceToCinema() { // Функция входа в кино, предла
             break;
         case 1:
             ClearScreen();
-            wcout << fileIn("6104.txt") << endl;
+            wcout << fileIn("CINEWAVE.txt") << endl;
             wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
             wcout << L"Нажимайте на стелочки" << endl;
             wcout << L"выбрать фильм <---" << endl;
@@ -69,7 +69,7 @@ void extranceToCinema() { // Функция входа в кино, предла
             break;
         case 0:
             ClearScreen();
-            wcout << fileIn("6104.txt") << endl;
+            wcout << fileIn("CINEWAVE.txt") << endl;
             wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
             wcout << L"Нажимайте на стелочки" << endl;
             wcout << L"выбрать фильм" << endl;
@@ -77,7 +77,7 @@ void extranceToCinema() { // Функция входа в кино, предла
             break;
         default:
             ClearScreen();
-            wcout << fileIn("6104.txt") << endl;
+            wcout << fileIn("CINEWAVE.txt") << endl;
             wcout << L"Введенно неверное значение" << endl;
             wcout << L"Что вы желаете сделать?" << endl;
             wcout << L"Нажимайте на стелочки" << endl;
