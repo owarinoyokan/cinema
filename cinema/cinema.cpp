@@ -27,7 +27,7 @@ void extranceToCinema(); // Функция входа в кино, предла�
 void availablePromo(); // Функция для просмотра доспупных акций
 void movieSelection(); // Функция выводяшая список фильмов с краткой информацией
 void detailedInform(); // Функция выводящая детали фильма
-void filterSessions(const TrioDays& trio_days); // Функция фильтра фильмов по названию или жанру
+void filterSessions( TrioDays& trio_days); // Функция фильтра фильмов по названию или жанру
 void displayFilmDescription(const wstring& filmName); // Функция для отображения описания
 //void choosingPlace(); // меню выбора места
 wstring fileIn(const string& fname); // Функция для чтения файла с широкими символами
@@ -38,6 +38,7 @@ void selectionDay(int day);
 
 void extranceToCinema() { // Функция входа в кино, предлагает самый первый выбор
     short int input = 1;
+    ::Days;
     ClearScreen();
     wcout << fileIn("CINEWAVE.txt") << endl;
     wcout << L"Что вы желаете сделать? Для выбора нажмите SPACE" << endl;
@@ -177,6 +178,7 @@ void displayFilmDescription(const wstring& filmName) {
     if (it != filmDescriptions.end()) {
         // Передаём день недели и ID фильма
         int day = 1; // По умолчанию используем первый день (или запрашиваем его отдельно)
+        ClearScreen();
         returnSessions(day, it->second);
     }
     else {
@@ -240,6 +242,7 @@ void filterMenu() {
 }
 
 void movieSelection() { // Функция выводяшая список фильмов с краткой информацией
+    ::Days;
     ClearScreen();
     short int input = 3;
     wcout << L"\n" << fileIn("cinema_info.txt") << endl; // Вывод файла
@@ -340,6 +343,7 @@ void detailedInform() { // Функция выводящая детали фил
 }
 
 void selectionDay(int day) {
+    ::Days;
     short int prevInput, inp = 0;
     wcout << L"\n" << fileIn("AllMovDay_1.txt") << endl;
     wcout << L"Нажимайте на стрелочки <- ->, чтобы выбрать день. Нажмите SPACE, чтобы зафиксировать день" << endl;
@@ -382,6 +386,7 @@ void selectionDay(int day) {
 
 void returnSessions(int day, int input)
 {
+    ::Days;
     // Создаем map для соответствия между номерами сеансов и именами файлов
     map<int, string> sessionFiles = {
         {1001, "Gone with the session.txt"},
@@ -398,78 +403,78 @@ void returnSessions(int day, int input)
         {1012, "Lab Wars.txt"}
     };
 
-    vector<Session> sessions_film; //сеансы выбранного фильма 
+    std::vector<std::reference_wrapper<Session>> sessions_film; // сеансы выбранного фильма
 
     switch (input) {
     case 1001:
-        sessions_film.resize(2);
-        sessions_film[0] = Days.trio_days[0].Cinema_room_2[1];
-        sessions_film[1] = Days.trio_days[1].Cinema_room_3[1];
+        sessions_film.clear();
+        sessions_film.push_back(::Days.trio_days[0].Cinema_room_2[1]);
+        sessions_film.push_back(::Days.trio_days[1].Cinema_room_3[1]);
         break;
     case 1002:
-        sessions_film.resize(3);
-        sessions_film[0] = Days.trio_days[0].Cinema_room_1[0];
-        sessions_film[1] = Days.trio_days[1].Cinema_room_2[0];
-        sessions_film[2] = Days.trio_days[2].Cinema_room_2[1];
+        sessions_film.clear();
+        sessions_film.push_back(::Days.trio_days[0].Cinema_room_1[0]);
+        sessions_film.push_back(::Days.trio_days[1].Cinema_room_2[0]);
+        sessions_film.push_back(::Days.trio_days[2].Cinema_room_2[1]);
         break;
     case 1003:
-        sessions_film.resize(2);
-        sessions_film[0] = Days.trio_days[1].Cinema_room_2[1];
-        sessions_film[1] = Days.trio_days[2].Cinema_room_1[2];
+        sessions_film.clear();
+        sessions_film.push_back(::Days.trio_days[1].Cinema_room_2[1]);
+        sessions_film.push_back(::Days.trio_days[2].Cinema_room_1[2]);
         break;
     case 1004:
-        sessions_film.resize(3);
-        sessions_film[0] = Days.trio_days[0].Cinema_room_3[3];
-        sessions_film[1] = Days.trio_days[1].Cinema_room_1[2];
-        sessions_film[2] = Days.trio_days[2].Cinema_room_1[2];
+        sessions_film.clear();
+        sessions_film.push_back(::Days.trio_days[0].Cinema_room_3[3]);
+        sessions_film.push_back(::Days.trio_days[1].Cinema_room_1[2]);
+        sessions_film.push_back(::Days.trio_days[2].Cinema_room_1[2]);
         break;
     case 1005:
-        sessions_film.resize(4);
-        sessions_film[0] = Days.trio_days[0].Cinema_room_1[2];
-        sessions_film[1] = Days.trio_days[0].Cinema_room_2[3];
-        sessions_film[2] = Days.trio_days[1].Cinema_room_1[3];
-        sessions_film[3] = Days.trio_days[2].Cinema_room_3[2];
+        sessions_film.clear();
+        sessions_film.push_back(::Days.trio_days[0].Cinema_room_1[2]);
+        sessions_film.push_back(::Days.trio_days[0].Cinema_room_2[3]);
+        sessions_film.push_back(::Days.trio_days[1].Cinema_room_1[3]);
+        sessions_film.push_back(::Days.trio_days[2].Cinema_room_3[2]);
         break;
     case 1006:
-        sessions_film.resize(3);
-        sessions_film[0] = Days.trio_days[0].Cinema_room_2[2];
-        sessions_film[1] = Days.trio_days[1].Cinema_room_1[1];
-        sessions_film[2] = Days.trio_days[2].Cinema_room_2[2];
+        sessions_film.clear();
+        sessions_film.push_back(::Days.trio_days[0].Cinema_room_2[2]);
+        sessions_film.push_back(::Days.trio_days[1].Cinema_room_1[1]);
+        sessions_film.push_back(::Days.trio_days[2].Cinema_room_2[2]);
         break;
     case 1007:
-        sessions_film.resize(3);
-        sessions_film[0] = Days.trio_days[0].Cinema_room_1[1];
-        sessions_film[1] = Days.trio_days[1].Cinema_room_2[2];
-        sessions_film[2] = Days.trio_days[2].Cinema_room_2[0];
+        sessions_film.clear();
+        sessions_film.push_back(::Days.trio_days[0].Cinema_room_1[1]);
+        sessions_film.push_back(::Days.trio_days[1].Cinema_room_2[2]);
+        sessions_film.push_back(::Days.trio_days[2].Cinema_room_2[0]);
         break;
     case 1008:
-        sessions_film.resize(4);
-        sessions_film[0] = Days.trio_days[0].Cinema_room_1[3];
-        sessions_film[1] = Days.trio_days[1].Cinema_room_3[2];
-        sessions_film[2] = Days.trio_days[2].Cinema_room_2[3];
-        sessions_film[3] = Days.trio_days[2].Cinema_room_3[1];
+        sessions_film.clear();
+        sessions_film.push_back(::Days.trio_days[0].Cinema_room_1[3]);
+        sessions_film.push_back(::Days.trio_days[1].Cinema_room_3[2]);
+        sessions_film.push_back(::Days.trio_days[2].Cinema_room_2[3]);
+        sessions_film.push_back(::Days.trio_days[2].Cinema_room_3[1]);
         break;
     case 1009:
-        sessions_film.resize(3);
-        sessions_film[0] = Days.trio_days[0].Cinema_room_2[0];
-        sessions_film[1] = Days.trio_days[0].Cinema_room_3[2];
-        sessions_film[2] = Days.trio_days[1].Cinema_room_3[0];
+        sessions_film.clear();
+        sessions_film.push_back(::Days.trio_days[0].Cinema_room_2[0]);
+        sessions_film.push_back(::Days.trio_days[0].Cinema_room_3[2]);
+        sessions_film.push_back(::Days.trio_days[1].Cinema_room_3[0]);
         break;
     case 1010:
-        sessions_film.resize(2);
-        sessions_film[0] = Days.trio_days[0].Cinema_room_3[0];
-        sessions_film[1] = Days.trio_days[1].Cinema_room_1[0];
+        sessions_film.clear();
+        sessions_film.push_back(::Days.trio_days[0].Cinema_room_3[0]);
+        sessions_film.push_back(::Days.trio_days[1].Cinema_room_1[0]);
         break;
     case 1011:
-        sessions_film.resize(3);
-        sessions_film[0] = Days.trio_days[0].Cinema_room_3[1];
-        sessions_film[1] = Days.trio_days[2].Cinema_room_1[0];
-        sessions_film[2] = Days.trio_days[2].Cinema_room_3[0];
+        sessions_film.clear();
+        sessions_film.push_back(::Days.trio_days[0].Cinema_room_3[1]);
+        sessions_film.push_back(::Days.trio_days[2].Cinema_room_1[0]);
+        sessions_film.push_back(::Days.trio_days[2].Cinema_room_3[0]);
         break;
     case 1012:
-        sessions_film.resize(2);
-        sessions_film[0] = Days.trio_days[1].Cinema_room_3[3];
-        sessions_film[1] = Days.trio_days[2].Cinema_room_1[3];
+        sessions_film.clear();
+        sessions_film.push_back(::Days.trio_days[1].Cinema_room_3[3]);
+        sessions_film.push_back(::Days.trio_days[2].Cinema_room_1[3]);
         break;
     }
 
@@ -483,7 +488,6 @@ void returnSessions(int day, int input)
         wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
         int input_2;
         while (!correctInput(input_2)) {
-            //ClearScreenFromPosition(0, 34);
             wcout << L"Некорректный ввод. Попробуйте снова.\n";
             ClearScreenFromPosition(0, 35);
         }
@@ -503,18 +507,24 @@ void returnSessions(int day, int input)
 }
 
 void sessionSelection(int day) { // Выбор сеанса
+    ::Days;
     wcout << L"Введите номер сеанса, на который хотите пойти" << endl << endl;
     wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
     //wcin >> input;
+    int cnt_error_messege = 0;
 
     int input;
     while (true) {
+        if (cnt_error_messege > 0) {
+            cnt_error_messege = 0;
+            ClearScreenFromPosition(0, 43);
+        }
         FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
-        if (correctInput(input) && ((day == 1 && input <= 12) || (day != 1 && input <= 11) || (input == 0)))
+        if (correctInput(input) && ((day == 1 && input <= 12) || (day != 1 && input <= 11) || input == 0 || input == 111 || input == 222 || input == 333))
             break;
         wcout << L"Ошибка ввода попробуйте ещё раз\n";
+        ++cnt_error_messege;
     }
-
     ClearScreen();
     if (input == 0) {
         movieSelection();
@@ -539,124 +549,7 @@ void sessionSelection(int day) { // Выбор сеанса
     }
     input = listFilmFromTheDay(day, input); // возвращаяем номер фильма зная день и его номер в расписании дня
     returnSessions(day, input);
-    //input = listFilmFromTheDay(day, input); // возвращаяем номер фильма зная день и его номер в расписании дня
-
-    //
-
-
-    // // Создаем map для соответствия между номерами сеансов и именами файлов
-    //map<int, string> sessionFiles = {
-    //    {1001, "Gone with the session.txt"},
-    //    {1002, "Shrek.txt"},
-    //    {1003, "Back to the compiler.txt"},
-    //    {1004, "And deadlines are tight.txt"},
-    //    {1005, "Lord of the Lab.txt"},
-    //    {1006, "Titanic.txt"},
-    //    {1007, "Debagger 2.txt"},
-    //    {1008, "Garry Coder.txt"},
-    //    {1009, "Matrix.txt"},
-    //    {1010, "Fifth algorithm.txt"},
-    //    {1011, "People in black pixels.txt"},
-    //    {1012, "Lab Wars.txt"}
-    //};
-    //
-    //vector<Session> sessions_film; //сеансы выбранного фильма 
-
-    //switch (input) {
-    //case 1001:
-    //    sessions_film.resize(2);
-    //    sessions_film[0] = Days.trio_days[0].Cinema_room_2[1];
-    //    sessions_film[1] = Days.trio_days[1].Cinema_room_3[1];
-    //    break;
-    //case 1002:
-    //    sessions_film.resize(3);
-    //    sessions_film[0] = Days.trio_days[0].Cinema_room_1[0];
-    //    sessions_film[1] = Days.trio_days[1].Cinema_room_2[0];
-    //    sessions_film[2] = Days.trio_days[2].Cinema_room_2[1];
-    //    break;
-    //case 1003:
-    //    sessions_film.resize(2);
-    //    sessions_film[0] = Days.trio_days[1].Cinema_room_2[1];
-    //    sessions_film[1] = Days.trio_days[2].Cinema_room_1[2];
-    //    break;
-    //case 1004:
-    //    sessions_film.resize(3);
-    //    sessions_film[0] = Days.trio_days[0].Cinema_room_3[3];
-    //    sessions_film[1] = Days.trio_days[1].Cinema_room_1[2];
-    //    sessions_film[2] = Days.trio_days[2].Cinema_room_1[2];
-    //    break;
-    //case 1005:
-    //    sessions_film.resize(4);
-    //    sessions_film[0] = Days.trio_days[0].Cinema_room_1[2];
-    //    sessions_film[1] = Days.trio_days[0].Cinema_room_2[3];
-    //    sessions_film[2] = Days.trio_days[1].Cinema_room_1[3];
-    //    sessions_film[3] = Days.trio_days[2].Cinema_room_3[2];
-    //    break;
-    //case 1006:
-    //    sessions_film.resize(3);
-    //    sessions_film[0] = Days.trio_days[0].Cinema_room_2[2];
-    //    sessions_film[1] = Days.trio_days[1].Cinema_room_1[1];
-    //    sessions_film[2] = Days.trio_days[2].Cinema_room_2[2];
-    //    break;
-    //case 1007:
-    //    sessions_film.resize(3);
-    //    sessions_film[0] = Days.trio_days[0].Cinema_room_1[1];
-    //    sessions_film[1] = Days.trio_days[1].Cinema_room_2[2];
-    //    sessions_film[2] = Days.trio_days[2].Cinema_room_2[0];
-    //    break;
-    //case 1008:
-    //    sessions_film.resize(4);
-    //    sessions_film[0] = Days.trio_days[0].Cinema_room_1[3];
-    //    sessions_film[1] = Days.trio_days[1].Cinema_room_3[2];
-    //    sessions_film[2] = Days.trio_days[2].Cinema_room_2[3];
-    //    sessions_film[3] = Days.trio_days[2].Cinema_room_3[1];
-    //    break;
-    //case 1009:
-    //    sessions_film.resize(3);
-    //    sessions_film[0] = Days.trio_days[0].Cinema_room_2[0];
-    //    sessions_film[1] = Days.trio_days[0].Cinema_room_3[2];
-    //    sessions_film[2] = Days.trio_days[1].Cinema_room_3[0];
-    //    break;
-    //case 1010:
-    //    sessions_film.resize(2);
-    //    sessions_film[0] = Days.trio_days[0].Cinema_room_3[0];
-    //    sessions_film[1] = Days.trio_days[1].Cinema_room_1[0];
-    //    break;
-    //case 1011:
-    //    sessions_film.resize(3);
-    //    sessions_film[0] = Days.trio_days[0].Cinema_room_3[1];
-    //    sessions_film[1] = Days.trio_days[2].Cinema_room_1[0];
-    //    sessions_film[2] = Days.trio_days[2].Cinema_room_3[0];
-    //    break;
-    //case 1012:
-    //    sessions_film.resize(2);
-    //    sessions_film[0] = Days.trio_days[1].Cinema_room_3[3];
-    //    sessions_film[1] = Days.trio_days[2].Cinema_room_1[3];
-    //    break;
-    //}
-
-
-
-
-    //// Проверяем, есть ли input в map
-    //if (sessionFiles.find(input) != sessionFiles.end()) {
-    //    wcout << L"\n" << fileIn(sessionFiles[input]) << endl; // Выводим содержимое файла
-    //    wcout << L"Выберите сеанс введите число от 1 до " << sessions_film.size() << " \n";
-    //    wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
-    //    int input_2;
-    //    wcin >> input_2;
-    //    if (input_2 == 0) {
-    //        sessionSelection(day);
-    //    }
-    //    else if (input_2 > 0 && input_2 <= sessions_film.size()) {
-    //        ClearScreen();
-    //        choosingPlace(sessions_film[input_2 - 1], day);
-    //    }
-    //}
-
-    //else {
-    //    wcout << L"Сеанс не найден." << endl; // Обработка случая, если input не найден
-    //}
+   
 }
 
 int listFilmFromTheDay(int day, int filmNumber) { // выводит номер фильма от его номера в таблице и от дня
@@ -852,7 +745,6 @@ void ConsoleMode() {
 int main() {
     // Установка параметров консоли
     ConsoleMode();
-
     srand(time(0));
     generationTrioDays(Days); // генерация всех 3х дней
 

@@ -22,6 +22,7 @@
 
 void selectionDay(int day);
 void displayFilmDescription(const std::wstring& filmName);
+void extranceToCinema();
 
 using namespace std;
 
@@ -581,6 +582,7 @@ void PressCtrlPlus(int count) {
 
 void waitForInput() {
 	system("pause");
+	FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE)); 
 }
 
 bool correctInput(int& number) {
@@ -624,7 +626,7 @@ bool correctInput(int& number) {
 /// дня, зала, времени, названия и других данных о сеансе.
 /// После каждой фильтрации пользователю предлагается возможность повторить поиск или завершить фильтрацию.
 /// </remarks>
-void filterSessions(const TrioDays& trio_days) {
+void filterSessions(TrioDays& trio_days) {
 	bool repeatFiltering = true;
 
 	while (repeatFiltering) {
@@ -813,6 +815,7 @@ void filterSessions(const TrioDays& trio_days) {
 
 				// Вызываем функцию для отображения описания выбранного фильма
 				displayFilmDescription(foundFilmNames[filmIndex - 1]);
+				extranceToCinema();
 				break;
 			}
 			case 2:
@@ -832,43 +835,133 @@ void filterSessions(const TrioDays& trio_days) {
 
 
 //авто выбор мест
-bool aoutoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector<int>& bookedRows, vector<int>& bookedPlaces, double& totalCost) {
-	for (int i = 0; i < session.rows.size(); ++i) {
-		int cnt = 0;  // Счётчик свободных мест подряд
-		int start_index = -1; // Индекс начала первого подходящего участка
+bool autoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector<int>& bookedRows, vector<int>& bookedPlaces, double& totalCost) {
+	int all_free_places = session.cnt_free_places_in_session(); // Количество всех свободных мест
 
-		for (int j = 1; j < session.rows[i].seats.size() - 1; ++j) { // Проход от 1 до предпоследнего индекса
-			if (session.rows[i].seats[j].status != L"x") {
-				// Если место свободно, увеличиваем счётчик
-				if (cnt == 0) start_index = j; // Устанавливаем начало участка
-				++cnt;
+	// Если запрошено больше мест, чем свободно, сразу возвращаем false
+	if (cnt_places > all_free_places) {
+		return false;
+	}
 
-				if (cnt == cnt_places) { // Если нашли подходящий участок
-					// Помечаем места как занятые
-					for (int k = start_index; k < start_index + cnt_places; ++k) {
-						session.rows[i].seats[k].status = L"x";
-						session.rows[i].seats[k].color = L"violet";
-						bookedRows.push_back(i); // Добавляем ряд в список забронированных
-						bookedPlaces.push_back(k); // Добавляем место в список забронированных
-						totalCost += session.rows[i].seats[k].cost;
+	// Приоритет 1: искать подряд свободные места в одном ряду, начиная с центра зала
+	int mid_row = session.rows.size() / 2;
+	for (int offset = 0; offset <= mid_row; ++offset) {
+		for (int i : {mid_row - offset, mid_row + offset}) {
+			if (i < 0 || i >= session.rows.size()) continue;
+
+			int cnt = 0;  // Счётчик свободных мест подряд
+			int start_index = -1; // Индекс начала первого подходящего участка
+
+			for (int j = 1; j < session.rows[i].seats.size() - 1; ++j) { // Проход от 1 до предпоследнего индекса
+				if (session.rows[i].seats[j].status != L"x" && session.rows[i].seats[j].status != L"0") {
+					if (cnt == 0) start_index = j; // Устанавливаем начало участка
+					++cnt;
+
+					if (cnt == cnt_places) { // Если нашли подходящий участок
+						// Помечаем места как занятые
+						for (int k = start_index; k < start_index + cnt_places; ++k) {
+							session.rows[i].seats[k].status = L"x";
+							session.rows[i].seats[k].color = L"violet";
+							bookedRows.push_back(i);
+							bookedPlaces.push_back(k);
+							totalCost += session.rows[i].seats[k].cost;
+						}
+						ClearScreen();
+						DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+						for (int k = start_index; k < start_index + cnt_places; ++k) {
+							session.rows[i].seats[k].color = L"gray";
+						}
+						return true; // Возвращаем успех
 					}
-					ClearScreen();
-					DrawSession(session, session.rows.size(), session.rows[0].seats.size());
-					for (int k = start_index; k < start_index + cnt_places; ++k) {
-						session.rows[i].seats[k].color = L"gray";
-					}
-					return true; // Возвращаем успех
 				}
-			}
-			else {
-				// Если место занято, сбрасываем счётчик
-				cnt = 0;
-				start_index = -1;
+				else {
+					cnt = 0; // Сбрасываем счётчик
+					start_index = -1;
+				}
 			}
 		}
 	}
-	return false; // Если ни одного подходящего участка не найдено
+
+	// Приоритет 1 (часть 2): Разбиваем по разным рядам, если не удалось найти подряд
+	vector<pair<int, int>> selected_seats; // Пара (ряд, место)
+	int total_found = 0;
+
+	for (int offset = 0; offset <= mid_row && total_found < cnt_places; ++offset) {
+		for (int i : {mid_row - offset, mid_row + offset}) {
+			if (i < 0 || i >= session.rows.size()) continue;
+
+			for (int j = 1; j < session.rows[i].seats.size() - 1 && total_found < cnt_places; ++j) {
+				if (session.rows[i].seats[j].status != L"x" && session.rows[i].seats[j].status != L"0") {
+					selected_seats.emplace_back(i, j);
+					total_found++;
+				}
+			}
+		}
+	}
+
+	if (total_found == cnt_places) {
+		for (const auto& seat : selected_seats) {
+			int row = seat.first;
+			int place = seat.second;
+			session.rows[row].seats[place].status = L"x";
+			session.rows[row].seats[place].color = L"violet";
+			bookedRows.push_back(row);
+			bookedPlaces.push_back(place);
+			totalCost += session.rows[row].seats[place].cost;
+		}
+		ClearScreen();
+		DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+		for (const auto& seat : selected_seats) {
+			session.rows[seat.first].seats[seat.second].color = L"gray";
+		}
+		return true;
+	}
+
+	// Приоритет 2: искать места ближе к центру ряда
+	for (int offset = 0; offset <= mid_row; ++offset) {
+		for (int i : {mid_row - offset, mid_row + offset}) {
+			if (i < 0 || i >= session.rows.size()) continue;
+
+			int center = session.rows[i].seats.size() / 2;
+			vector<int> free_indices;
+
+			for (int offset_c = 0; offset_c <= center; ++offset_c) {
+				if (center - offset_c >= 1 && session.rows[i].seats[center - offset_c].status != L"x" && session.rows[i].seats[center - offset_c].status != L"0") {
+					free_indices.push_back(center - offset_c);
+				}
+				if (center + offset_c < session.rows[i].seats.size() - 1 && session.rows[i].seats[center + offset_c].status != L"x" && session.rows[i].seats[center + offset_c].status != L"0") {
+					free_indices.push_back(center + offset_c);
+				}
+				if (free_indices.size() >= cnt_places) break;
+			}
+
+			if (free_indices.size() >= cnt_places) {
+				for (int k = 0; k < cnt_places; ++k) {
+					int place = free_indices[k];
+					session.rows[i].seats[place].status = L"x";
+					session.rows[i].seats[place].color = L"violet";
+					bookedRows.push_back(i);
+					bookedPlaces.push_back(place);
+					totalCost += session.rows[i].seats[place].cost;
+				}
+				ClearScreen();
+				DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+				for (int k = 0; k < cnt_places; ++k) {
+					session.rows[i].seats[free_indices[k]].color = L"gray";
+				}
+				return true;
+			}
+		}
+	}
+
+	return false; // Если не удалось найти подходящих мест
 }
+
+
+
+
+
+
 
 // Функция для вывода всех деталей билета
 void printTicketDetails(const vector<int>& bookedRows, const vector<int>& bookedPlaces, int cnt_places, double totalTicketCost, const wstring& filmName, const wstring& filmTime, const wstring& genre, const wstring& duration) {
@@ -1334,7 +1427,7 @@ void choosingPlace(Session& session, int day) {
 					cnt_error_messeg = 0;
 					continue;
 				}
-				wcout << L"Введите количество мест (меньше 16): ";
+				wcout << L"Введите количество мест (меньше "<< all_free_places << L"): ";
 
 				if (!correctInput(cnt_places)) {
 					++cnt_error_messeg;
@@ -1342,13 +1435,13 @@ void choosingPlace(Session& session, int day) {
 					continue;
 				}
 
-				if (cnt_places <= 0 || cnt_places > 16) {
+				if (cnt_places <= 0 || cnt_places > all_free_places) {
 					++cnt_error_messeg;
 					wcout << L"Количество мест вне диапазона. Пожалуйста, введите корректное количество.\n";
 					continue;
 				}
 
-				if (!aoutoChoosingPlace(session, cnt_places, bookedRow, bookedRows, bookedPlaces, totalTicketCost)) {
+				if (!autoChoosingPlace(session, cnt_places, bookedRow, bookedRows, bookedPlaces, totalTicketCost)) {
 					wcout << L"К сожалению, не удалось найти " << cnt_places << L" свободных рядом мест.\n";
 					++cnt_error_messeg;
 					continue;
@@ -1356,7 +1449,8 @@ void choosingPlace(Session& session, int day) {
 
 
 				wcout << L"Места успешно забронированы.\n";
-				Sleep(1000);  // Задержка в 2000 миллисекунд (2 секунды)
+				waitForInput();
+				//Sleep(1000);  // Задержка в 2000 миллисекунд (2 секунды)
 				system("cls");
 
 				// Вывод всех деталей билета
