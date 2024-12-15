@@ -868,6 +868,7 @@ void printTicketDetails(const vector<int>& bookedRows, const vector<int>& booked
 	// Формируем строку для отображения мест и рядов
 	wstring places;
 	wstring rows;
+	int width = 2;
 	for (size_t i = 0; i < bookedPlaces.size(); ++i) {
 		rows += to_wstring(bookedRows[i] + 1);
 		places += to_wstring(bookedPlaces[i] + 1);
@@ -877,32 +878,42 @@ void printTicketDetails(const vector<int>& bookedRows, const vector<int>& booked
 		}
 	}
 	// Красивый и объёмный формат без рамок
-	wcout << L"===========================================\n";
-	wcout << L"               ВАШ БИЛЕТ                   \n";
-	wcout << L"===========================================\n\n";
+	wcout << L"===================================================================\n";
+	wcout << L"                                ВАШ БИЛЕТ                   \n";
+	wcout << L"===================================================================\n\n";
 
-	wcout << L" Кинотеатр:    Имени \"6104\"\n";
-	wcout << L" -----------------------------------------\n";
-	wcout << L" Фильм:        " << filmName << L"\n";
-	wcout << L" Жанр:         " << genre << L"\n";
-	wcout << L" Время:        " << filmTime << L"\n";
-	wcout << L" Длительность: " << duration << L"\n";
-	wcout << L" -----------------------------------------\n";
+	wcout << L" Кинотеатр:                Имени \"6104\"\n";
+	wcout << L" ------------------------------------------------------------------\n";
+	wcout << L" Фильм:                    " << filmName << L"\n";
+	wcout << L" Жанр:                     " << genre << L"\n";
+	wcout << L" Время:                    " << filmTime << L"\n";
+	wcout << L" Длительность:             " << duration << L"\n";
+	wcout << L" -----------------------------------------------------------------\n";
 
 	wcout << L" Ваши места: \n";
-	wcout << L" -----------------------------------------\n";
-	wcout << L" Ряды:        " << rows << L"\n";
-	wcout << L" Места:       " << places << L"\n";
-	wcout << L" -----------------------------------------\n";
+	wcout << L" -----------------------------------------------------------------\n";
+	wcout << L" Ряды:         ";
+	wstringstream rowStream(rows);
+	wstring row;
+	while (getline(rowStream, row, L',')) {
+		wcout << std::setw(width) << std::stoi(row);  // Выводим ряд с выравниванием
+		wcout << L" ";  // Добавляем пробел между рядами
+	}
+	wcout << endl;
+	wcout << L" Места:        ";
+	wstringstream placeStream(places);
+	wstring place;
+	while (getline(placeStream, place, L',')) {
+		wcout << std::setw(width) << std::stoi(place);  // Выводим место с выравниванием
+		wcout << L" ";  // Добавляем пробел между местами
+	}
+	wcout << endl;
+	wcout << L" -----------------------------------------------------------------" << endl;
 
 	wcout << L" Количество билетов: " << cnt_places << L"\n";
 	wcout << L" Итого к оплате:     " << totalTicketCost << L"₽\n";
-	wcout << L" -----------------------------------------\n";
+	wcout << L" -----------------------------------------------------------------\n";
 
-	wcout << L"===========================================\n";
-	wcout << L"       Спасибо за ваш выбор!              \n";
-	wcout << L"     Желаем приятного просмотра!         \n";
-	wcout << L"===========================================\n";
 }
 
 void displayMenuFromFile(const wstring& menuFile) {
@@ -971,7 +982,7 @@ void loadAndShowBuffetMenu(double& totalBuffetCost) {
 
 		// Проверка на корректный ввод
 		while (!correctInput(choice) || choice > 20) {
-			ClearScreenFromPosition(0, 49);
+			ClearScreenFromPosition(0, 36);
 			wcout << L"Некорректный ввод. Попробуйте снова.\n";
 		}
 
@@ -989,20 +1000,59 @@ void loadAndShowBuffetMenu(double& totalBuffetCost) {
 
 			// Проверка на корректный ввод количества
 			while (!correctInput(quantity)) {
-				ClearScreenFromPosition(0, 50);
+				ClearScreenFromPosition(0, 36);
 				wcout << L"Некорректное количество. Попробуйте снова.\n";
 				wcin.clear();               // Очищаем флаг ошибки ввода
 			}
 
 			// Добавляем стоимость в общий заказ с учетом количества
 			totalBuffetCost += it->second.second * quantity;
-			ClearScreenFromPosition(0, 50);
+			ClearScreenFromPosition(0, 36);
 			wcout << L"Вы добавили " << quantity << L" шт. '" << it->second.first << L"' на сумму " << it->second.second * quantity << L" рублей.\n";
 		}
 		else {
 			wcout << L"Некорректный выбор. Попробуйте снова.\n";
 		}
 	}
+}
+
+void printSeatsWithAnimation(const wstring& rows, const wstring& places) {
+	int width = 2;  // Устанавливаем ширину для вывода
+
+	// Анимация вывода
+	wcout << L"-------------------------------------------------------------------\n";
+	wcout << L" Ряды:         ";
+
+	// Выводим ряды с выравниванием по ширине и анимацией
+	wstringstream rowStream(rows);
+	wstring row;
+	bool firstRow = true;
+	while (getline(rowStream, row, L',')) {  // Разделяем ряды по запятой
+		if (!firstRow) {
+			wcout << L" ";  // Добавляем пробел между рядами
+		}
+		wcout << std::setw(width) << std::stoi(row);  // Выводим ряд с выравниванием
+		firstRow = false;  // Перестаем добавлять пробел для первого ряда
+		this_thread::sleep_for(chrono::milliseconds(300));  // Задержка для анимации
+	}
+	wcout << endl;
+
+	wcout << L" Места:        ";
+
+	// Выводим места с выравниванием по ширине и анимацией
+	wstringstream placeStream(places);
+	wstring place;
+	bool firstPlace = true;
+	while (getline(placeStream, place, L',')) {  // Разделяем места по запятой
+		if (!firstPlace) {
+			wcout << L" ";  // Добавляем пробел между местами
+		}
+		wcout << std::setw(width) << std::stoi(place);  // Выводим место с выравниванием
+		firstPlace = false;  // Перестаем добавлять пробел для первого места
+		this_thread::sleep_for(chrono::milliseconds(300));  // Задержка для анимации
+	}
+	wcout << endl;
+	wcout << L"-------------------------------------------------------------------\n";
 }
 
 
@@ -1043,29 +1093,27 @@ void printReceiptDetails(const vector<int>& bookedRows, const vector<int>& booke
 
 	// Заголовок
 	setColor(14, 0); // Жёлтый текст
-	animateLine(L"===========================================");
-	animateLine(L"                 ВАШ ЧЕК                   ");
-	animateLine(L"===========================================");
+	animateLine(L"===================================================================");
+	animateLine(L"                               ВАШ ЧЕК                   ");
+	animateLine(L"===================================================================");
 
 	// Детали фильма
 	setColor(11, 0); // Голубой текст
-	animateLine(L" Фильм:        " + filmName);
-	animateLine(L" Время:        " + filmTime);
-	animateLine(L" Жанр:         " + genre);
-	animateLine(L" Длительность: " + duration);
-	animateLine(L" -----------------------------------------");
+	animateLine(L" Фильм:                   " + filmName);
+	animateLine(L" Время:                   " + filmTime);
+	animateLine(L" Жанр:                    " + genre);
+	animateLine(L" Длительность:            " + duration);
+	animateLine(L" ------------------------------------------------------------------");
 
 	// Детали мест
 	setColor(10, 0); // Зелёный текст
-	animateLine(L" Ряды:         " + rows);
-	animateLine(L" Места:        " + places);
-	animateLine(L" -----------------------------------------");
+	printSeatsWithAnimation(rows, places);
 
 	// Суммы
 	setColor(7, 0); // Белый текст
-	animateLine(L" Билеты:       " + to_wstring(cnt_places));
+	animateLine(L" Билеты:        " + to_wstring(cnt_places));
 	animateLine(L" Сумма билетов: " + formatAmount(totalTicketCost) + L"₽");
-	animateLine(L" Буфет:        " + formatAmount(buffetCost) + L"₽");
+	animateLine(L" Буфет:         " + formatAmount(buffetCost) + L"₽");
 	if (discountAmount > 0) {
 		setColor(12, 0); // Красный текст
 		animateLine(L" Скидка:       -" + formatAmount(discountAmount) + L"₽");
@@ -1073,15 +1121,15 @@ void printReceiptDetails(const vector<int>& bookedRows, const vector<int>& booke
 
 	// Итоговая сумма
 	setColor(14, 0); // Жёлтый текст
-	animateLine(L" -----------------------------------------");
+	animateLine(L" ------------------------------------------------------------------");
 	animateLine(L" ИТОГО:        " + formatAmount(summ) + L"₽");
-	animateLine(L"===========================================");
+	animateLine(L"===================================================================");
 
 	// Благодарность
 	setColor(13, 0); // Фиолетовый текст
-	animateLine(L"      Спасибо за ваш выбор!               ");
-	animateLine(L"    Желаем приятного просмотра!           ");
-	animateLine(L"===========================================");
+	animateLine(L"                      Спасибо за ваш выбор!               ");
+	animateLine(L"                  Желаем приятного просмотра!           ");
+	animateLine(L"===================================================================");
 	setColor(15, 0); // Сброс цвета
 }
 // Функция для выбора способа оплаты
@@ -1157,8 +1205,7 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 		wchar_t choice;
 		wcin >> choice;
 		wcin.ignore(INT_MAX, L'\n'); // Очищаем оставшиеся символы после ввода
-		ClearScreenFromPosition(0, 12);
-
+		ClearScreenFromPosition(0, 0);
 		if (choice != L'y' && choice != L'Y') {
 			wcout << L"Применение промокода завершено. Сумма без изменений.\n";
 			break; // Выход из цикла, если пользователь не хочет вводить промокод
@@ -1169,7 +1216,7 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 	while (true) {
 		wcout << L"--- Способы оплаты ---\n";
 		wcout << L"1. Картой\n";
-		wcout << L"2. Электронный кошелёк\n";
+		wcout << L"2. Наличными\n";
 		wcout << L"Введите номер выбранного способа оплаты: ";
 
 		while (!correctInput(paymentChoice) || paymentChoice < 1 || paymentChoice > 2) {
@@ -1225,59 +1272,7 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 			break;
 		}
 		case 2: {
-			// Оплата через электронный кошелёк
-			map<int, wstring> walletOptions = {
-				{1, L"Qiwi"},
-				{2, L"ЮMoney"},
-				{3, L"PayPal"}
-			};
-
-			wcout << L"--- Оплата через электронный кошелёк ---\n";
-			wcout << L"Выберите платёжную систему:\n";
-			for (const auto& option : walletOptions) {
-				wcout << option.first << L". " << option.second << endl;
-			}
-
-			int choice;
-			while (true) {
-				wcout << L"Введите номер выбранной системы: ";
-				cin >> choice;
-				if (walletOptions.find(choice) != walletOptions.end()) {
-					break;
-				}
-				wcout << L"Некорректный выбор. Попробуйте снова.\n";
-			}
-
-			wstring selectedWallet = walletOptions[choice];
-			wcout << L"Вы выбрали " << selectedWallet << L".\n";
-
-			// Ввод номера телефона для авторизации
-			wstring phoneNumber;
-			while (true) {
-				wcout << L"Введите номер телефона для " << selectedWallet << L" (формат +7XXXYYYZZZZ): ";
-				getline(wcin, phoneNumber);
-				if (phoneNumber.size() == 12 && phoneNumber[0] == L'+' && all_of(phoneNumber.begin() + 1, phoneNumber.end(), iswdigit)) {
-					break;
-				}
-				wcout << L"Некорректный номер телефона. Попробуйте снова.\n";
-			}
-
-			// Генерация платёжной ссылки (симуляция)
-			wcout << L"Генерируем ссылку на оплату...\n";
-			wstring paymentLink = L"https://payment." + selectedWallet + L".com/pay?amount=" + to_wstring(summ);
-			wcout << L"Ссылка на оплату: " << paymentLink << endl;
-
-			// Подтверждение платежа
-			char paymentConfirmation;
-			wcout << L"Подтвердите платёж (y/n): ";
-			cin >> paymentConfirmation;
-
-			if (paymentConfirmation == 'y' || paymentConfirmation == 'Y') {
-				wcout << L"Оплата успешно выполнена. Спасибо!\n";
-			}
-			else {
-				wcout << L"Оплата отменена. Попробуйте снова.\n";
-			}
+			wcout << L"Вы выбрали оплату наличными.\n";
 			break;
 		}
 		}
@@ -1378,7 +1373,7 @@ void choosingPlace(Session& session, int day) {
 				loadAndShowBuffetMenu(totalBuffetCost);
 				Sleep(1000);
 				system("cls");
-				choosePaymentMethod(totalTicketCost,cnt_places,totalBuffetCost, bookedRows, bookedPlaces, session.film_name, session.time_film, session.genre, session.duration);
+				choosePaymentMethod(totalTicketCost, cnt_places, totalBuffetCost, bookedRows, bookedPlaces, session.film_name, session.time_film, session.genre, session.duration);
 				break;
 			}
 			break;
