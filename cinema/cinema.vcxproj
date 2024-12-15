@@ -137,10 +137,10 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="cinema.rc" />
+    <Image Include="CineWave.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="CineMave.ico" />
+    <ResourceCompile Include="cinema.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

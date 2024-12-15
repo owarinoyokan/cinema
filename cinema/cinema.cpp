@@ -22,7 +22,7 @@ using namespace Config;    // Пространство имен
 
 TrioDays Days; //глобальная переменная дней
 
-
+void returnSessions(int day, int input);
 void extranceToCinema(); // Функция входа в кино, предлагает самый первый выбор
 void availablePromo(); // Функция для просмотра доспупных акций
 void movieSelection(); // Функция выводяшая список фильмов с краткой информацией
@@ -34,6 +34,7 @@ wstring fileIn(const string& fname); // Функция для чтения фа�
 void sessionSelection(int);
 int listFilmFromTheDay(int day, int filmNumber);
 void selectionDay(int day);
+
 
 void extranceToCinema() { // Функция входа в кино, предлагает самый первый выбор
     short int input = 1;
@@ -48,6 +49,7 @@ void extranceToCinema() { // Функция входа в кино, предла
     while (true) {
         prevInput = input; // input_A - это пердыдущее значение input
         tracingUD(input);
+        FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
         switch (input) {
         case 200:
             switch (prevInput) {
@@ -112,6 +114,7 @@ void availablePromo() { // Функция для просмотра доспуп
     while (true) {
         prevInput = input;
         tracingUD(input);
+        FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
         switch (input) {
         case 200:
             switch (prevInput) {
@@ -154,52 +157,80 @@ void availablePromo() { // Функция для просмотра доспуп
 }
 
 void displayFilmDescription(const wstring& filmName) {
-    map<wstring, string> filmDescriptions = {
-        {L"Шрек и болото багов", "Shrek.txt"},
-        {L"Унесённые сессией", "Gone with the session.txt"},
-        {L"Назад к компилятору", "Back to the compiler.txt"},
-        {L"А дедлайны здесь жесткие", "And deadlines are tight.txt"},
-        {L"Властелин лаб: возвращение сеньора", "Lord of the Lab.txt"},
-        {L"Титаник: крах программы", "Titanic.txt"},
-        {L"Дебаггер 2: Судный день компиляции", "Debagger 2.txt"},
-        {L"Гарри Кодер и C++", "Garry Coder.txt"},
-        {L"Матрица данных", "Matrix.txt"},
-        {L"Пятый алгоритм", "Fifth algorithm.txt"},
-        {L"Люди в Черных пикселях", "People in black pixels.txt"},
-        {L"Лабные Войны: Эпизод 5", "Lab Wars.txt"}
+    map<wstring, int> filmDescriptions = {
+        {L"Унесённые сессией", 1001},
+        {L"Шрек и болото багов", 1002},
+        {L"Назад к компилятору", 1003},
+        {L"А дедлайны здесь жесткие", 1004},
+        {L"Властелин лаб: Возвращение сеньора", 1005},
+        {L"Титаник: крах программы", 1006},
+        {L"Дебаггер 2: Судный день компиляции", 1007},
+        {L"Гарри Кодер и С++", 1008},
+        {L"Матрица данных", 1009},
+        {L"Пятый алгоритм", 1010},
+        {L"Люди в Черных пикселях", 1011},
+        {L"Лабные войны: Эпизод 5 - Питон наносит ответный удар", 1012}
     };
 
-    // Преобразуем введенное название фильма в нижний регистр
-    locale loc("ru_RU.UTF-8");
-    wstring formattedFilmName = filmName;
-    transform(formattedFilmName.begin(), formattedFilmName.end(), formattedFilmName.begin(),
-        [&loc](wchar_t c) { return tolower(c, loc); });
-    removeCarriageReturn(formattedFilmName); // Убираем лишние символы
-
-    bool found = false;
-
-    for (const auto& pair : filmDescriptions) {
-        // Преобразуем название фильма из map в нижний регистр
-        wstring filmInMap = pair.first;
-        transform(filmInMap.begin(), filmInMap.end(), filmInMap.begin(),
-            [&loc](wchar_t c) { return tolower(c, loc); });
-        removeCarriageReturn(filmInMap);
-
-        if (filmInMap == formattedFilmName) {
-            wcout << L"\nОписание фильма:\n";
-            wcout << fileIn(pair.second) << endl;
-            found = true;
-        }
+    // Поиск фильма в map
+    auto it = filmDescriptions.find(filmName);
+    if (it != filmDescriptions.end()) {
+        // Передаём день недели и ID фильма
+        int day = 1; // По умолчанию используем первый день (или запрашиваем его отдельно)
+        returnSessions(day, it->second);
     }
-
-    if (!found)
-        wcout << L"Описание для выбранного фильма не найдено.\n";
-
-    // Пауза перед возвратом в меню
-    wcout << L"\nНажмите Enter, чтобы продолжить...";
-    wcin.ignore();
-    wcin.get();
+    else {
+        wcout << L"Фильм не найден: " << filmName << endl;
+    }
 }
+
+//void displayFilmDescription(const wstring& filmName) {
+//    map<wstring, string> filmDescriptions = {
+//        {L"Шрек и болото багов", "Shrek.txt"},
+//        {L"Унесённые сессией", "Gone with the session.txt"},
+//        {L"Назад к компилятору", "Back to the compiler.txt"},
+//        {L"А дедлайны здесь жесткие", "And deadlines are tight.txt"},
+//        {L"Властелин лаб: Возвращение сеньора", "Lord of the Lab.txt"},
+//        {L"Титаник: крах программы", "Titanic.txt"},
+//        {L"Дебаггер 2: Судный день компиляции", "Debagger 2.txt"},
+//        {L"Гарри Кодер и С++", "Garry Coder.txt"},
+//        {L"Матрица данных", "Matrix.txt"},
+//        {L"Пятый алгоритм", "Fifth algorithm.txt"},
+//        {L"Люди в Черных пикселях", "People in black pixels.txt"},
+//        {L"Лабные войны: Эпизод 5 - Питон наносит ответный удар", "Lab Wars.txt"}
+//    };
+//
+//    // Преобразуем введенное название фильма в нижний регистр
+//    locale loc("ru_RU.UTF-8");
+//    wstring formattedFilmName = filmName;
+//    transform(formattedFilmName.begin(), formattedFilmName.end(), formattedFilmName.begin(),
+//        [&loc](wchar_t c) { return tolower(c, loc); });
+//    removeCarriageReturn(formattedFilmName); // Убираем лишние символы
+//
+//    bool found = false;
+//
+//    for (const auto& pair : filmDescriptions) {
+//        // Преобразуем название фильма из map в нижний регистр
+//        wstring filmInMap = pair.first;
+//        transform(filmInMap.begin(), filmInMap.end(), filmInMap.begin(),
+//            [&loc](wchar_t c) { return tolower(c, loc); });
+//        removeCarriageReturn(filmInMap);
+//
+//        if (filmInMap == formattedFilmName) {
+//            wcout << L"\nОписание фильма:\n";
+//            wcout << fileIn(pair.second) << endl;
+//            found = true;
+//        }
+//    }
+//
+//    if (!found)
+//        wcout << L"Описание для выбранного фильма не найдено.\n";
+//
+//    // Пауза перед возвратом в меню
+//    wcout << L"\nНажмите Enter, чтобы продолжить...";
+//    wcin.ignore();
+//    wcin.get();
+//}
 
 // Вспомогательная функция фильтра
 void filterMenu() {
@@ -223,6 +254,7 @@ void movieSelection() { // Функция выводяшая список фил
     while (true) {
         prevInput = input;
         tracingUD(input);
+        FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
         switch (input) {
         case 200:
             switch (prevInput) {
@@ -348,7 +380,7 @@ void selectionDay(int day) {
     }
 }
 
-void returnSessions(int day,int input)
+void returnSessions(int day, int input)
 {
     // Создаем map для соответствия между номерами сеансов и именами файлов
     map<int, string> sessionFiles = {
@@ -443,14 +475,18 @@ void returnSessions(int day,int input)
 
 
 
-
     // Проверяем, есть ли input в map
     if (sessionFiles.find(input) != sessionFiles.end()) {
         wcout << L"\n" << fileIn(sessionFiles[input]) << endl; // Выводим содержимое файла
+        setCursorPosition(0, 33);
         wcout << L"Выберите сеанс введите число от 1 до " << sessions_film.size() << " \n";
         wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
         int input_2;
-        wcin >> input_2;
+        while (!correctInput(input_2)) {
+            //ClearScreenFromPosition(0, 34);
+            wcout << L"Некорректный ввод. Попробуйте снова.\n";
+            ClearScreenFromPosition(0, 35);
+        }
         if (input_2 == 0) {
             ClearScreen();
             selectionDay(day);
@@ -474,10 +510,11 @@ void sessionSelection(int day) { // Выбор сеанса
     int input;
     while (true) {
         FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
-        if (correctInput(input) && ((day == 1 && input <= 12) || (day != 1 && input <= 11) || input == 0 || input == 111 || input == 222 || input == 333))
+        if (correctInput(input) && ((day == 1 && input <= 12) || (day != 1 && input <= 11) || (input == 0)))
             break;
         wcout << L"Ошибка ввода попробуйте ещё раз\n";
     }
+
     ClearScreen();
     if (input == 0) {
         movieSelection();
