@@ -915,7 +915,7 @@ void printTicketDetails(const vector<int>& bookedRows, const vector<int>& booked
 	wcout << L"                                ВАШ БИЛЕТ                   \n";
 	wcout << L"===================================================================\n\n";
 
-	wcout << L" Кинотеатр:                Имени \"6104\"\n";
+	wcout << L" Кинотеатр:                Имени \"CineWave\"\n";
 	wcout << L" ------------------------------------------------------------------\n";
 	wcout << L" Фильм:                    " << filmName << L"\n";
 	wcout << L" Жанр:                     " << genre << L"\n";
