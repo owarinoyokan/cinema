@@ -755,7 +755,7 @@ void filterSessions(TrioDays& trio_days) {
 
 				// Вызываем функцию для отображения описания выбранного фильма
 				displayFilmDescription(foundFilmNames[filmIndex - 1]);
-				extranceToCinema();
+				//extranceToCinema();
 				break;
 			}
 			case 2:
@@ -783,58 +783,49 @@ bool autoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector<
 		return false;
 	}
 
-	// Приоритет 1: искать подряд свободные места в одном ряду, начиная с центра зала
-	int mid_row = session.rows.size() / 2;
-	for (int offset = 0; offset <= mid_row; ++offset) {
-		for (int i : {mid_row - offset, mid_row + offset}) {
-			if (i < 0 || i >= session.rows.size()) continue;
+	// Ищем подряд свободные места в одном ряду
+	for (int i = 0; i < session.rows.size(); ++i) {
+		int cnt = 0;         // Счётчик свободных мест подряд
+		int start_index = -1; // Индекс начала первого подходящего участка
 
-			int cnt = 0;  // Счётчик свободных мест подряд
-			int start_index = -1; // Индекс начала первого подходящего участка
+		for (int j = 0; j < session.rows[i].seats.size(); ++j) {
+			if (session.rows[i].seats[j].status != L"x" && session.rows[i].seats[j].status != L"0") {
+				if (cnt == 0) start_index = j; // Устанавливаем начало участка
+				++cnt;
 
-			for (int j = 1; j < session.rows[i].seats.size() - 1; ++j) { // Проход от 1 до предпоследнего индекса
-				if (session.rows[i].seats[j].status != L"x" && session.rows[i].seats[j].status != L"0") {
-					if (cnt == 0) start_index = j; // Устанавливаем начало участка
-					++cnt;
-
-					if (cnt == cnt_places) { // Если нашли подходящий участок
-						// Помечаем места как занятые
-						for (int k = start_index; k < start_index + cnt_places; ++k) {
-							session.rows[i].seats[k].status = L"x";
-							session.rows[i].seats[k].color = L"violet";
-							bookedRows.push_back(i);
-							bookedPlaces.push_back(k);
-							totalCost += session.rows[i].seats[k].cost;
-						}
-						ClearScreen();
-						DrawSession(session, session.rows.size(), session.rows[0].seats.size());
-						for (int k = start_index; k < start_index + cnt_places; ++k) {
-							session.rows[i].seats[k].color = L"gray";
-						}
-						return true; // Возвращаем успех
+				if (cnt == cnt_places) { // Если нашли подходящий участок
+					// Помечаем места как занятые
+					for (int k = start_index; k < start_index + cnt_places; ++k) {
+						session.rows[i].seats[k].status = L"x";
+						session.rows[i].seats[k].color = L"violet";
+						bookedRows.push_back(i);
+						bookedPlaces.push_back(k);
+						totalCost += session.rows[i].seats[k].cost;
 					}
+					ClearScreen();
+					DrawSession(session, session.rows.size(), session.rows[0].seats.size());
+					for (int k = start_index; k < start_index + cnt_places; ++k) {
+						session.rows[i].seats[k].color = L"gray";
+					}
+					return true; // Возвращаем успех
 				}
-				else {
-					cnt = 0; // Сбрасываем счётчик
-					start_index = -1;
-				}
+			}
+			else {
+				cnt = 0; // Сбрасываем счётчик
+				start_index = -1;
 			}
 		}
 	}
 
-	// Приоритет 1 (часть 2): Разбиваем по разным рядам, если не удалось найти подряд
+	// Если подряд места не найдены, разбиваем их по разным рядам
 	vector<pair<int, int>> selected_seats; // Пара (ряд, место)
 	int total_found = 0;
 
-	for (int offset = 0; offset <= mid_row && total_found < cnt_places; ++offset) {
-		for (int i : {mid_row - offset, mid_row + offset}) {
-			if (i < 0 || i >= session.rows.size()) continue;
-
-			for (int j = 1; j < session.rows[i].seats.size() - 1 && total_found < cnt_places; ++j) {
-				if (session.rows[i].seats[j].status != L"x" && session.rows[i].seats[j].status != L"0") {
-					selected_seats.emplace_back(i, j);
-					total_found++;
-				}
+	for (int i = 0; i < session.rows.size() && total_found < cnt_places; ++i) {
+		for (int j = 0; j < session.rows[i].seats.size() && total_found < cnt_places; ++j) {
+			if (session.rows[i].seats[j].status != L"x" && session.rows[i].seats[j].status != L"0") {
+				selected_seats.emplace_back(i, j);
+				total_found++;
 			}
 		}
 	}
@@ -857,44 +848,7 @@ bool autoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector<
 		return true;
 	}
 
-	// Приоритет 2: искать места ближе к центру ряда
-	for (int offset = 0; offset <= mid_row; ++offset) {
-		for (int i : {mid_row - offset, mid_row + offset}) {
-			if (i < 0 || i >= session.rows.size()) continue;
-
-			int center = session.rows[i].seats.size() / 2;
-			vector<int> free_indices;
-
-			for (int offset_c = 0; offset_c <= center; ++offset_c) {
-				if (center - offset_c >= 1 && session.rows[i].seats[center - offset_c].status != L"x" && session.rows[i].seats[center - offset_c].status != L"0") {
-					free_indices.push_back(center - offset_c);
-				}
-				if (center + offset_c < session.rows[i].seats.size() - 1 && session.rows[i].seats[center + offset_c].status != L"x" && session.rows[i].seats[center + offset_c].status != L"0") {
-					free_indices.push_back(center + offset_c);
-				}
-				if (free_indices.size() >= cnt_places) break;
-			}
-
-			if (free_indices.size() >= cnt_places) {
-				for (int k = 0; k < cnt_places; ++k) {
-					int place = free_indices[k];
-					session.rows[i].seats[place].status = L"x";
-					session.rows[i].seats[place].color = L"violet";
-					bookedRows.push_back(i);
-					bookedPlaces.push_back(place);
-					totalCost += session.rows[i].seats[place].cost;
-				}
-				ClearScreen();
-				DrawSession(session, session.rows.size(), session.rows[0].seats.size());
-				for (int k = 0; k < cnt_places; ++k) {
-					session.rows[i].seats[free_indices[k]].color = L"gray";
-				}
-				return true;
-			}
-		}
-	}
-
-	return false; // Если не удалось найти подходящих мест
+	return false; // Не удалось найти места
 }
 
 
@@ -1059,7 +1013,7 @@ void printSeatsWithAnimation(const wstring& rows, const wstring& places) {
 		}
 		wcout << std::setw(width) << std::stoi(row);  // Выводим ряд с выравниванием
 		firstRow = false;  // Перестаем добавлять пробел для первого ряда
-		this_thread::sleep_for(chrono::milliseconds(300));  // Задержка для анимации
+		this_thread::sleep_for(chrono::milliseconds(3));  // Задержка для анимации
 	}
 	wcout << endl;
 
@@ -1075,7 +1029,7 @@ void printSeatsWithAnimation(const wstring& rows, const wstring& places) {
 		}
 		wcout << std::setw(width) << std::stoi(place);  // Выводим место с выравниванием
 		firstPlace = false;  // Перестаем добавлять пробел для первого места
-		this_thread::sleep_for(chrono::milliseconds(300));  // Задержка для анимации
+		this_thread::sleep_for(chrono::milliseconds(3));  // Задержка для анимации
 	}
 	wcout << endl;
 	wcout << L"-------------------------------------------------------------------\n";
@@ -1089,10 +1043,9 @@ void printReceiptDetails(const vector<int>& bookedRows, const vector<int>& booke
 		};
 
 	// Анимация строки
-	auto animateLine = [](const wstring& line, int delayMs = 10) {
+	auto animateLine = [](const wstring& line) {
 		for (const wchar_t& c : line) {
 			wcout << c;
-			this_thread::sleep_for(chrono::milliseconds(delayMs));
 		}
 		wcout << endl;
 		};
@@ -1311,6 +1264,9 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 	printReceiptDetails(bookedRows, bookedPlaces, cnt_places, totalTicketCost, totalBuffetCost,
 		filmName, filmTime, genre, duration, summ, discountAmount);
 	wcout << L"Спасибо за ваш выбор! Транзакция завершена.\n";
+	system("pause");
+	
+	extranceToCinema();
 }
 
 

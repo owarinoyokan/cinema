@@ -18,6 +18,7 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutPath)
 $Shortcut.TargetPath = $ExePath
 $Shortcut.WorkingDirectory = (Get-Item $ExePath).DirectoryName
 $Shortcut.IconLocation = $ExePath
+$Shortcut.WindowStyle = 3  # Устанавливаем окно в полноэкранный режим (3 - максимизированное окно)
 $Shortcut.Save()
 
 Write-Host "Ярлык успешно создан: $ShortcutPath" -ForegroundColor Green
