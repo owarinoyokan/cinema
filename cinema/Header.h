@@ -1187,7 +1187,7 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 		wcout << L"Введите номер выбранного способа оплаты: ";
 
 		while (!correctInput(paymentChoice) || paymentChoice < 1 || paymentChoice > 2) {
-			ClearScreenFromPosition(0, 20);
+			ClearScreenFromPosition(0, 9);
 			wcout << L"Некорректный ввод. Попробуйте снова.\n";
 		}
 
@@ -1252,12 +1252,13 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 			wcout << L"Вы выбрали оплату наличными.\n";
 			break;
 		}
+		}
 		break;
 	}
 
 	printReceiptDetails(bookedRows, bookedPlaces, cnt_places, totalcostwithoutdiscount, totalBuffetCost, filmName, filmTime, genre, duration, summ, discountAmount);
 	wcout << L"Спасибо за ваш выбор! Транзакция завершена.\n";
-}
+
 	system("pause");
 	
 	extranceToCinema();
