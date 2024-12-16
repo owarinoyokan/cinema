@@ -63,8 +63,8 @@ void availablePromo() { // Функция для просмотра доспуп
     short int prevInput;
     wcout << L"\n" << fileIn("Actions.txt") << endl; // Вывод файла
     //wcout << L"Список доступных акций ... " << endl;
-    wcout << L"1. Чтобы испытать удачу в игре" << endl;
-    wcout << L"Нажмите BACKSPACE чтобы вернуться назад" << endl;
+    //wcout << L"1. Чтобы испытать удачу в игре" << endl;
+    //wcout << L"Нажмите BACKSPACE чтобы вернуться назад" << endl;
     input = tracing(1);
     FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
     switch (input) {
