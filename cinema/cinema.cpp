@@ -35,7 +35,6 @@ void sessionSelection(int);
 int listFilmFromTheDay(int day, int filmNumber);
 void selectionDay(int day);
 
-
 void extranceToCinema() { // Функция входа в кино, предлагает самый первый выбор
     short int input;
     ::Days;
