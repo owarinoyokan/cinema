@@ -41,10 +41,10 @@ void extranceToCinema() { // Функция входа в кино, предла
     ::Days;
     ClearScreen();
     wcout << fileIn("CINEWAVE.txt") << endl;
-    wcout << L"Что вы желаете сделать? Для выбора нажмите ENTER" << endl;
-    wcout << L"Нажимайте на стелочки" << endl;
-    wcout << L"1. выбрать фильм" << endl;
-    wcout << L"Нажмите BACKSPACE чтобы вернуться назад" << endl;
+    wcout << L"Что вы желаете сделать?" << endl;
+    //wcout << L"Нажимайте на стелочки" << endl;
+    wcout << L"1. Чтобы выбрать фильм" << endl;
+    wcout << L"Нажмите BACKSPACE чтобы выйти" << endl;
     input = tracing(1);
     FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
     switch (input) {
@@ -62,8 +62,8 @@ void availablePromo() { // Функция для просмотра доспуп
     short int input;
     short int prevInput;
     wcout << L"\n" << fileIn("Actions.txt") << endl; // Вывод файла
-    wcout << L"Список доступных акций ... " << endl;
-    wcout << L"1. чтобы испытать удачу в игре" << endl;
+    //wcout << L"Список доступных акций ... " << endl;
+    wcout << L"1. Чтобы испытать удачу в игре" << endl;
     wcout << L"Нажмите BACKSPACE чтобы вернуться назад" << endl;
     input = tracing(1);
     FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
@@ -166,11 +166,11 @@ void movieSelection() { // Функция выводяшая список фил
     ClearScreen();
     short int input;
     wcout << L"\n" << fileIn("cinema_info.txt") << endl; // Вывод файла
-    wcout << L"Что вы желаете сделать? Для выбора нажмите ENTER" << endl;
-    wcout << L"1. чтобы выбрать сеанс" << endl;
+    //wcout << L"Что вы желаете сделать? Для выбора нажмите ENTER" << endl;
+    /*wcout << L"1. чтобы выбрать сеанс" << endl;
     wcout << L"2. чтобы посмотреть доступные акции" << endl;
     wcout << L"3. чтобы использовать фильтр" << endl;
-    wcout << L"Нажмите BACKSPACE чтобы вернуться назад" << endl;
+    wcout << L"Нажмите BACKSPACE чтобы вернуться назад" << endl;*/
 
     input = tracing(3);
     FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
@@ -217,24 +217,24 @@ void selectionDay(int day) {
             ClearScreen();
             //wcout << L"День 3" << endl;
             wcout << L"\n" << fileIn("AllMovDay_3.txt") << endl;
-            wcout << L"Нажимайте на стрелочки, чтобы выбрать день. Нажмите ENTER, чтобы зафиксировать день" << endl;
+            wcout << L"Нажимайте на стрелочки <- ->, чтобы выбрать день. Нажмите ENTER, чтобы зафиксировать день" << endl;
             break;
         case 1:
             ClearScreen();
             //wcout << L"День 2" << endl;
             wcout << L"\n" << fileIn("AllMovDay_2.txt") << endl;
-            wcout << L"Нажимайте на стрелочки, чтобы выбрать день. Нажмите ENTER, чтобы зафиксировать день" << endl;
+            wcout << L"Нажимайте на стрелочки <- ->, чтобы выбрать день. Нажмите ENTER, чтобы зафиксировать день" << endl;
             break;
         case 0:
             ClearScreen();
             //wcout << L"День 1" << endl;
             wcout << L"\n" << fileIn("AllMovDay_1.txt") << endl;
-            wcout << L"Нажимайте на стрелочки, чтобы выбрать день. Нажмите ENTER, чтобы зафиксировать день" << endl;
+            wcout << L"Нажимайте на стрелочки <- ->, чтобы выбрать день. Нажмите ENTER, чтобы зафиксировать день" << endl;
             break;
         default:
             ClearScreen();
             wcout << L"\n" << fileIn("AllMovDay_1.txt") << endl;
-            wcout << L"Нажимайте на стрелочки, чтобы выбрать день. Нажмите ENTER, чтобы зафиксировать день" << endl;
+            wcout << L"Нажимайте на стрелочки , чтобы выбрать день. Нажмите ENTER, чтобы зафиксировать день" << endl;
             inp = 0;
             break;
 
@@ -381,7 +381,7 @@ void returnSessions(int day, int input)
 
 void sessionSelection(int day) { // Выбор сеанса
     ::Days;
-    wcout << L"Введите номер сеанса, на который хотите пойти" << endl << endl;
+    wcout << L"\nВведите номер сеанса, на который хотите пойти" << endl;
     wcout << L"Нажмите '0', чтобы вернуться назад" << endl;
     int cnt_error_messege = 0;
     
@@ -600,7 +600,6 @@ void generationTrioDays(TrioDays& trio)
 }
 
 void ConsoleMode() {
-    ResizeConsoleWindow(20, 60);
     // открытие консоли в полном экране
     fullScreen();
 
@@ -608,11 +607,10 @@ void ConsoleMode() {
     setMode16();
 
     // Название для консоли
-    SetConsoleTitle(L"Кинотеатр \"6104\"");
+    SetConsoleTitle(L"Кинотеатр \"CineWave\"");
 
     // Масштаб -1
     PressCtrlMinus(1);
-    
 }
 
 int main() {

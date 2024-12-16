@@ -8,6 +8,7 @@
 #include <chrono>
 #include <Thread>
 #include <windows.h>
+#include <random>
 
 using namespace std;
 
@@ -52,9 +53,13 @@ void what_is_action(int res_user) {
     }
 }
 
-void random(int& rd)
+int rando()
 {
-    rd = rand() % 6 + 1;
+    static random_device rd;						// Генератор чисел
+    static default_random_engine re(rd());			// Генератор неповтояющихся чисел на основе rd
+    uniform_int_distribution<int> nums(1, 7);	// Подбор чисел в диапозоне от min до max
+
+    return nums(re); // Генерация случайного числа
 }
 
 void PrintDiceFace(int number) {
@@ -89,10 +94,18 @@ void TheActionGame() {
     ClearScreen();
     srand(time(0));
 
-    if (countMove == 3 || lucky == true) {
+    if (countMove == 3 && lucky == true) {
         ClearScreen();
         PressCtrlPlus(16);
         wcout << L"Поздравляем с победой!!!" << endl;
+        waitForInput();
+        PressCtrlMinus(16);
+        availablePromo();
+    }
+    else if (countMove == 3 && lucky == false) {
+        ClearScreen();
+        PressCtrlPlus(16);
+        wcout << L"Повезет в следующий раз." << endl;
         waitForInput();
         PressCtrlMinus(16);
         availablePromo();
@@ -106,8 +119,7 @@ void TheActionGame() {
 
         int res_user = 0;
         for (int i = 0; i < rounds; ++i) {
-            int user_now;
-            random(user_now);
+            int user_now = rando();
 
             wcout << L"Нажмите 'Enter' чтобы бросить кубик.\n";
             waitForInput();
