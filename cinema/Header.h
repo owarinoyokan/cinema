@@ -1251,6 +1251,7 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 		}*/
 
 		paymentChoice = tracing(2);
+		FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
 
 		// Если ввод корректный, очищаем сообщения об ошибке
 		switch (paymentChoice) {
@@ -1354,6 +1355,7 @@ void choosingPlace(Session& session, int day) {
 		}*/
 
 		choice = tracing(2);
+		FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
 
 		if (choice == 0) {
 			ClearScreen();
