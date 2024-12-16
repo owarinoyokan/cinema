@@ -698,78 +698,15 @@ void filterSessions(TrioDays& trio_days) {
 			wcout << L"Введите ваш выбор (1-3): ";*/
 
 			wcout << L"\nЧто вы хотите сделать дальше?\n";
-			wcout << L"Перейти к описанию найденного фильма <---\n";
-			wcout << L"Заново воспользоваться фильтром\n";
-			wcout << L"Вернуться в меню\n";
-			wcout << L"Используйте стрелочки, для выбора нажмите SPACE";
-			//int choice = -1;
-			short int choice = 3, prevChoice;
-			bool flag = true;
-			while (flag) {
-				prevChoice = choice;
-				tracingUD(choice);
-				FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
-				switch (choice) {
-				case 200:
-					choice = prevChoice;
-					flag = false;
-					wcout << L"" << choice << endl;
-					break;
-				case 3:
-					ClearScreen();
-					wcout << L"Найдено совпадений:\n";
-					for (size_t i = 0; i < foundFilms.size(); ++i) {
-						wcout << L"[" << i + 1 << L"] " << foundFilms[i] << L"\n";
-					}
-					wcout << L"\nЧто вы хотите сделать дальше?\n";
-					wcout << L"Перейти к описанию найденного фильма <---\n";
-					wcout << L"Заново воспользоваться фильтром\n";
-					wcout << L"Вернуться в меню\n";
-					wcout << L"Используйте стрелочки, для выбора нажмите SPACE";
-					wcout << L"" << choice << endl;
-					break;
-				case 2:
-					ClearScreen();
-					wcout << L"Найдено совпадений:\n";
-					for (size_t i = 0; i < foundFilms.size(); ++i) {
-						wcout << L"[" << i + 1 << L"] " << foundFilms[i] << L"\n";
-					}
-					wcout << L"\nЧто вы хотите сделать дальше?\n";
-					wcout << L"Перейти к описанию найденного фильма\n";
-					wcout << L"Заново воспользоваться фильтром <---\n";
-					wcout << L"Вернуться в меню\n";
-					wcout << L"Используйте стрелочки, для выбора нажмите SPACE";
-					wcout << L"" << choice << endl;
-					break;
-				case 1:
-					ClearScreen();
-					wcout << L"Найдено совпадений:\n";
-					for (size_t i = 0; i < foundFilms.size(); ++i) {
-						wcout << L"[" << i + 1 << L"] " << foundFilms[i] << L"\n";
-					}
-					wcout << L"\nЧто вы хотите сделать дальше?\n";
-					wcout << L"Перейти к описанию найденного фильма\n";
-					wcout << L"Заново воспользоваться фильтром\n";
-					wcout << L"Вернуться в меню <---\n";
-					wcout << L"Используйте стрелочки, для выбора нажмите SPACE";
-					wcout << L"" << choice << endl;
-					break;
-				default:
-					ClearScreen();
-					choice = 3;
-					wcout << L"Найдено совпадений:\n";
-					for (size_t i = 0; i < foundFilms.size(); ++i) {
-						wcout << L"[" << i + 1 << L"] " << foundFilms[i] << L"\n";
-					}
-					wcout << L"\nВведено неверное значение\n";
-					wcout << L"Что вы хотите сделать дальше?\n";
-					wcout << L"Перейти к описанию найденного фильма <---\n";
-					wcout << L"Заново воспользоваться фильтром\n";
-					wcout << L"Вернуться в меню\n";
-					wcout << L"Используйте стрелочки, для выбора нажмите SPACE";
-					wcout << L"" << choice << endl;
-					break;
-				}
+			wcout << L"1. Перейти к описанию найденного фильма\n";
+			wcout << L"2. Заново воспользоваться фильтром\n";
+			wcout << L"Нажмите BACKSPACE чтобы вернуться назад\n";
+			short int input;
+			input = tracing(2);
+
+			ClearScreen();
+			for (size_t i = 0; i < foundFilms.size(); ++i) {
+				wcout << L"[" << i + 1 << L"] " << foundFilms[i] << L"\n";
 			}
 
 			//while (choice != 1 && choice != 2 && choice != 3) {
@@ -792,8 +729,8 @@ void filterSessions(TrioDays& trio_days) {
 					wcout << L"[" << i + 1 << L"] " << foundFilms[i] << L"\n";
 				}
 
-			switch (choice) {	
-			case 3: {
+			switch (input) {	
+			case 1: {
 				// Пользователь выбрал перейти к описанию фильма
 				wcout << L"Введите номер фильма для получения описания: ";
 				int filmIndex = -1;
@@ -821,7 +758,7 @@ void filterSessions(TrioDays& trio_days) {
 			case 2:
 				// Повторить фильтрацию
 				continue;
-			case 1:
+			case 0:
 				// Вернуться в меню
 				repeatFiltering = false;
 				break;
