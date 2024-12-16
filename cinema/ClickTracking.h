@@ -4,62 +4,104 @@
 #include "Header.h"
 void setMode16();
 
-#include <iostream>     // Äëÿ ðàáîòû ïîòîêà ââîäà è âûâîäà
-#include <io.h>         // Äëÿ ðàáîòû ñ _setmode 
-#include <locale>       // Äëÿ ðàáîòû ñ êîäèðîâêàìè
-#include <fcntl.h>      // Äëÿ ðåæèìà _O_U16TEXT
-#include <fstream>      // Äëÿ ðàáîòû ñ ôàéëàìè
-#include <codecvt>      // Äëÿ ïðåîáðàçîâàíèÿ UTF-16 â wide string
-#include <string>       // Äëÿ ðàáîòû ñ ñòðîêàìè
-#include <sstream>      // Äëÿ ðàáîòû ñ ñòðîêîâûìè ïîòîêàìè
-#include <vector>       // Ñàìè çíàåòå
+#include <iostream>     
+#include <io.h>         
+#include <locale>       
+#include <fcntl.h>      
+#include <fstream>      
+#include <codecvt>      
+#include <string>       
+#include <sstream>      
+#include <vector>       
 #include <map>
 #include <windows.h>
 
-char keyTracing() {
+char keyTracingArrow() {
     while (true) {
-        if (GetAsyncKeyState(VK_LEFT) & 0x8000) { // Ïðîâåðÿåì, íàæàòà ëè êëàâèøà âëåâî
+        if (GetAsyncKeyState(VK_LEFT) & 0x8000) { // Отслеживание нажатия клавиши Влево
             return L'l';
         }
-        else if (GetAsyncKeyState(VK_UP) & 0x8000) { // Ïðîâåðÿåì, íàæàòà ëè êëàâèøà ââåðõ
+        else if (GetAsyncKeyState(VK_UP) & 0x8000) { // Вверх
             return L'u';
         }
-        else if (GetAsyncKeyState(VK_RIGHT) & 0x8000) { // Ïðîâåðÿåì, íàæàòà ëè êëàâèøà âïðàâî
+        else if (GetAsyncKeyState(VK_RIGHT) & 0x8000) { // Вправо
             return L'r';
         }
-        else if (GetAsyncKeyState(VK_DOWN) & 0x8000) { // Ïðîâåðÿåì, íàæàòà ëè êëàâèøà âíèç
+        else if (GetAsyncKeyState(VK_DOWN) & 0x8000) { // Вниз
             return L'd';
         }
-        else if (GetAsyncKeyState(VK_BACK) & 0x8000) { // Ïðîâåðÿåì, íàæàòà ëè êëàâèøà Backspace
+        else if (GetAsyncKeyState(VK_BACK) & 0x8000) { // BACKSPACE
             return L'b';
         }
-        else if (GetAsyncKeyState(VK_SPACE) & 0x8000) { // Ïðîâåðÿåì, íàæàòà ëè êëàâèøà Ïðîáåë
-            return L's';
+        else if (GetAsyncKeyState(VK_RETURN) & 0x8000) { // ENTER
+            return L'e';
         }
     }
 }
 
-void tracingUD(short int& c) { // Ïðîâåðêà íà íàæàòèå ââåðõ è âíèç
-    char a = keyTracing();
-    Sleep(200); // Çàäåðæêà (0.2 ñåê), èíà÷å çà 1 íàæàòèå áóäåò âûïîëíåíî ìíîãî ðàç
-    switch (a) {
-    case L'u':
-        c += 1;
-        break;
-    case L'd':
-        c -= 1;
-        break;
-    case L's':
-        c = 200;
-        break;
-    default:
-        break;
+char keyTracing() {
+    while (true) {
+        for (int i = 49; i <= 57; ++i) { // Цифры от 1 до 9
+            if (GetAsyncKeyState(i) & 0x8000)
+                return char(i);
+        }
+        if (GetAsyncKeyState(VK_BACK) & 0x8000) // Backspace
+            return L'b';
+        else if (GetAsyncKeyState(VK_RETURN) & 0x8000) // Enter
+            return L'e';
     }
 }
 
-void tracingLR(short int& c) { // Ïðîâåðêà íà íàæàòèå ëåâî è ïðàâî
-    wchar_t a = keyTracing();
-    Sleep(200); // Çàäåðæêà (0.2 ñåê), èíà÷å çà 1 íàæàòèå áóäåò âûïîëíåíî ìíîãî ðàç
+short int tracing(short int c) { // принимает максимальное количество чисел для выбора и возращает выбранное число или 0 в случае выхода
+    char a = keyTracing();
+    Sleep(200);
+    switch (a) {
+    case '1':
+        if (1 <= c)
+            return 1;
+        break;
+    case '2':
+        if (2 <= c)
+            return 2;
+        break;
+    case '3':
+        if (3 <= c)
+            return 3;
+        break;
+    case '4':
+        if (4 <= c)
+            return 4;
+        break;
+    case '5':
+        if (5 <= c)
+            return 5;
+        break;
+    case '6':
+        if (6 <= c)
+            return 6;
+        break;
+    case '7':
+        if (7 <= c)
+            return 7;
+        break;
+    case '8':
+        if (8 <= c)
+            return 8;
+        break;
+    case '9':
+        if (9 <= c)
+            return 9;
+        break;
+    case 'b':
+        return 0;
+        break;
+    }
+    tracing(c);
+}
+
+void tracingLR(short int& c) {
+    wchar_t a = keyTracingArrow();
+    Sleep(200);
     switch (a) {
     case L'r':
         c += 1;
@@ -67,7 +109,7 @@ void tracingLR(short int& c) { // Ïðîâåðêà íà íàæàòèå ëåâî 
     case L'l':
         c -= 1;
         break;
-    case L's':
+    case L'e':
         c = 200;
         break;
     default:
@@ -75,4 +117,4 @@ void tracingLR(short int& c) { // Ïðîâåðêà íà íàæàòèå ëåâî 
     }
 }
 
-#endif // CLICKTRACKING_H
+#endif 
