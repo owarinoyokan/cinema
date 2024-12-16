@@ -57,7 +57,7 @@ int rando()
 {
     static random_device rd;						// Генератор чисел
     static default_random_engine re(rd());			// Генератор неповтояющихся чисел на основе rd
-    uniform_int_distribution<int> nums(1, 7);	// Подбор чисел в диапозоне от min до max
+    uniform_int_distribution<int> nums(1, 6);	// Подбор чисел в диапозоне от min до max
 
     return nums(re); // Генерация случайного числа
 }
