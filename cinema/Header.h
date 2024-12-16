@@ -1343,7 +1343,8 @@ void choosingPlace(Session& session, int day) {
 	wcout << L"Выберите способ бронирования мест:\n";
 	wcout << L"1. Автоподбор мест\n";
 	wcout << L"2. Ручной выбор мест\n";
-	wcout << L"0. Вернуться назад\n";
+	//wcout << L"0. Вернуться назад\n";
+	wcout << L"Нажмите BACKSPACE, чтобы вернуться назад\n";
 	wcout << L"Введите ваш выбор: ";
 	while (true) {
 
@@ -1354,14 +1355,16 @@ void choosingPlace(Session& session, int day) {
 		}
 
 
-		if (!correctInput(choice) || (choice != 1 && choice != 2 && choice != 0)) {
+		/*if (!correctInput(choice) || (choice != 1 && choice != 2 && choice != 0)) {
 			if (choice != 1 && choice != 2) {
 				cnt_error_messeg += 3;
 				wcout << L"Некорректный ввод. Введите 1 или 2.\n";
 				continue;
 			}
 			continue;
-		}
+		}*/
+
+		choice = tracing(2);
 
 		if (choice == 0) {
 			ClearScreen();
@@ -1378,17 +1381,17 @@ void choosingPlace(Session& session, int day) {
 					cnt_error_messeg = 0;
 					continue;
 				}
-				wcout << L"Введите количество мест (меньше "<< all_free_places << L"): ";
+				wcout << L"\nВведите количество мест (меньше "<< all_free_places << L"): ";
 
 				if (!correctInput(cnt_places)) {
 					++cnt_error_messeg;
-					wcout << L"Некорректный ввод. Введите количество мест заново.\n";
+					wcout << L"\nНекорректный ввод. Введите количество мест заново.\n";
 					continue;
 				}
 
 				if (cnt_places <= 0 || cnt_places > all_free_places) {
 					++cnt_error_messeg;
-					wcout << L"Количество мест вне диапазона. Пожалуйста, введите корректное количество.\n";
+					wcout << L"\nКоличество мест вне диапазона. Пожалуйста, введите корректное количество.\n";
 					continue;
 				}
 
@@ -1427,10 +1430,10 @@ void choosingPlace(Session& session, int day) {
 					cnt_error_messeg = 0;
 					continue;
 				}
-				wcout << L"Сколько мест вы хотите купить? ";
+				wcout << L"\nСколько мест вы хотите купить? ";
 				if (!correctInput(cnt_places)) {
 					++cnt_error_messeg;
-					wcout << L"Некорректный ввод. Введите количество мест заново.\n";
+					wcout << L"\nНекорректный ввод. Введите количество мест заново.\n";
 					continue;
 				}
 
