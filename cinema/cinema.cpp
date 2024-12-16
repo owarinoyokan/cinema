@@ -600,7 +600,6 @@ void generationTrioDays(TrioDays& trio)
 }
 
 void ConsoleMode() {
-    ResizeConsoleWindow(20, 60);
     // открытие консоли в полном экране
     fullScreen();
 
