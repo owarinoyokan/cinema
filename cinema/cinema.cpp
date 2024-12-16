@@ -607,11 +607,10 @@ void ConsoleMode() {
     setMode16();
 
     // Название для консоли
-    SetConsoleTitle(L"Кинотеатр \"6104\"");
+    SetConsoleTitle(L"Кинотеатр \"CineWave\"");
 
     // Масштаб -1
     PressCtrlMinus(1);
-    
 }
 
 int main() {

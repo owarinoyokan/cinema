@@ -1089,7 +1089,7 @@ void printReceiptDetails(const vector<int>& bookedRows, const vector<int>& booke
 		};
 
 	// Анимация строки
-	auto animateLine = [](const wstring& line, int delayMs = 50) {
+	auto animateLine = [](const wstring& line, int delayMs = 10) {
 		for (const wchar_t& c : line) {
 			wcout << c;
 			this_thread::sleep_for(chrono::milliseconds(delayMs));
