@@ -41,16 +41,32 @@ char keyTracingArrow() {
 
 char keyTracing() {
     while (true) {
-        for (int i = 49; i <= 57; ++i) { // Цифры от 1 до 9
-            if (GetAsyncKeyState(i) & 0x8000)
+        // Проверка обычных цифр от 1 до 9 (код 49 - 57) и 0 (код 48)
+        for (int i = 48; i <= 57; ++i) {
+            if (GetAsyncKeyState(i) & 0x8000) {
                 return char(i);
+            }
         }
-        if (GetAsyncKeyState(VK_BACK) & 0x8000) // Backspace
-            return L'b';
-        else if (GetAsyncKeyState(VK_RETURN) & 0x8000) // Enter
-            return L'e';
+
+        // Проверка для NumPad
+        for (int i = 96; i <= 105; ++i) { // NumPad цифры от 0 до 9
+            if (GetAsyncKeyState(i) & 0x8000) {
+                return char(i - 48); // Приводим к ASCII, чтобы 0 на NumPad возвращал '0', 1 - '1' и т.д.
+            }
+        }
+
+        // Проверка на Backspace
+        if (GetAsyncKeyState(VK_BACK) & 0x8000) {
+            return 'b'; // Возвращаем 'b' для Backspace
+        }
+
+        // Проверка на Enter
+        else if (GetAsyncKeyState(VK_RETURN) & 0x8000) {
+            return 'e'; // Возвращаем 'e' для Enter
+        }
     }
 }
+
 
 short int tracing(short int c) { // принимает максимальное количество чисел для выбора и возращает выбранное число или 0 в случае выхода
     char a = keyTracing();

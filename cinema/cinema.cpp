@@ -46,6 +46,7 @@ void extranceToCinema() { // Функция входа в кино, предла
     wcout << L"1. выбрать фильм" << endl;
     wcout << L"Нажмите BACKSPACE чтобы вернуться назад" << endl;
     input = tracing(1);
+    FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
     switch (input) {
     case 1:
         movieSelection();
@@ -65,6 +66,7 @@ void availablePromo() { // Функция для просмотра доспуп
     wcout << L"1. чтобы испытать удачу в игре" << endl;
     wcout << L"Нажмите BACKSPACE чтобы вернуться назад" << endl;
     input = tracing(1);
+    FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
     switch (input) {
     case 1:
         TheActionGame();
@@ -171,6 +173,7 @@ void movieSelection() { // Функция выводяшая список фил
     wcout << L"Нажмите BACKSPACE чтобы вернуться назад" << endl;
 
     input = tracing(3);
+    FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
     switch (input) {
     case 1:
         selectionDay(1);
@@ -344,6 +347,7 @@ void returnSessions(int day, int input)
         wcout << L"Нажмите BACKSPACE, чтобы вернуться назад" << endl;
         short int input;
         input = tracing(sessions_film.size());
+        FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
         switch (input) {
         case 0:
             ClearScreen();

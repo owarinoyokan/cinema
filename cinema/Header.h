@@ -717,6 +717,7 @@ void filterSessions(TrioDays& trio_days) {
 			wcout << L"Нажмите BACKSPACE чтобы вернуться назад\n";
 			short int input;
 			input = tracing(2);
+			FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
 
 			ClearScreen();
 			for (size_t i = 0; i < foundFilms.size(); ++i) {
@@ -750,6 +751,7 @@ void filterSessions(TrioDays& trio_days) {
 				int filmIndex = -1;
 				while (filmIndex < 1 || filmIndex > foundFilms.size()) {
 					wstring input;
+					FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
 					getline(wcin, input);
 
 					// Проверка
