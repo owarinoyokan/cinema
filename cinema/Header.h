@@ -1227,12 +1227,12 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 		}
 
 		// Запрос на повторный ввод
-		wcout << L"Хотите ввести промокод ещё раз? (y/n): ";
-		wchar_t choice;
+		wcout << L"Если хотите ввести промокод ещё раз, введите (yes): ";
+		wstring choice;
 		wcin >> choice;
 		wcin.ignore(INT_MAX, L'\n'); // Очищаем оставшиеся символы после ввода
 		ClearScreenFromPosition(0, 0);
-		if (choice != L'y' && choice != L'Y') {
+		if (choice != L"yes" && choice != L"Yes") {
 			wcout << L"Применение промокода завершено. Сумма без изменений.\n";
 			break; // Выход из цикла, если пользователь не хочет вводить промокод
 		}
@@ -1315,7 +1315,7 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 		break;
 	}
 
-	printReceiptDetails(bookedRows, bookedPlaces, cnt_places, totalcostwithoutdiscount , totalBuffetCost,filmName, filmTime, genre, duration, summ, discountAmount);
+	printReceiptDetails(bookedRows, bookedPlaces, cnt_places, totalcostwithoutdiscount, totalBuffetCost, filmName, filmTime, genre, duration, summ, discountAmount);
 	wcout << L"Спасибо за ваш выбор! Транзакция завершена.\n";
 }
 
