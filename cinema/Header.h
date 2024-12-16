@@ -612,6 +612,9 @@ bool correctInput(int& number) {
 	if (ss.fail() || !ss.eof()) { // Если преобразование не удалось или остались лишние символы
 		return false;
 	}
+	if (number > 100) {
+		return false; // Число не может быть больше 100
+	}
 	return true; // Успех
 }
 
@@ -852,7 +855,43 @@ bool autoChoosingPlace(Session& session, int cnt_places, int& bookedRow, vector<
 }
 
 
+void printSeatsWithAnimation(const wstring& rows, const wstring& places) {
+	int width = 3;  // Устанавливаем ширину для выравнивания чисел
+	int maxLineLength = 40;  // Максимальная длина строки (например, 80 символов)
 
+	// Разделение строк на блоки
+	wstringstream rowStream(rows), placeStream(places);
+	wstring row, place;
+
+	int currentLineLength = 0;  // Переменная для отслеживания текущей длины строки
+
+	// Выводим ряды и места с выравниванием
+	wcout << L"-------------------------------------------------------------------\n";
+
+	while (getline(rowStream, row, L',')) {
+		// Выводим ряд с выравниванием
+		wcout << L" Ряд:" << std::setw(width) << std::stoi(row);
+		wcout << L" ";  // Добавляем пробел между рядами
+		wcout << L" ";
+
+		// Проверяем, есть ли место для соответствующего ряда
+		if (getline(placeStream, place, L',')) {
+			// Выводим место с выравниванием
+			wcout << L" Место:" << std::setw(width) << std::stoi(place);
+			wcout << L" ";  // Добавляем пробел между местами
+			wcout << L" ";
+		}
+
+		// Проверяем, достигли ли мы максимальной длины строки
+		currentLineLength += 2 * width + 8; // 2 * width (для ряда и места) + 8 символов на пробелы и текст
+
+		if (currentLineLength >= maxLineLength) {
+			wcout << endl;  // Переход на новую строку
+			currentLineLength = 0;  // Сбрасываем длину строки
+		}
+	}
+	wcout << L"\n-------------------------------------------------------------------\n";
+}
 
 
 
@@ -883,26 +922,7 @@ void printTicketDetails(const vector<int>& bookedRows, const vector<int>& booked
 	wcout << L" Время:                    " << filmTime << L"\n";
 	wcout << L" Длительность:             " << duration << L"\n";
 	wcout << L" -----------------------------------------------------------------\n";
-
-	wcout << L" Ваши места: \n";
-	wcout << L" -----------------------------------------------------------------\n";
-	wcout << L" Ряды:         ";
-	wstringstream rowStream(rows);
-	wstring row;
-	while (getline(rowStream, row, L',')) {
-		wcout << std::setw(width) << std::stoi(row);  // Выводим ряд с выравниванием
-		wcout << L" ";  // Добавляем пробел между рядами
-	}
-	wcout << endl;
-	wcout << L" Места:        ";
-	wstringstream placeStream(places);
-	wstring place;
-	while (getline(placeStream, place, L',')) {
-		wcout << std::setw(width) << std::stoi(place);  // Выводим место с выравниванием
-		wcout << L" ";  // Добавляем пробел между местами
-	}
-	wcout << endl;
-	wcout << L" -----------------------------------------------------------------" << endl;
+	printSeatsWithAnimation(rows, places);
 
 	wcout << L" Количество билетов: " << cnt_places << L"\n";
 	wcout << L" Итого к оплате:     " << totalTicketCost << L"₽\n";
@@ -927,6 +947,8 @@ void displayMenuFromFile(const wstring& menuFile) {
 
 	file.close();
 }
+
+
 void loadAndShowBuffetMenu(double& totalBuffetCost) {
 	// Визуальная часть меню выводится из файла
 	displayMenuFromFile(L"menu.txt");
@@ -996,56 +1018,21 @@ void loadAndShowBuffetMenu(double& totalBuffetCost) {
 	}
 }
 
-void printSeatsWithAnimation(const wstring& rows, const wstring& places) {
-	int width = 2;  // Устанавливаем ширину для вывода
-
-	// Анимация вывода
-	wcout << L"-------------------------------------------------------------------\n";
-	wcout << L" Ряды:         ";
-
-	// Выводим ряды с выравниванием по ширине и анимацией
-	wstringstream rowStream(rows);
-	wstring row;
-	bool firstRow = true;
-	while (getline(rowStream, row, L',')) {  // Разделяем ряды по запятой
-		if (!firstRow) {
-			wcout << L" ";  // Добавляем пробел между рядами
-		}
-		wcout << std::setw(width) << std::stoi(row);  // Выводим ряд с выравниванием
-		firstRow = false;  // Перестаем добавлять пробел для первого ряда
-		this_thread::sleep_for(chrono::milliseconds(3));  // Задержка для анимации
-	}
-	wcout << endl;
-
-	wcout << L" Места:        ";
-
-	// Выводим места с выравниванием по ширине и анимацией
-	wstringstream placeStream(places);
-	wstring place;
-	bool firstPlace = true;
-	while (getline(placeStream, place, L',')) {  // Разделяем места по запятой
-		if (!firstPlace) {
-			wcout << L" ";  // Добавляем пробел между местами
-		}
-		wcout << std::setw(width) << std::stoi(place);  // Выводим место с выравниванием
-		firstPlace = false;  // Перестаем добавлять пробел для первого места
-		this_thread::sleep_for(chrono::milliseconds(3));  // Задержка для анимации
-	}
-	wcout << endl;
-	wcout << L"-------------------------------------------------------------------\n";
-}
 
 
-void printReceiptDetails(const vector<int>& bookedRows, const vector<int>& bookedPlaces, int cnt_places, double totalTicketCost, double buffetCost, const wstring& filmName, const wstring& filmTime, const wstring& genre, const wstring& duration, double summ,double discountAmount) {
+
+
+void printReceiptDetails(const vector<int>& bookedRows, const vector<int>& bookedPlaces, int cnt_places, double totalTicketCost, double buffetCost, const wstring& filmName, const wstring& filmTime, const wstring& genre, const wstring& duration, double summ, double discountAmount) {
 	// Цвета для вывода
 	auto setColor = [](int text, int background = 0) {
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (background << 4) | text);
 		};
 
 	// Анимация строки
-	auto animateLine = [](const wstring& line) {
+	auto animateLine = [](const wstring& line, int delayMs = 5) {
 		for (const wchar_t& c : line) {
 			wcout << c;
+			this_thread::sleep_for(chrono::milliseconds(delayMs));
 		}
 		wcout << endl;
 		};
@@ -1118,6 +1105,7 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 	const wstring& genre, const wstring& duration) {
 	int paymentChoice;
 	wstring promoCode;
+	double totalcostwithoutdiscount = totalTicketCost;
 	double summ = totalTicketCost + totalBuffetCost;
 	double discountAmount = 0;
 	map<wstring, double> promoCodes = {
@@ -1198,13 +1186,10 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 		wcout << L"2. Наличными\n";
 		wcout << L"Введите номер выбранного способа оплаты: ";
 
-		/*while (!correctInput(paymentChoice) || paymentChoice < 1 || paymentChoice > 2) {
-			ClearScreenFromPosition(0, 20);
+		while (!correctInput(paymentChoice) || paymentChoice < 1 || paymentChoice > 2) {
+			ClearScreenFromPosition(0, 9);
 			wcout << L"Некорректный ввод. Попробуйте снова.\n";
-		}*/
-
-		paymentChoice = tracing(2);
-		FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
+		}
 
 		// Если ввод корректный, очищаем сообщения об ошибке
 		switch (paymentChoice) {
@@ -1232,8 +1217,18 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 				if (expiryDate.size() == 5 && expiryDate[2] == L'/' &&
 					iswdigit(expiryDate[0]) && iswdigit(expiryDate[1]) &&
 					iswdigit(expiryDate[3]) && iswdigit(expiryDate[4])) {
-					break;
+
+					// Извлекаем месяц и год
+					int month = (expiryDate[0] - L'0') * 10 + (expiryDate[1] - L'0');
+					int year = (expiryDate[3] - L'0') * 10 + (expiryDate[4] - L'0');
+
+					// Проверка на месяц (не более 12)
+					if (month >= 1 && month <= 12 && year >= 24) {
+						break;  // Ввод корректен
+					}
 				}
+
+				// Если проверка не пройдена, очищаем экран и просим ввести снова
 				ClearScreenFromPosition(0, 11);
 				wcout << L"Некорректная дата. Попробуйте снова.\n";
 			}
@@ -1261,9 +1256,9 @@ void choosePaymentMethod(double totalTicketCost, int cnt_places, double& totalBu
 		break;
 	}
 
-	printReceiptDetails(bookedRows, bookedPlaces, cnt_places, totalTicketCost, totalBuffetCost,
-		filmName, filmTime, genre, duration, summ, discountAmount);
+	printReceiptDetails(bookedRows, bookedPlaces, cnt_places, totalcostwithoutdiscount, totalBuffetCost, filmName, filmTime, genre, duration, summ, discountAmount);
 	wcout << L"Спасибо за ваш выбор! Транзакция завершена.\n";
+
 	system("pause");
 	
 	extranceToCinema();
@@ -1356,7 +1351,7 @@ void choosingPlace(Session& session, int day) {
 
 				// Вывод всех деталей билета
 				printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalTicketCost, session.film_name, session.time_film, session.genre, session.duration);
-				Sleep(3000);  // Задержка в 2000 миллисекунд (2 секунды)
+				system("pause");  // Задержка в 2000 миллисекунд (2 секунды)
 				system("cls");
 				loadAndShowBuffetMenu(totalBuffetCost);
 				Sleep(1000);
@@ -1445,7 +1440,7 @@ void choosingPlace(Session& session, int day) {
 				Sleep(1000);  // Задержка в 2000 миллисекунд (2 секунды)
 				system("cls");
 				printTicketDetails(bookedRows, bookedPlaces, cnt_places, totalTicketCost, session.film_name, session.time_film, session.genre, session.duration);
-				Sleep(3000);
+				system("pause");
 				system("cls");
 				loadAndShowBuffetMenu(totalBuffetCost);
 				Sleep(1000);
