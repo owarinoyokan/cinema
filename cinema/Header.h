@@ -1367,7 +1367,7 @@ void choosingPlace(Session& session, int day) {
 			vector<int> bookedRows; // Список забронированных рядов
 			vector<int> bookedPlaces; // Список забронированных мест
 			while (true) {
-				if (cnt_error_messeg > 3) {
+				if (cnt_error_messeg > 1) {
 					ClearScreenFromPosition(0, 42);
 					cnt_error_messeg = 0;
 					continue;
@@ -1379,7 +1379,7 @@ void choosingPlace(Session& session, int day) {
 					continue;
 				}
 
-				if (cnt_places <= 0 || cnt_places > 16) {
+				if (cnt_places <= 0 || cnt_places > all_free_places) {
 					++cnt_error_messeg;
 					wcout << L"\nКоличество мест вне диапазона. Пожалуйста, введите корректное количество.\n";
 					continue;
