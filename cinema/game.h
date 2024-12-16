@@ -35,18 +35,21 @@ void what_is_action(int res_user) {
     case 4: {
         wcout << L"Вам выпала акция \"Хорошая\":\n";
         wcout << L"При покупке скидка 10% на весь чек.\n\n";
+        wcout << L"Ваш промокод LUCKY10\n";
         lucky = true;
         break;
     }
     case 5: {
         wcout << L"Вам выпала акция \"Большая компания\":\n";
         wcout << L"При покупке пяти билетов скидка на каждый билет 25%\n\n";
+        wcout << L"Ваш промокод BIGGROUP25 применим только при покупке 5 билетов.\n";
         lucky = true;
         break;
     }
     case 6: {
         wcout << L"Вам выпала акция \"ЛУЧШАЯ АКЦИЯ\"!:\n";
         wcout << L"При покупке билета скидка 35%.\n\n";
+        wcout << L"Ваш промокод BEST35\n";
         lucky = true;
         break;
     }
