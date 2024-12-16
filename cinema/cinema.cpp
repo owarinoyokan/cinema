@@ -596,7 +596,7 @@ void generationTrioDays(TrioDays& trio)
 }
 
 void ConsoleMode() {
-
+    ResizeConsoleWindow(20, 60);
     // открытие консоли в полном экране
     fullScreen();
 
@@ -608,6 +608,7 @@ void ConsoleMode() {
 
     // Масштаб -1
     PressCtrlMinus(1);
+    
 }
 
 int main() {

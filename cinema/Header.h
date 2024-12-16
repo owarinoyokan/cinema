@@ -371,6 +371,20 @@ void EnterClear() {
 	keybd_event(VK_NEXT, 0, KEYEVENTF_KEYUP, 0); // Отпуск Page Down
 }
 
+void ResizeConsoleWindow(int width, int height) {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE); // Получить дескриптор консоли
+
+	// Установить размер буфера
+	COORD bufferSize = { static_cast<SHORT>(width), static_cast<SHORT>(height) };
+	SetConsoleScreenBufferSize(hConsole, bufferSize);
+
+	// Установить размер окна
+	SMALL_RECT windowSize = { 0, 0, static_cast<SHORT>(width - 1), static_cast<SHORT>(height - 1) };
+	SetConsoleWindowInfo(hConsole, TRUE, &windowSize);
+}
+
+
+
 void fullScreen() {
 	COORD coord;
 	SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_FULLSCREEN_MODE, &coord);
